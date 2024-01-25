@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPM & Damage Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a; /* Darker grey background */
+            color: #fff; /* White text */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #9800FA; /* Vibrant purple header text */
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 500px;
+			border-radius: 10px;
+            background-color: #703B94 /* Dark purple tab background */
+        }
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            color: white; /* Vibrant purple tab text color */
+            cursor: pointer;
+			border-radius: 10px;
+            transition: background-color 0.3s;
+        }
+        .tab:hover {
+            background-color: #513A61; /* Purple tab background on hover */
+        }
+        .calculator-container {
+            width: 90%;
+            max-width: 500px;
+            background-color: #1a1a1a; /* Darker calculator background */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            margin-right: 10px;
+            display: inline-block;
+            width: 40%; /* Adjust the width as needed */
+            color: white; /* Grey label text color */
+        }
+        input, button {
+            width: 100%;
+            background-color: #1a1a1a; /* Dark grey input background */
+            color: #fff; /* White text */
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            border: 1px solid #9800FA; /* Purple border */
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        button {
+            cursor: pointer;
+            background-color: #513A61; /* Purple button background */
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #703B94; /* Lighter purple button background on hover */
+        }
+        .result {
+            margin-top: 20px;
+            color: #50fa7b; /* Green result text */
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<h1>RPM & Damage Calculator</h1>
+
+<div class="tabs">
+    <div class="tab" onclick="switchTab(1)">RPM</div>
+    <div class="tab" onclick="switchTab(2)">Damage</div>
+    <div class="tab" onclick="switchTab(3)">Roll</div>
+</div>
+
+<div class="calculator-container" id="tab1">
+    <div class="input-group">
+        <label for="baseRpm">Base RPM:</label>
+        <input type="number" id="baseRpm" placeholder="Enter Base RPM">
+    </div>
+
+    <div class="input-group">
+        <label for="rpmStat">RPM Stat (%):</label>
+        <input type="number" id="rpmStat" placeholder="Enter RPM Stat">
+    </div>
+
+    <div class="input-group">
+        <label for="rpmTalent">RPM Talent (%):</label>
+        <input type="number" id="rpmTalent" placeholder="Enter RPM Talent">
+    </div>
+
+    <div class="input-group">
+        <label for="rpmTalent2">RPM Talent 2 (%):</label>
+        <input type="number" id="rpmTalent2" placeholder="Enter RPM Talent 2">
+    </div>
+
+    <p id="rpmResult" class="result"></p>
+    <p id="functionalRpmResult" class="result"></p>
+</div>
+
+<div class="calculator-container" id="tab2" style="display: none;">
+    <div class="input-group">
+        <label for="baseDamage">Base Damage:</label>
+        <input type="number" id="baseDamage" placeholder="Enter Base Damage" step="0.01">
+    </div>
+
+    <div class="input-group">
+        <label for="damageStat">Damage Stat (%):</label>
+        <input type="number" id="damageStat" placeholder="Enter Damage Stat">
+    </div>
+
+    <div class="input-group">
+        <label for="talent1">Talent 1 (%):</label>
+        <input type="number" id="talent1" placeholder="Enter Talent 1">
+    </div>
+
+    <div class="input-group">
+        <label for="talent2">Talent 2 (%):</label>
+        <input type="number" id="talent2" placeholder="Enter Talent 2">
+    </div>
+
+    <div class="input-group">
+        <label for="hsmLimb">HSM/Limb:</label>
+        <input type="number" id="hsmLimb" placeholder="Enter HSM/Limb" step="0.01">
+    </div>
+
+    <p id="damageResult" class="result"></p>
+    <p id="armoredDamageResult" class="result"></p>
+</div>
+
+<div class="calculator-container" id="tab3" style="display: none">
+    <div class="input-group">
+        <label for="minimum">Minimum:</label>
+        <input type="number" id="minimum" placeholder="Enter Minimum">
+    </div>
+
+    <div class="input-group">
+        <label for="maximum">Maximum:</label>
+        <input type="number" id="maximum" placeholder="Enter Maximum">
+    </div>
+
+    <div class="input-group">
+        <label for="roll">Roll:</label>
+        <input type="number" id="roll" placeholder="Enter Roll">
+    </div>
+
+    <p id="rollResult" class="result"></p>
+</div>
+
+<script>
+    function calculateRPM() {
+        var baseRpm = parseFloat(document.getElementById("baseRpm").value) || 0;
+        var rpmStat = parseFloat(document.getElementById("rpmStat").value) || 0;
+        var rpmTalent = parseFloat(document.getElementById("rpmTalent").value) || 0;
+        var rpmTalent2 = parseFloat(document.getElementById("rpmTalent2").value) || 0;
+
+        // Convert percentages to decimals
+        rpmStat /= 100;
+        rpmTalent /= 100;
+        rpmTalent2 /= 100;
+
+        var effectiveRpm = baseRpm / (1 - rpmStat) / (1 - rpmTalent) / (1 - rpmTalent2);
+
+        var rpmResultElement = document.getElementById("rpmResult");
+        rpmResultElement.innerHTML = "The effective RPM is: " + (isFinite(effectiveRpm) ? effectiveRpm.toFixed(2) : "∞");
+        rpmResultElement.style.color = "#50fa7b"; /* Green result text */
+        rpmResultElement.style.fontWeight = "bold";
+
+        // Calculate and display Functional RPM
+        var functionalRPMList = [
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+            21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38,
+            39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56,
+            57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 88, 90,
+            99, 110, 120, 132, 165, 180, 198, 220, 264, 360, 396, 440, 495, 565, 660,
+            792, 990, 1320, 1980, 3960
+        ];
+
+        var roundedDownRPM = Math.max.apply(null, functionalRPMList.filter(val => val <= effectiveRpm));
+
+        var functionalRpmResultElement = document.getElementById("functionalRpmResult");
+        functionalRpmResultElement.innerHTML = "The Functional RPM is: " + (isFinite(roundedDownRPM) ? roundedDownRPM : "∞");
+        functionalRpmResultElement.style.color = "#50fa7b"; /* Green result text */
+        functionalRpmResultElement.style.fontWeight = "bold";
+    }
+
+    function calculateDamage() {
+        var baseDamage = parseFloat(document.getElementById("baseDamage").value) || 0;
+        var damageStat = parseFloat(document.getElementById("damageStat").value) || 0;
+        var talent1 = parseFloat(document.getElementById("talent1").value) || 0;
+        var talent2 = parseFloat(document.getElementById("talent2").value) || 0;
+        var hsmLimb = parseFloat(document.getElementById("hsmLimb").value) || 1;
+
+        // Convert percentages to decimals and add to the base percentage of 100%
+        damageStat = (damageStat / 100) + 1;
+        talent1 = (talent1 / 100) + 1;
+        talent2 = (talent2 / 100) + 1;
+        hsmLimb /= 100;
+
+        // Calculate effective Damage
+        var effectiveDamage = baseDamage * damageStat * talent1 * talent2 * hsmLimb * 100; // Multiply by 100
+
+        // Calculate Armored Damage
+        var armoredDamage = effectiveDamage * (1-0.3);
+
+        var damageResultElement = document.getElementById("damageResult");
+        damageResultElement.innerHTML = "Damage: " + effectiveDamage.toFixed(2);
+        damageResultElement.style.color = "#50fa7b"; /* Green result text */
+        damageResultElement.style.fontWeight = "bold";
+
+        var armoredDamageResultElement = document.getElementById("armoredDamageResult");
+        armoredDamageResultElement.innerHTML = "Armored Damage: " + armoredDamage.toFixed(2);
+        armoredDamageResultElement.style.color = "#50fa7b"; /* Green result text */
+        armoredDamageResultElement.style.fontWeight = "bold";
+    }
+	function calculateRoll() {
+        var minimum = parseFloat(document.getElementById("minimum").value) || 0;
+        var maximum = parseFloat(document.getElementById("maximum").value) || 0;
+        var roll = parseFloat(document.getElementById("roll").value) || 0;
+
+        // Calculate the result ((Maximum - Minimum) * Roll) + Minimum
+        var rollResult = ((maximum - minimum) * roll) + minimum;
+
+        var rollResultElement = document.getElementById("rollResult");
+        rollResultElement.innerHTML = "Result: " + rollResult.toFixed(2);
+        rollResultElement.style.color = "#50fa7b"; /* Green result text */
+        rollResultElement.style.fontWeight = "bold";
+    }
+	
+	function switchTab(tab) {
+    var tab1 = document.getElementById("tab1");
+    var tab2 = document.getElementById("tab2");
+    var tab3 = document.getElementById("tab3");
+
+    switch (tab) {
+        case 1:
+            tab1.style.display = "block";
+            tab2.style.display = "none";
+            tab3.style.display = "none";
+            calculateRPM();
+            break;
+        case 2:
+            tab1.style.display = "none";
+            tab2.style.display = "block";
+            tab3.style.display = "none";
+            calculateDamage();
+            break;
+        case 3:
+            tab1.style.display = "none";
+            tab2.style.display = "none";
+            tab3.style.display = "block";
+            calculateRoll();
+            break;
+        default:
+            // Handle default case or do nothing
+            break;
+    }
+}
+		
+		
+
+    // Attach the calculate functions to input change events
+    var inputElementsTab1 = document.querySelectorAll('#tab1 input');
+    inputElementsTab1.forEach(function (input) {
+        input.addEventListener('input', calculateRPM);
+    });
+
+    var inputElementsTab2 = document.querySelectorAll('#tab2 input');
+    inputElementsTab2.forEach(function (input) {
+        input.addEventListener('input', calculateDamage);
+    });
+	
+	var inputElementsTab3 = document.querySelectorAll('#tab3 input');
+    inputElementsTab3.forEach(function (input) {
+        input.addEventListener('input', calculateRoll);
+    });
+	
+	
+</script>
+
+</body>
+</html>
