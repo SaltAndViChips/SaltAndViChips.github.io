@@ -159,6 +159,7 @@
     <p id="damageResult" class="result"></p>
 	<p id="pelletsResult" class="result"></p>
     <p id="armoredDamageResult" class="result"></p>
+	<p id="pelletsarmoredDamageResult" class="result"></p>
 	
 </div>
 
@@ -267,7 +268,7 @@
     
 	var pelletsResultElement = document.getElementById("pelletsResult");
 	if (pellets > 1) {
-        pelletsResultElement.innerHTML = "Total Damage: " + (baseDamage*pellets);
+        pelletsResultElement.innerHTML = "Total Damage: " + (isFinite(effectiveDamage) ? effectiveDamage.toFixed(2) : effectiveDamage) * pellets;
         pelletsResultElement.style.color = "#50fa7b"; /* Green result text */
         pelletsResultElement.style.fontWeight = "bold";
     } else {
@@ -275,9 +276,25 @@
     }
 
     var armoredDamageResultElement = document.getElementById("armoredDamageResult");
-    armoredDamageResultElement.innerHTML = "Armored Damage: " + (isFinite(armoredDamage) ? armoredDamage.toFixed(2) : armoredDamage);
-    armoredDamageResultElement.style.color = "#50fa7b"; /* Green result text */
-    armoredDamageResultElement.style.fontWeight = "bold";
+    if (pellets > 1) {
+        armoredDamageResultElement.innerHTML = "Single Pellet Armored Damage: " + (isFinite(armoredDamage) ? armoredDamage.toFixed(2) : armoredDamage);
+		armoredDamageResultElement.style.color = "#50fa7b"; /* Green result text */
+		armoredDamageResultElement.style.fontWeight = "bold";
+    } else {
+        armoredDamageResultElement.innerHTML = "Armored Damage: " + (isFinite(armoredDamage) ? armoredDamage.toFixed(2) : armoredDamage);
+		armoredDamageResultElement.style.color = "#50fa7b"; /* Green result text */
+		armoredDamageResultElement.style.fontWeight = "bold";
+    }
+	
+	
+	 var  pelletsArmorResultElement = document.getElementById("pelletsarmoredDamageResult");
+	if (pellets > 1) {
+        pelletsArmorResultElement.innerHTML = "Total Armored Damage: " + (isFinite(armoredDamage) ? armoredDamage.toFixed(2) : armoredDamage) * pellets;
+        pelletsArmorResultElement.style.color = "#50fa7b"; /* Green result text */
+        pelletsArmorResultElement.style.fontWeight = "bold";
+    } else {
+        pelletsArmorResultElement.innerHTML = ""; // Clear the result if pellets are not greater than 1
+    }
 
     // Display the number of pellets
     
