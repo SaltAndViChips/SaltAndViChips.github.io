@@ -133,7 +133,7 @@
 <div class="calculator-container" id="tab2" style="display: none;">
     <div class="input-group">
         <label for="baseDamage">Base Damage:</label>
-        <input type="number" id="baseDamage" placeholder="Enter Base Damage" step="0.01">
+        <input type="string" id="baseDamage" placeholder="Enter Base Damage">
     </div>
 
     <div class="input-group">
@@ -153,11 +153,13 @@
 
     <div class="input-group">
         <label for="hsmLimb">HSM/Limb:</label>
-        <input type="number" id="hsmLimb" placeholder="Enter HSM/Limb" step="0.01">
+        <input type="number" id="hsmLimb" placeholder="Enter HSM/Limb">
     </div>
 
     <p id="damageResult" class="result"></p>
+	<p id="pelletsResult" class="result"></p>
     <p id="armoredDamageResult" class="result"></p>
+	
 </div>
 
 <div class="calculator-container" id="tab3" style="display: none">
@@ -217,34 +219,69 @@
     }
 
     function calculateDamage() {
-        var baseDamage = parseFloat(document.getElementById("baseDamage").value) || 0;
-        var damageStat = parseFloat(document.getElementById("damageStat").value) || 0;
-        var talent1 = parseFloat(document.getElementById("talent1").value) || 0;
-        var talent2 = parseFloat(document.getElementById("talent2").value) || 0;
-        var hsmLimb = parseFloat(document.getElementById("hsmLimb").value) || 1;
+    var baseDamageInput = document.getElementById("baseDamage").value;
+	if (baseDamageInput.includes("*")) {
+        // If it contains "*", split it into two variables: baseDamage and Pellets
+        var [baseDamage, pellets] = baseDamageInput.split('*').map(item => parseFloat(item.trim()));
 
-        // Convert percentages to decimals and add to the base percentage of 100%
-        damageStat = (damageStat / 100) + 1;
-        talent1 = (talent1 / 100) + 1;
-        talent2 = (talent2 / 100) + 1;
-        hsmLimb /= 100;
-
-        // Calculate effective Damage
-        var effectiveDamage = baseDamage * damageStat * talent1 * talent2 * hsmLimb * 100; // Multiply by 100
-
-        // Calculate Armored Damage
-        var armoredDamage = effectiveDamage * (1-0.3);
-
-        var damageResultElement = document.getElementById("damageResult");
-        damageResultElement.innerHTML = "Damage: " + effectiveDamage.toFixed(2);
-        damageResultElement.style.color = "#50fa7b"; /* Green result text */
-        damageResultElement.style.fontWeight = "bold";
-
-        var armoredDamageResultElement = document.getElementById("armoredDamageResult");
-        armoredDamageResultElement.innerHTML = "Armored Damage: " + armoredDamage.toFixed(2);
-        armoredDamageResultElement.style.color = "#50fa7b"; /* Green result text */
-        armoredDamageResultElement.style.fontWeight = "bold";
+        // Check if both baseDamage and pellets are valid numbers
+        if (isNaN(baseDamage) || isNaN(pellets)) {
+            baseDamage = 0;
+            pellets = 1;
+        }
+    } else {
+        // If it doesn't contain "*", set baseDamage and pellets with default values
+        var baseDamage = parseFloat(baseDamageInput) || 0;
+        var pellets = 1;
     }
+    var damageStat = parseFloat(document.getElementById("damageStat").value) || 0;
+    var talent1 = parseFloat(document.getElementById("talent1").value) || 0;
+    var talent2 = parseFloat(document.getElementById("talent2").value) || 0;
+    var hsmLimb = parseFloat(document.getElementById("hsmLimb").value) || 1;
+
+    // Convert percentages to decimals and add to the base percentage of 100%
+    damageStat = (damageStat / 100) + 1;
+    talent1 = (talent1 / 100) + 1;
+    talent2 = (talent2 / 100) + 1;
+    hsmLimb /= 100;
+
+    // Check if the baseDamage input contains "*"
+    
+
+    // Calculate effective Damage
+    var effectiveDamage = baseDamage * damageStat * talent1 * talent2 * hsmLimb * 100; // Multiply by 100
+
+    // Calculate Armored Damage
+    var armoredDamage = effectiveDamage * (1 - 0.3);
+
+    var damageResultElement = document.getElementById("damageResult");
+	if (pellets > 1) {
+        damageResultElement.innerHTML = "Single Pellet Damage: " + (isFinite(effectiveDamage) ? effectiveDamage.toFixed(2) : effectiveDamage);
+		damageResultElement.style.color = "#50fa7b"; /* Green result text */
+		damageResultElement.style.fontWeight = "bold";
+    } else {
+        damageResultElement.innerHTML = "Damage: " + (isFinite(effectiveDamage) ? effectiveDamage.toFixed(2) : effectiveDamage);
+		damageResultElement.style.color = "#50fa7b"; /* Green result text */
+		damageResultElement.style.fontWeight = "bold";
+    }
+    
+	var pelletsResultElement = document.getElementById("pelletsResult");
+	if (pellets > 1) {
+        pelletsResultElement.innerHTML = "Total Damage: " + (baseDamage*pellets);
+        pelletsResultElement.style.color = "#50fa7b"; /* Green result text */
+        pelletsResultElement.style.fontWeight = "bold";
+    } else {
+        pelletsResultElement.innerHTML = ""; // Clear the result if pellets are not greater than 1
+    }
+
+    var armoredDamageResultElement = document.getElementById("armoredDamageResult");
+    armoredDamageResultElement.innerHTML = "Armored Damage: " + (isFinite(armoredDamage) ? armoredDamage.toFixed(2) : armoredDamage);
+    armoredDamageResultElement.style.color = "#50fa7b"; /* Green result text */
+    armoredDamageResultElement.style.fontWeight = "bold";
+
+    // Display the number of pellets
+    
+}
 	function calculateRoll() {
         var minimum = parseFloat(document.getElementById("minimum").value) || 0;
         var maximum = parseFloat(document.getElementById("maximum").value) || 0;
