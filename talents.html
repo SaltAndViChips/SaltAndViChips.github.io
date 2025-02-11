@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Salt&#39;s Spindowns" property="og:title">
-	<meta content="Made by Salt &amp; Vi ♥" property="og:description">
-	<meta content="https://github.com/SaltAndViChips/SaltAndViChips.github.io/tree/main" property="og:url">
-	<meta content="https://saltandvichips.github.io/SaltAndViChips.github.io/profile.png" property="og:image">
-	<meta content="#00fa9a" data-react-helmet="true" name="theme-color">
-	<link rel="icon" type="image/x-icon" href="https://nicecock.ca/profile.png">
+    <meta content="Made by Salt &amp; Vi ♥" property="og:description">
+    <meta content="https://github.com/SaltAndViChips/SaltAndViChips.github.io/tree/main" property="og:url">
+    <meta content="https://saltandvichips.github.io/SaltAndViChips.github.io/profile.png" property="og:image">
+    <meta content="#00fa9a" data-react-helmet="true" name="theme-color">
     <title>Talents Dropdown</title>
     <style>
         body {
@@ -19,40 +20,135 @@
             height: 100vh;
             flex-direction: column;
         }
-        select, p {
-            font-size: 18px;
-            padding: 10px;
-            margin: 10px;
-            border-radius: 5px;
-            border: none;
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            width: 250px;
         }
-        select {
+
+        .dropdown-button {
             background-color: #1e1e1e;
             color: #00fa9a;
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 2px solid #00fa9a;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #1e1e1e;
+            border: 2px solid #00fa9a;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            border-radius: 8px;
+            z-index: 10;
+        }
+
+        .dropdown-content div {
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .dropdown-content div:hover {
+            background-color: #C200FA;
+            color: #ffffff;
+        }
+
+        .show {
+            display: block;
+        }
+
+        /* Custom scrollbar */
+        .dropdown-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .dropdown-content::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+
+        .dropdown-content::-webkit-scrollbar-thumb {
+            background: #00fa9a;
+            border-radius: 4px;
+        }
+
+        .dropdown-content::-webkit-scrollbar-thumb:hover {
+            background: #C200FA;
         }
         p {
-            background-color: #1e1e1e;
-            padding: 10px;
-            border-radius: 5px;
+        font-size: 18px;
+        margin-top: 20px;
+        color: #ffffff;
+    }
+
+    #nextTalent {
+        font-weight: bold;
+        color: #00fa9a;
+        text-transform: uppercase;
+    }
+     label {
+            font-size: 20px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00fa9a, #44b7a8);
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 4px #00fa9a, 0 0 6px #44b7a8;
+            display: block;
+            margin-bottom: 10px;
         }
     </style>
     <script>
-        function updateNextTalent() {
-            let talents = [{"Tier": 1, "ID": 1, "NotUnique": true, "Name": "Close Quarters"}, {"Tier": 2, "ID": 2, "NotUnique": true, "Name": "Stability"}, {"Tier": 3, "ID": 3, "NotUnique": true, "Name": "Phoenix"}, {"Tier": 1, "ID": 4, "NotUnique": true, "Name": "Accurate"}, {"Tier": 2, "ID": 5, "NotUnique": true, "Name": "Sustained"}, {"Tier": 1, "ID": 6, "NotUnique": true, "Name": "Brutal"}, {"Tier": 2, "ID": 7, "NotUnique": true, "Name": "Extended Mag"}, {"Tier": 1, "ID": 8, "NotUnique": true, "Name": "Adrenaline Rush"}, {"Tier": 3, "ID": 9, "NotUnique": true, "Name": "Tesla"}, {"Tier": 3, "ID": 10, "NotUnique": true, "Name": "Frost"}, {"Tier": 2, "ID": 11, "NotUnique": true, "Name": "Meticulous"}, {"Tier": 1, "ID": 12, "NotUnique": true, "Name": "Critical Hit"}, {"Tier": 1, "ID": 13, "NotUnique": true, "Name": "Trigger Finger"}, {"Tier": 2, "ID": 14, "NotUnique": true, "Name": "Prepared"}, {"Tier": 2, "ID": 16, "NotUnique": true, "Name": "Vampiric"}, {"Tier": 3, "ID": 17, "NotUnique": true, "Name": "Tug"}, {"Tier": 3, "ID": 18, "NotUnique": true, "Name": "Cleanse"}, {"Tier": 2, "ID": 19, "NotUnique": true, "Name": "Assassin"}, {"Tier": 3, "ID": 20, "NotUnique": true, "Name": "Contagious"}, {"Tier": 1, "ID": 21, "NotUnique": true, "Name": "Desperate Times"}, {"Tier": 2, "ID": 22, "NotUnique": true, "Name": "Medicality"}, {"Tier": 2, "ID": 23, "NotUnique": true, "Name": "Speedforce"}, {"Tier": 1, "ID": 24, "NotUnique": true, "Name": "Lightweight"}, {"Tier": 2, "ID": 26, "NotUnique": true, "Name": "Fortified"}, {"Tier": 3, "ID": 27, "NotUnique": true, "Name": "Mark"}, {"Tier": 3, "ID": 28, "NotUnique": true, "Name": "Soften"}, {"Tier": 1, "ID": 29, "NotUnique": true, "Name": "Armour Piercing"}, {"Tier": 2, "ID": 37, "NotUnique": true, "Name": "Strength In Numbers"}, {"Tier": 1, "ID": 39, "NotUnique": true, "Name": "Speed Cola"}, {"Tier": 3, "ID": 41, "NotUnique": true, "Name": "Hush"}, {"Tier": 2, "ID": 42, "NotUnique": true, "Name": "Double-Cross"}, {"Tier": 3, "ID": 57, "NotUnique": true, "Name": "Suds"}, {"Tier": 2, "ID": 81, "NotUnique": true, "Name": "Visionary"}, {"Tier": 2, "ID": 82, "NotUnique": true, "Name": "Scavenger"}, {"Tier": 3, "ID": 83, "NotUnique": true, "Name": "Dragonborn"}, {"Tier": 1, "ID": 85, "NotUnique": true, "Name": "Center Mass"}, {"Tier": 1, "ID": 86, "NotUnique": true, "Name": "Fracture"}, {"Tier": 2, "ID": 87, "NotUnique": true, "Name": "Explosive"}, {"Tier": 2, "ID": 88, "NotUnique": true, "Name": "Predatory"}, {"Tier": 2, "ID": 99, "NotUnique": true, "Name": "Replenish"}, {"Tier": 3, "ID": 110, "NotUnique": true, "Name": "Gravity Manipulator"}, {"Tier": 3, "ID": 114, "NotUnique": true, "Name": "Crystal Cavern"}, {"Tier": 3, "ID": 155, "NotUnique": true, "Name": "Leech"}, {"Tier": 3, "ID": 161, "NotUnique": true, "Name": "EMP"}, {"Tier": 3, "ID": 190, "NotUnique": true, "Name": "Disruptor"}, {"Tier": 3, "ID": 694, "NotUnique": true, "Name": "Cripple"}, {"Tier": 1, "ID": 9040, "NotUnique": true, "Name": "Silenced"}];
-            let selectedTalent = document.getElementById("talents").value;
-            let currentIndex = talents.findIndex(t => t.Name === selectedTalent);
-            let nextTalent = (currentIndex - 1 >= 0) 
-    ? talents[currentIndex - 1].Name 
-    : talents[talents.length - 1]?.Name || "None";
-            document.getElementById("nextTalent").innerText = nextTalent;
-        }
+        document.addEventListener("DOMContentLoaded", function() {
+    const dropdownButton = document.querySelector(".dropdown-button");
+    const dropdownContent = document.querySelector(".dropdown-content");
+    const selectedTalent = document.getElementById("selectedTalent");
+    const nextTalent = document.getElementById("nextTalent");
+
+    let talents = [{"Tier": 1, "ID": 1, "NotUnique": true, "Name": "Close Quarters"},
+            {"Tier": 2, "ID": 2, "NotUnique": true, "Name": "Stability"}, {"Tier": 3, "ID": 3, "NotUnique": true, "Name": "Phoenix"}, {"Tier": 1, "ID": 4, "NotUnique": true, "Name": "Accurate"}, {"Tier": 2, "ID": 5, "NotUnique": true, "Name": "Sustained"}, {"Tier": 1, "ID": 6, "NotUnique": true, "Name": "Brutal"}, {"Tier": 2, "ID": 7, "NotUnique": true, "Name": "Extended Mag"}, {"Tier": 1, "ID": 8, "NotUnique": true, "Name": "Adrenaline Rush"}, {"Tier": 3, "ID": 9, "NotUnique": true, "Name": "Tesla"}, {"Tier": 3, "ID": 10, "NotUnique": true, "Name": "Frost"}, {"Tier": 2, "ID": 11, "NotUnique": true, "Name": "Meticulous"}, {"Tier": 1, "ID": 12, "NotUnique": true, "Name": "Critical Hit"}, {"Tier": 1, "ID": 13, "NotUnique": true, "Name": "Trigger Finger"}, {"Tier": 2, "ID": 14, "NotUnique": true, "Name": "Prepared"}, {"Tier": 2, "ID": 16, "NotUnique": true, "Name": "Vampiric"}, {"Tier": 3, "ID": 17, "NotUnique": true, "Name": "Tug"}, {"Tier": 3, "ID": 18, "NotUnique": true, "Name": "Cleanse"}, {"Tier": 2, "ID": 19, "NotUnique": true, "Name": "Assassin"}, {"Tier": 3, "ID": 20, "NotUnique": true, "Name": "Contagious"}, {"Tier": 1, "ID": 21, "NotUnique": true, "Name": "Desperate Times"}, {"Tier": 2, "ID": 22, "NotUnique": true, "Name": "Medicality"}, {"Tier": 2, "ID": 23, "NotUnique": true, "Name": "Speedforce"}, {"Tier": 1, "ID": 24, "NotUnique": true, "Name": "Lightweight"}, {"Tier": 2, "ID": 26, "NotUnique": true, "Name": "Fortified"}, {"Tier": 3, "ID": 27, "NotUnique": true, "Name": "Mark"}, {"Tier": 3, "ID": 28, "NotUnique": true, "Name": "Soften"}, {"Tier": 1, "ID": 29, "NotUnique": true, "Name": "Armour Piercing"}, {"Tier": 2, "ID": 37, "NotUnique": true, "Name": "Strength In Numbers"}, {"Tier": 1, "ID": 39, "NotUnique": true, "Name": "Speed Cola"}, {"Tier": 3, "ID": 41, "NotUnique": true, "Name": "Hush"}, {"Tier": 2, "ID": 42, "NotUnique": true, "Name": "Double-Cross"}, {"Tier": 3, "ID": 57, "NotUnique": true, "Name": "Suds"}, {"Tier": 2, "ID": 81, "NotUnique": true, "Name": "Visionary"}, {"Tier": 2, "ID": 82, "NotUnique": true, "Name": "Scavenger"}, {"Tier": 3, "ID": 83, "NotUnique": true, "Name": "Dragonborn"}, {"Tier": 1, "ID": 85, "NotUnique": true, "Name": "Center Mass"}, {"Tier": 1, "ID": 86, "NotUnique": true, "Name": "Fracture"}, {"Tier": 2, "ID": 87, "NotUnique": true, "Name": "Explosive"}, {"Tier": 2, "ID": 88, "NotUnique": true, "Name": "Predatory"}, {"Tier": 2, "ID": 99, "NotUnique": true, "Name": "Replenish"}, {"Tier": 3, "ID": 110, "NotUnique": true, "Name": "Gravity Manipulator"}, {"Tier": 3, "ID": 114, "NotUnique": true, "Name": "Crystal Cavern"}, {"Tier": 3, "ID": 155, "NotUnique": true, "Name": "Leech"}, {"Tier": 3, "ID": 161, "NotUnique": true, "Name": "EMP"}, {"Tier": 3, "ID": 190, "NotUnique": true, "Name": "Disruptor"}, {"Tier": 3, "ID": 694, "NotUnique": true, "Name": "Cripple"}, {"Tier": 1, "ID": 9040, "NotUnique": true, "Name": "Silenced"}];
+
+    let sortedTalents = [...talents].sort((a, b) => a.Name.localeCompare(b.Name));
+    let sortedById = [...talents].sort((a, b) => a.ID - b.ID);
+    let highestIdTalent = sortedById[sortedById.length - 1];
+
+    sortedTalents.forEach(talent => {
+        const option = document.createElement("div");
+        option.textContent = talent.Name;
+        option.addEventListener("click", function() {
+            selectedTalent.textContent = talent.Name;
+            updateNextTalent(talent.ID);
+            dropdownContent.classList.remove("show");
+        });
+        dropdownContent.appendChild(option);
+    });
+
+    dropdownButton.addEventListener("click", function() {
+        dropdownContent.classList.toggle("show");
+    });
+
+    function updateNextTalent(selectedId) {
+        let currentIndex = sortedById.findIndex(t => t.ID === selectedId);
+        let nextLowest = (currentIndex - 1 >= 0) ? sortedById[currentIndex - 1].Name : highestIdTalent.Name;
+        nextTalent.textContent = nextLowest;
+    }
+});
+
     </script>
 </head>
 <body>
-    <label for="talents">Choose a talent:</label>
-    <select id="talents" onchange="updateNextTalent()">
-        <option value="Close Quarters">Close Quarters</option><option value="Stability">Stability</option><option value="Phoenix">Phoenix</option><option value="Accurate">Accurate</option><option value="Sustained">Sustained</option><option value="Brutal">Brutal</option><option value="Extended Mag">Extended Mag</option><option value="Adrenaline Rush">Adrenaline Rush</option><option value="Tesla">Tesla</option><option value="Frost">Frost</option><option value="Meticulous">Meticulous</option><option value="Critical Hit">Critical Hit</option><option value="Trigger Finger">Trigger Finger</option><option value="Prepared">Prepared</option><option value="Vampiric">Vampiric</option><option value="Tug">Tug</option><option value="Cleanse">Cleanse</option><option value="Assassin">Assassin</option><option value="Contagious">Contagious</option><option value="Desperate Times">Desperate Times</option><option value="Medicality">Medicality</option><option value="Speedforce">Speedforce</option><option value="Lightweight">Lightweight</option><option value="Fortified">Fortified</option><option value="Mark">Mark</option><option value="Soften">Soften</option><option value="Armour Piercing">Armour Piercing</option><option value="Strength In Numbers">Strength In Numbers</option><option value="Speed Cola">Speed Cola</option><option value="Hush">Hush</option><option value="Double-Cross">Double-Cross</option><option value="Suds">Suds</option><option value="Visionary">Visionary</option><option value="Scavenger">Scavenger</option><option value="Dragonborn">Dragonborn</option><option value="Center Mass">Center Mass</option><option value="Fracture">Fracture</option><option value="Explosive">Explosive</option><option value="Predatory">Predatory</option><option value="Replenish">Replenish</option><option value="Gravity Manipulator">Gravity Manipulator</option><option value="Crystal Cavern">Crystal Cavern</option><option value="Leech">Leech</option><option value="EMP">EMP</option><option value="Disruptor">Disruptor</option><option value="Cripple">Cripple</option><option value="Silenced">Silenced</option>
-    </select>
+    <label>Choose a talent:</label>
+    <div class="dropdown">
+        <div class="dropdown-button" id="selectedTalent">Select Talent</div>
+        <div class="dropdown-content"></div>
+    </div>
     <p>Your spindown will be: <span id="nextTalent">None</span></p>
 </body>
 </html>
