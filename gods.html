@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Random Character Picker</title>
   <style>
     body {
@@ -29,7 +29,8 @@
       background-color: #00c98b;
     }
     .slot-container {
-      height: 2em;
+      /* Height plus vertical padding above and below */
+      height: calc(2.5em + 12px); /* 2.5em base height plus verticalPadding * 2 */
       overflow: hidden;
       width: 220px;
       border: 2px solid #00fa9a;
@@ -39,10 +40,9 @@
     .slot {
       display: flex;
       flex-direction: column;
-      transition: transform 0.3s ease-out;
     }
     .slot-item {
-      height: 2em;
+      height: 2.5em;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -66,6 +66,8 @@
   </div>
 
   <script>
+    const verticalPadding = 6; // Adjust this value (in pixels) to add extra vertical space above and below visible slot
+
     const characters = [
       "Achilles", "Agni", "Aladdin", "Amaterasu", "Anhur", "Anubis", "Aphrodite", "Apollo", "Ares", "Artemis",
       "Athena", "Awilix", "Bacchus", "Baron Samedi", "Bellona", "Cabrakan", "Cerberus", "Cernunnos", "Chaac",
@@ -95,10 +97,15 @@
       const itemHeight = slot.querySelector('.slot-item').offsetHeight;
       const containerHeight = document.querySelector('.slot-container').offsetHeight;
       const targetOffset = itemHeight * (spinList.length - 1);
-      const centeredOffset = targetOffset - Math.floor((containerHeight - itemHeight) / 2);
+
+      // Calculate offset to center final item, plus extra vertical padding to avoid cutoff
+      const centeredOffset = targetOffset - Math.floor((containerHeight - itemHeight) / 2) + verticalPadding;
 
       slot.style.transition = 'none';
       slot.style.transform = 'translateY(0px)';
+
+      // Force reflow for transition to reset properly
+      void slot.offsetWidth;
 
       requestAnimationFrame(() => {
         slot.style.transition = 'transform 3.5s cubic-bezier(0.25, 1, 0.5, 1)';
@@ -107,7 +114,12 @@
         setTimeout(() => {
           document.querySelectorAll('.slot-item').forEach(el => el.classList.remove('highlight'));
           const finalItem = document.querySelector('.final-item');
-          if (finalItem) finalItem.classList.add('highlight');
+          if (finalItem) {
+            // Reset animation by replacing the node
+            const clone = finalItem.cloneNode(true);
+            finalItem.parentNode.replaceChild(clone, finalItem);
+            clone.classList.add('highlight');
+          }
           button.disabled = false;
         }, 3700);
       });
