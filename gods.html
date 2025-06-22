@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random Character Picker</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #00fa9a;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+    button {
+      background-color: #00fa9a;
+      color: #121212;
+      border: none;
+      padding: 1em 2em;
+      font-size: 1.2em;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    button:hover {
+      background-color: #00c98b;
+    }
+    .slot-container {
+      height: 2em;
+      overflow: hidden;
+      width: 220px;
+      border: 2px solid #00fa9a;
+      margin-top: 30px;
+      position: relative;
+    }
+    .slot {
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease-out;
+    }
+    .slot-item {
+      height: 2em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-shadow: 1px 1px 2px black;
+      font-size: 2em;
+    }
+    .highlight {
+      animation: flash 0.5s ease-in-out 2;
+    }
+    @keyframes flash {
+      0%, 100% { background-color: transparent; }
+      50% { background-color: #00fa9a; color: #121212; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Random Character Picker</h1>
+  <button id="spin-button" onclick="spinCharacter()">Pick a Character</button>
+  <div class="slot-container">
+    <div id="slot" class="slot"></div>
+  </div>
+
+  <script>
+    const characters = [
+      "Achilles", "Agni", "Aladdin", "Amaterasu", "Anhur", "Anubis", "Aphrodite", "Apollo", "Ares", "Artemis",
+      "Athena", "Awilix", "Bacchus", "Baron Samedi", "Bellona", "Cabrakan", "Cerberus", "Cernunnos", "Chaac",
+      "Cupid", "Danzaburou", "Fenrir", "Ganesha", "Geb", "Guan Yu", "Hades", "Hecate", "Hercules", "Hua Mulan",
+      "Hun Batz", "Izanami", "Jing Wei", "Kali", "Khepri", "Kukulkan", "Loki", "Medusa", "Merlin", "Mordred",
+      "Neith", "Nemesis", "Nu Wa", "Odin", "Pele", "Poseidon", "Princess Bari", "Ra", "Rama", "Scylla", "Sobek",
+      "Sol", "Susano", "Thanatos", "The Morrigan", "Thor", "Ullr", "Vulcan", "Yemoja", "Ymir", "Zeus"
+    ];
+
+    function spinCharacter() {
+      const button = document.getElementById('spin-button');
+      button.disabled = true;
+
+      const slot = document.getElementById('slot');
+      slot.innerHTML = '';
+
+      const spinList = [];
+      for (let i = 0; i < 30; i++) {
+        const char = characters[Math.floor(Math.random() * characters.length)];
+        spinList.push(`<div class="slot-item">${char}</div>`);
+      }
+      const finalChar = characters[Math.floor(Math.random() * characters.length)];
+      spinList.push(`<div class="slot-item final-item">${finalChar}</div>`);
+
+      slot.innerHTML = spinList.join('');
+
+      const itemHeight = slot.querySelector('.slot-item').offsetHeight;
+      const containerHeight = document.querySelector('.slot-container').offsetHeight;
+      const targetOffset = itemHeight * (spinList.length - 1);
+      const centeredOffset = targetOffset - Math.floor((containerHeight - itemHeight) / 2);
+
+      slot.style.transition = 'none';
+      slot.style.transform = 'translateY(0px)';
+
+      requestAnimationFrame(() => {
+        slot.style.transition = 'transform 3.5s cubic-bezier(0.25, 1, 0.5, 1)';
+        slot.style.transform = `translateY(-${centeredOffset}px)`;
+
+        setTimeout(() => {
+          document.querySelectorAll('.slot-item').forEach(el => el.classList.remove('highlight'));
+          const finalItem = document.querySelector('.final-item');
+          if (finalItem) finalItem.classList.add('highlight');
+          button.disabled = false;
+        }, 3700);
+      });
+    }
+  </script>
+</body>
+</html>
