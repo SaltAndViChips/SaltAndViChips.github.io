@@ -1,135 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta content="Salt's Random God Wheel" property="og:title" />
-	<meta content="Made by Salt & Vi ♥" property="og:description" />
-	<meta content="https://github.com/SaltAndViChips/SaltAndViChips.github.io/tree/main" property="og:url" />
-	<meta content="https://saltandvichips.github.io/SaltAndViChips.github.io/profile.png" property="og:image" />
-	<meta content="#00fa9a" data-react-helmet="true" name="theme-color" />
-	<link rel="icon" type="image/x-icon" href="profile.png">
-  <title>Salt's Random God Wheel</title>
-  <style>
-    body {
-      background-color: #121212;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Random Character Picker</title>
+<style>
+  body {
+    background-color: #121212;
+    color: #00fa9a;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+    margin: 0;
+  }
+  button {
+    background-color: #00fa9a;
+    color: #121212;
+    border: none;
+    padding: 1em 2em;
+    font-size: 1.2em;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+  button:hover {
+    background-color: #00c98b;
+  }
+  .slot-container {
+    height: 5em;
+    overflow: hidden;
+    width: 220px;
+    border: 2px solid #00fa9a;
+    margin-top: 30px;
+    position: relative;
+  }
+  .slot {
+    display: flex;
+    flex-direction: column;
+    will-change: transform;
+  }
+  .slot-item {
+    height: 5em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-shadow: 1px 1px 2px black;
+    user-select: none;
+    font-weight: 400;
+    color: #00fa9a;
+    transition: color 0.3s, background-color 0.3s;
+    padding: 0 8px;
+    box-sizing: border-box;
+  }
+  .slot-item > div:first-child {
+    font-size: 1.8em;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 0.3em;
+  }
+  .aspect-line {
+    font-size: 1.1em;
+    color: #00fa9a;
+    font-weight: 400;
+    line-height: 1;
+    user-select: none;
+  }
+  /* Flash animation: text color toggles black/teal, background and glow fade in/out */
+  .highlight {
+    animation: flash 1s ease-in-out 2;
+  }
+  @keyframes flash {
+    0%, 100% {
+      background-color: transparent;
       color: #00fa9a;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      flex-direction: column;
+      box-shadow: none;
     }
-    button {
+    50% {
       background-color: #00fa9a;
       color: #121212;
-      border: none;
-      padding: 1em 2em;
-      font-size: 1.2em;
-      border-radius: 10px;
-      cursor: pointer;
-      margin-top: 20px;
+      box-shadow: 0 0 20px 8px #00fa9a;
     }
-    button:hover {
-      background-color: #00c98b;
-    }
-    .slot-container {
-      /* Height plus vertical padding above and below */
-      height: calc(2.5em + 12px); /* 2.5em base height plus verticalPadding * 2 */
-      overflow: hidden;
-      width: 220px;
-      border: 2px solid #00fa9a;
-      margin-top: 30px;
-      position: relative;
-    }
-    .slot {
-      display: flex;
-      flex-direction: column;
-    }
-    .slot-item {
-      height: 2.5em;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-shadow: 1px 1px 2px black;
-      font-size: 2em;
-    }
-    .highlight {
-      animation: flash 0.5s ease-in-out 2;
-    }
-    @keyframes flash {
-      0%, 100% { background-color: transparent; }
-      50% { background-color: #00fa9a; color: #121212; }
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
-  <h1>Random Character Picker</h1>
-  <button id="spin-button" onclick="spinCharacter()">Pick a Character</button>
-  <div class="slot-container">
-    <div id="slot" class="slot"></div>
-  </div>
+<h1>Random Character Picker</h1>
+<button id="spin-button" onclick="spinCharacter()">Pick a Character</button>
+<div class="slot-container">
+  <div id="slot" class="slot"></div>
+</div>
 
-  <script>
-    const verticalPadding = 6; // Adjust this value (in pixels) to add extra vertical space above and below visible slot
+<script>
+  const verticalPadding = 6;
 
-    const characters = [
-      "Achilles", "Agni", "Aladdin", "Amaterasu", "Anhur", "Anubis", "Aphrodite", "Apollo", "Ares", "Artemis",
-      "Athena", "Awilix", "Bacchus", "Baron Samedi", "Bellona", "Cabrakan", "Cerberus", "Cernunnos", "Chaac",
-      "Cupid", "Danzaburou", "Fenrir", "Ganesha", "Geb", "Guan Yu", "Hades", "Hecate", "Hercules", "Hua Mulan",
-      "Hun Batz", "Izanami", "Jing Wei", "Kali", "Khepri", "Kukulkan", "Loki", "Medusa", "Merlin", "Mordred",
-      "Neith", "Nemesis", "Nu Wa", "Odin", "Pele", "Poseidon", "Princess Bari", "Ra", "Rama", "Scylla", "Sobek",
-      "Sol", "Susano", "Thanatos", "The Morrigan", "Thor", "Ullr", "Vulcan", "Yemoja", "Ymir", "Zeus"
-    ];
+  const characters = [
+    "Achilles", "Agni", "Aladdin", "Amaterasu", "Anhur", "Anubis", "Aphrodite", "Apollo", "Ares", "Artemis",
+    "Athena", "Awilix", "Bacchus", "Baron Samedi", "Bellona", "Cabrakan", "Cerberus", "Cernunnos", "Chaac",
+    "Cupid", "Danzaburou", "Fenrir", "Ganesha", "Geb", "Guan Yu", "Hades", "Hecate", "Hercules", "Hua Mulan",
+    "Hun Batz", "Izanami", "Jing Wei", "Kali", "Khepri", "Kukulkan", "Loki", "Medusa", "Merlin", "Mordred",
+    "Neith", "Nemesis", "Nu Wa", "Odin", "Pele", "Poseidon", "Princess Bari", "Ra", "Rama", "Scylla", "Sobek",
+    "Sol", "Susano", "Thanatos", "The Morrigan", "Thor", "Ullr", "Vulcan", "Yemoja", "Ymir", "Zeus"
+  ];
 
-    function spinCharacter() {
-      const button = document.getElementById('spin-button');
-      button.disabled = true;
+  function spinCharacter() {
+  const button = document.getElementById('spin-button');
+  const slot = document.getElementById('slot');
+  button.disabled = true;
 
-      const slot = document.getElementById('slot');
-      slot.innerHTML = '';
+  document.querySelectorAll('.slot-item.highlight').forEach(el => {
+    el.classList.remove('highlight');
+    void el.offsetWidth; // reflow to restart animation
+  });
 
-      const spinList = [];
-      for (let i = 0; i < 30; i++) {
-        const char = characters[Math.floor(Math.random() * characters.length)];
-        spinList.push(`<div class="slot-item">${char}</div>`);
-      }
-      const finalChar = characters[Math.floor(Math.random() * characters.length)];
-      spinList.push(`<div class="slot-item final-item">${finalChar}</div>`);
+  slot.innerHTML = '';
+  slot.style.transition = 'none';
+  slot.style.transform = 'translateY(0px)';
 
-      slot.innerHTML = spinList.join('');
+  const spinList = [];
+  for (let i = 0; i < 30; i++) {
+    const char = characters[Math.floor(Math.random() * characters.length)];
+    const aspect = Math.random() < 0.5 ? 'Aspect ❌' : 'Aspect ⚡';
+    spinList.push(`
+      <div class="slot-item">
+        <div>${char}</div>
+        <div class="aspect-line">${aspect}</div>
+      </div>
+    `);
+  }
+  const finalChar = characters[Math.floor(Math.random() * characters.length)];
+  const finalAspect = Math.random() < 0.5 ? 'Aspect ❌' : 'Aspect ⚡';
+  spinList.push(`
+    <div class="slot-item final-item">
+      <div>${finalChar}</div>
+      <div class="aspect-line">${finalAspect}</div>
+    </div>
+  `);
 
-      const itemHeight = slot.querySelector('.slot-item').offsetHeight;
-      const containerHeight = document.querySelector('.slot-container').offsetHeight;
-      const targetOffset = itemHeight * (spinList.length - 1);
+  slot.innerHTML = spinList.join('');
 
-      // Calculate offset to center final item, plus extra vertical padding to avoid cutoff
-      const centeredOffset = targetOffset - Math.floor((containerHeight - itemHeight) / 2) + verticalPadding;
+  const itemHeight = slot.querySelector('.slot-item').offsetHeight;
+  const containerHeight = document.querySelector('.slot-container').offsetHeight;
+  const targetOffset = itemHeight * (spinList.length - 1);
+  const centeredOffset = targetOffset - Math.floor((containerHeight - itemHeight) / 2) + verticalPadding;
 
-      slot.style.transition = 'none';
-      slot.style.transform = 'translateY(0px)';
+  requestAnimationFrame(() => {
+    slot.style.transition = 'transform 3.5s cubic-bezier(0.25, 1, 0.5, 1)';
+    slot.style.transform = `translateY(-${centeredOffset}px)`;
+  });
 
-      // Force reflow for transition to reset properly
-      void slot.offsetWidth;
+  setTimeout(() => {
+    const finalItem = document.querySelector('.final-item');
+    if (finalItem) {
+      finalItem.classList.add('highlight');
+      
+      // Play corresponding .ogg sound based on god name
+      const godName = finalItem.querySelector('div:first-child').textContent;
+      // Sanitize godName for filename if needed (remove spaces, etc.)
+      const filename = 'Sounds/' + godName.replace(/ /g, '') + '.ogg';
 
-      requestAnimationFrame(() => {
-        slot.style.transition = 'transform 3.5s cubic-bezier(0.25, 1, 0.5, 1)';
-        slot.style.transform = `translateY(-${centeredOffset}px)`;
-
-        setTimeout(() => {
-          document.querySelectorAll('.slot-item').forEach(el => el.classList.remove('highlight'));
-          const finalItem = document.querySelector('.final-item');
-          if (finalItem) {
-            // Reset animation by replacing the node
-            const clone = finalItem.cloneNode(true);
-            finalItem.parentNode.replaceChild(clone, finalItem);
-            clone.classList.add('highlight');
-          }
-          button.disabled = false;
-        }, 3700);
+      const audio = new Audio(filename);
+      audio.play().catch(e => {
+        console.warn(`Could not play sound file: ${filename}`, e);
       });
     }
-  </script>
+    button.disabled = false;
+  }, 3700);
+}
+
+</script>
 </body>
 </html>
