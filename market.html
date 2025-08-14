@@ -80,15 +80,40 @@
   </div>
   <div id="lightbox" class="lightbox" aria-hidden="true"><div class="backdrop" data-close></div><div class="viewer"><img id="viewImg" alt="" /><button class="close" aria-label="Close" data-close>✕</button></div></div>
   <script>
-    async function loadItems(){
-      const resp = await fetch('items.txt');
-      const text = await resp.text();
-      return text.trim().split(/\n+/).map(line=>{
-        const [name, imgur, price] = line.split('|').map(s=>s.trim());
-        return {imgur, label: `${name} — ${price}`};
-      });
-    }
-    function parseImgur(input){const str=String(input).trim();const m=str.match(/(?:imgur\.com\/)(?:gallery\/|a\/)?([a-zA-Z0-9]{5,10})(?:\.(jpg|jpeg|png|gif|webp))?/i)||str.match(/^([a-zA-Z0-9]{5,10})(?:\.(jpg|jpeg|png|gif|webp))?$/);if(!m)return{id:str,ext:"jpg"};return{id:m[1],ext:(m[2]||"jpg").toLowerCase()};}
+ async function loadItems(){
+  const resp = await fetch('items.txt?_=' + Date.now());
+  const text = await resp.text();
+  return text.trim().split(/\n+/).map(line=>{
+    const [name, imgur, price] = line.split('|').map(s=>s.trim());
+    return {name, imgur, price};
+  });
+}
+function parseImgur(input){
+  const m = String(input).trim().match(/(?:imgur\.com\/)?([a-zA-Z0-9]{5,10})(?:\.(jpg|jpeg|png|gif|webp))?/i);
+  return {id:m[1], ext:(m[2]||'jpg').toLowerCase()};
+}
+function imgUrl({id,ext}){return `https://i.imgur.com/${id}.${ext}`;}
+loadItems().then(items=>{
+  const grid=document.getElementById('grid');
+  items.forEach(it=>{
+    const rec=parseImgur(it.imgur);
+    const container=document.createElement('div');
+    container.className='item';
+    const img=document.createElement('img');
+    img.src=imgUrl(rec);
+    img.alt=it.name;
+    const nameDiv=document.createElement('div');
+    nameDiv.className='name';
+    nameDiv.textContent=it.name;
+    const priceDiv=document.createElement('div');
+    priceDiv.className='price';
+    priceDiv.textContent=it.price;
+    container.appendChild(img);
+    container.appendChild(nameDiv);
+    container.appendChild(priceDiv);
+    grid.appendChild(container);
+  });
+});
     function imgUrl({id,ext}){return`https://i.imgur.com/${id}.${ext}`}
     function extractIC(str){if(!str)return null;const m=str.match(/([0-9][0-9,\.\s]*?)\s*IC\b/i);return m?m[1].replace(/\s+/g,' ')+' IC':null;}
     const collator=new Intl.Collator(undefined,{numeric:true,sensitivity:'base'});
@@ -111,4 +136,5 @@
   </script>
 </body>
 </html>
+
 
