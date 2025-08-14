@@ -43,10 +43,9 @@
     .card:hover{transform: translateY(-2px); box-shadow:0 0 12px var(--accent)}
     .thumb{position:relative; aspect-ratio: 1 / 1; overflow:hidden; background:var(--panel-2)}
     .thumb img{width:100%; height:100%; object-fit:cover; display:block}
-    .price-badge{position:absolute; top:10px; left:10px; background: rgba(0,0,0,.55); backdrop-filter: blur(6px); border:1px solid var(--accent); color:var(--accent); padding:6px 10px; border-radius:999px; font-weight:600; font-size:12px; box-shadow:0 0 6px var(--accent)}
-    .label{padding:12px 14px 14px; display:flex; justify-content:space-between; align-items:flex-start; gap:12px}
-    .title{font-size:14px; line-height:1.25}
-    .id{font-size:12px; color:var(--muted)}
+    .price-text{font-size:12px; color:var(--accent); margin-top:4px}
+    .label{padding:12px 14px 14px; display:flex; flex-direction:column; gap:6px}
+    .title{font-size:14px; line-height:1.25; font-weight:bold}
     .lightbox{position:fixed; inset:0; display:none; place-items:center; z-index:50}
     .lightbox.active{display:grid}
     .backdrop{position:absolute; inset:0; background: rgba(0, 0, 0, .75); opacity:0; animation: fade .18s forwards}
@@ -85,12 +84,11 @@
       const text = await resp.text();
       return text.trim().split(/\n+/).map(line=>{
         const [name, imgur, price] = line.split('|').map(s=>s.trim());
-        return {imgur, label: `${name}`};
+        return {name, imgur, price};
       });
     }
     function parseImgur(input){const str=String(input).trim();const m=str.match(/(?:imgur\.com\/)(?:gallery\/|a\/)?([a-zA-Z0-9]{5,10})(?:\.(jpg|jpeg|png|gif|webp))?/i)||str.match(/^([a-zA-Z0-9]{5,10})(?:\.(jpg|jpeg|png|gif|webp))?$/);if(!m)return{id:str,ext:"jpg"};return{id:m[1],ext:(m[2]||"jpg").toLowerCase()};}
     function imgUrl({id,ext}){return`https://i.imgur.com/${id}.${ext}`}
-    function extractIC(str){if(!str)return null;const m=str.match(/([0-9][0-9,\.\s]*?)\s*IC\b/i);return m?m[1].replace(/\s+/g,' ')+' IC':null;}
     const collator=new Intl.Collator(undefined,{numeric:true,sensitivity:'base'});
     let records=[];
     const $grid=document.getElementById('grid');
@@ -99,15 +97,38 @@
     const $sort=document.getElementById('sort');
     const $lightbox=document.getElementById('lightbox');
     const $viewImg=document.getElementById('viewImg');
-    function render(){const q=$search.value.trim().toLowerCase();const sort=$sort.value;let list=[...records];if(q){list=list.filter(r=>(r.label||'').toLowerCase().includes(q)||(extractIC(r.label)||'').toLowerCase().includes(q));}list.sort((a,b)=>{if(sort==='name')return collator.compare(a.label,b.label);if(sort==='priceHi')return(priceToNum(b.label)-priceToNum(a.label));if(sort==='priceLo')return(priceToNum(a.label)-priceToNum(b.label));return b.createdAt-a.createdAt;});$grid.innerHTML='';list.forEach(rec=>{const url=imgUrl(rec);const card=document.createElement('article');card.className='card';card.setAttribute('role','listitem');card.innerHTML=`<div class="thumb btn" data-key="${rec.key}"><img loading="lazy" src="${url}" alt="${escapeHtml(rec.label)}" />${(()=>{const p=extractIC(rec.label);return p?`<span class='price-badge'>${escapeHtml(p)}</span>`:''})()}</div><div class="label"><div><div class="title">${escapeHtml(rec.label||'Untitled')}</div><div class="id">${rec.id}</div></div></div>`;$grid.appendChild(card);});const has=list.length>0;$grid.style.display=has?'grid':'none';$empty.style.display=has?'none':'block';}
-    function priceToNum(label){const ic=extractIC(label);if(!ic)return 0;const n=ic.replace(/IC/i,'').replace(/[,\s]/g,'');return parseFloat(n)||0;}
-    document.addEventListener('click',e=>{const t=e.target.closest('[data-key]');if(t){const key=t.getAttribute('data-key');const rec=records.find(r=>r.key===key);if(rec){$viewImg.src=imgUrl(rec);$viewImg.alt=rec.label||'';$lightbox.classList.add('active');$lightbox.setAttribute('aria-hidden','false');}}if(e.target.matches('[data-close]')){closeLightbox();}});
+    function render(){
+      const q=$search.value.trim().toLowerCase();
+      const sort=$sort.value;
+      let list=[...records];
+      if(q){list=list.filter(r=>(r.name||'').toLowerCase().includes(q)||(r.price||'').toLowerCase().includes(q));}
+      list.sort((a,b)=>{
+        if(sort==='name')return collator.compare(a.name,b.name);
+        if(sort==='priceHi')return priceToNum(b.price)-priceToNum(a.price);
+        if(sort==='priceLo')return priceToNum(a.price)-priceToNum(b.price);
+        return b.createdAt-a.createdAt;
+      });
+      $grid.innerHTML='';
+      list.forEach(rec=>{
+        const url=imgUrl(rec);
+        const card=document.createElement('article');
+        card.className='card';
+        card.setAttribute('role','listitem');
+        card.innerHTML=`<div class="thumb btn" data-key="${rec.key}"><img loading="lazy" src="${url}" alt="${escapeHtml(rec.name)}" /></div><div class="label"><div class="title">${escapeHtml(rec.name||'Untitled')}</div><div class="price-text">${escapeHtml(rec.price||'')}</div></div>`;
+        $grid.appendChild(card);
+      });
+      const has=list.length>0;
+      $grid.style.display=has?'grid':'none';
+      $empty.style.display=has?'none':'block';
+    }
+    function priceToNum(price){if(!price)return 0;const n=price.replace(/IC/i,'').replace(/[,\s]/g,'');return parseFloat(n)||0;}
+    document.addEventListener('click',e=>{const t=e.target.closest('[data-key]');if(t){const key=t.getAttribute('data-key');const rec=records.find(r=>r.key===key);if(rec){$viewImg.src=imgUrl(rec);$viewImg.alt=rec.name||'';$lightbox.classList.add('active');$lightbox.setAttribute('aria-hidden','false');}}if(e.target.matches('[data-close]')){closeLightbox();}});
     document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox();});
     function closeLightbox(){$lightbox.classList.remove('active');$lightbox.setAttribute('aria-hidden','true');$viewImg.removeAttribute('src');}
     $search.addEventListener('input',render);
     $sort.addEventListener('change',render);
     function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;','\'':'&#39;'}[c]));}
-    loadItems().then(items=>{records=items.map((it,i)=>({key:i+'-'+(Math.random().toString(36).slice(2)),id:parseImgur(it.imgur).id,ext:parseImgur(it.imgur).ext,label:it.label||'',createdAt:Date.now()-i*1000}));render();});
+    loadItems().then(items=>{records=items.map((it,i)=>({key:i+'-'+(Math.random().toString(36).slice(2)),...parseImgur(it.imgur),name:it.name,price:it.price,createdAt:Date.now()-i*1000}));render();});
   </script>
 </body>
 </html>
