@@ -114,7 +114,6 @@ loadItems().then(items=>{
     grid.appendChild(container);
   });
 });
-    function imgUrl({id,ext}){return`https://i.imgur.com/${id}.${ext}`}
     function extractIC(str){if(!str)return null;const m=str.match(/([0-9][0-9,\.\s]*?)\s*IC\b/i);return m?m[1].replace(/\s+/g,' ')+' IC':null;}
     const collator=new Intl.Collator(undefined,{numeric:true,sensitivity:'base'});
     let records=[];
