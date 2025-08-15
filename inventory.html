@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Salt's Black Market</title>
+  <meta name="description" content="Salts Black Market" />
+  <meta content="Salt's Black Market" property="og:title" />
+	<meta content="Made by Salt & Vi ♥" property="og:description" />
+	<meta content="https://github.com/SaltAndViChips/SaltAndViChips.github.io/tree/main" property="og:url" />
+	<meta content="https://saltandvichips.github.io/SaltAndViChips.github.io/profile.png" property="og:image" />
+	<meta content="#00fa9a" data-react-helmet="true" name="theme-color" />
+	<link rel="icon" type="image/x-icon" href="profile.png">
+  <style>
+    :root{
+      --bg:#0b0d10;
+      --panel:#13161d;
+      --panel-2:#0f1117;
+      --text:#e8ecf1;
+      --muted:#9aa4b2;
+      --accent:#00fa9a;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+      --radius:18px;
+    }
+    html,body{height:100%}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      background: radial-gradient(1000px 800px at 80% -10%, #0d1512 0, transparent 60%),
+                  radial-gradient(800px 600px at -10% 90%, #0c1410 0, transparent 60%),
+                  var(--bg);
+      color:var(--text);
+    }
+    .container{max-width:1100px; margin:24px auto 80px; padding:0 16px}
+    header{display:flex; align-items:center; gap:16px; justify-content:space-between; flex-wrap:wrap; margin-bottom:18px;}
+    .brand{display:flex; align-items:center; gap:12px}
+    .logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: url('profile.png') center/contain no-repeat;
+  box-shadow: 0 0 10px var(--accent);
+}
+    h1{font-size: clamp(20px, 3vw, 28px); margin:0; letter-spacing:.3px}
+    .muted{color:var(--muted)}
+    .controls{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .control{background:var(--panel); border:1px solid var(--accent); color:var(--text); border-radius:12px; padding:10px 12px; box-shadow:var(--shadow); transition:box-shadow .2s ease}
+    .control:hover{box-shadow:0 0 8px var(--accent)}
+    .control input, .control select{background:transparent; color:inherit; border:none; outline:none; font-size:14px; appearance:none; padding-right:20px}
+    select#sort{background:var(--panel); color:var(--text); border-radius:8px; cursor:pointer}
+    select#sort:focus{outline:none; box-shadow:0 0 8px var(--accent)}
+    .btn{cursor:pointer; user-select:none; transition:transform .08s ease, opacity .2s ease}
+    .btn:active{transform:scale(.98)}
+    .grid{display:grid; gap:14px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));}
+    .card{background:linear-gradient(180deg, rgba(0,250,154,.08), rgba(0,0,0,0)), var(--panel); border:1px solid #202435; border-radius: var(--radius); overflow:hidden; position:relative; box-shadow: var(--shadow); transition: transform .18s ease, box-shadow .18s ease;}
+    .card:hover{transform: translateY(-2px); box-shadow:0 0 12px var(--accent)}
+    .thumb{position:relative; aspect-ratio: 1 / 1; overflow:hidden; background:var(--panel-2)}
+    .thumb img{width:100%; height:100%; object-fit:cover; display:block}
+    .price-text{font-size:12px; color:var(--accent); margin-top:4px}
+    .label{padding:12px 14px 14px; display:flex; flex-direction:column; gap:6px}
+    .title{font-size:14px; line-height:1.25; font-weight:bold}
+    .lightbox{position:fixed; inset:0; display:none; place-items:center; z-index:50}
+    .lightbox.active{display:grid}
+    .backdrop{position:absolute; inset:0; background: rgba(0, 0, 0, .75); opacity:0; animation: fade .18s forwards}
+    @keyframes fade{to{opacity:1}}
+    .viewer{position:relative; width:min(88vw, 1200px); height:min(88vh, 88vw); display:grid; place-items:center; z-index:10}
+    .viewer img{max-width:100%; max-height:100%; border-radius:20px; box-shadow: var(--shadow); transform: scale(.96); animation: pop .2s ease forwards}
+    @keyframes pop{to{transform: scale(1)}}
+    .close{position:absolute; top:-14px; right:-14px; background:var(--panel); color:var(--accent); border:1px solid var(--accent); border-radius:999px; padding:10px 12px; cursor:pointer; box-shadow:0 0 8px var(--accent)}
+    .empty{opacity:.8; text-align:center; padding:40px; border:1px dashed #2a3049; border-radius:16px; background:rgba(0,0,0,.15)}
+    footer{color:var(--muted); text-align:center; margin-top:24px; font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden></div>
+        <div>
+          <h1>Salt's Inventory</h1>
+          <div class="muted" style="font-size:12px">Not selling these just showing off</div>
+        </div>
+      </div>
+      <div class="controls">
+        <label class="control" title="Search by item name or price">🔎 <input id="search" type="search" placeholder="Search items or price (e.g. 2,000,000 IC)" /></label>
+        <label class="control">Sort: <select id="sort"><option value="new">Newest</option><option value="name">Name A→Z</option><option value="priceHi">Price High→Low</option><option value="priceLo">Price Low→High</option></select></label>
+      </div>
+    </header>
+    <div id="grid" class="grid" role="list"></div>
+    <div id="empty" class="empty" style="display:none"><p>No items match your search.</p></div>
+    <footer><p>Salt & Vi- ♥</p></footer>
+  </div>
+  <div id="lightbox" class="lightbox" aria-hidden="true"><div class="backdrop" data-close></div><div class="viewer"><img id="viewImg" alt="" /><button class="close" aria-label="Close" data-close>✕</button></div></div>
+  <script>
+    async function loadItems(){
+      const resp = await fetch('inventory.txt');
+      const text = await resp.text();
+      return text.trim().split(/\n+/).map(line=>{
+        const [name, imgur, price] = line.split('|').map(s=>s.trim());
+        return {name, imgur};
+      });
+    }
+    function parseImgur(input){const str=String(input).trim();const m=str.match(/(?:imgur\.com\/)(?:gallery\/|a\/)?([a-zA-Z0-9]{5,10})(?:\.(jpg|jpeg|png|gif|webp))?/i)||str.match(/^([a-zA-Z0-9]{5,10})(?:\.(jpg|jpeg|png|gif|webp))?$/);if(!m)return{id:str,ext:"jpg"};return{id:m[1],ext:(m[2]||"jpg").toLowerCase()};}
+    function imgUrl({id,ext}){return`https://i.imgur.com/${id}.${ext}`}
+    const collator=new Intl.Collator(undefined,{numeric:true,sensitivity:'base'});
+    let records=[];
+    const $grid=document.getElementById('grid');
+    const $empty=document.getElementById('empty');
+    const $search=document.getElementById('search');
+    const $sort=document.getElementById('sort');
+    const $lightbox=document.getElementById('lightbox');
+    const $viewImg=document.getElementById('viewImg');
+    function render(){
+      const q=$search.value.trim().toLowerCase();
+      const sort=$sort.value;
+      let list=[...records];
+      if(q){list=list.filter(r=>(r.name||'').toLowerCase().includes(q)||(r.price||'').toLowerCase().includes(q));}
+      list.sort((a,b)=>{
+        if(sort==='name')return collator.compare(a.name,b.name);
+        if(sort==='priceHi')return priceToNum(b.price)-priceToNum(a.price);
+        if(sort==='priceLo')return priceToNum(a.price)-priceToNum(b.price);
+        return b.createdAt-a.createdAt;
+      });
+      $grid.innerHTML='';
+      list.forEach(rec=>{
+        const url=imgUrl(rec);
+        const card=document.createElement('article');
+        card.className='card';
+        card.setAttribute('role','listitem');
+        card.innerHTML=`<div class="thumb btn" data-key="${rec.key}"><img loading="lazy" src="${url}" alt="${escapeHtml(rec.name)}" /></div><div class="label"><div class="title">${escapeHtml(rec.name||'Untitled')}</div><div class="price-text">${escapeHtml(rec.price||'')}</div></div>`;
+        $grid.appendChild(card);
+      });
+      const has=list.length>0;
+      $grid.style.display=has?'grid':'none';
+      $empty.style.display=has?'none':'block';
+    }
+    function priceToNum(price){if(!price)return 0;const n=price.replace(/IC/i,'').replace(/[,\s]/g,'');return parseFloat(n)||0;}
+    document.addEventListener('click',e=>{const t=e.target.closest('[data-key]');if(t){const key=t.getAttribute('data-key');const rec=records.find(r=>r.key===key);if(rec){$viewImg.src=imgUrl(rec);$viewImg.alt=rec.name||'';$lightbox.classList.add('active');$lightbox.setAttribute('aria-hidden','false');}}if(e.target.matches('[data-close]')){closeLightbox();}});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox();});
+    function closeLightbox(){$lightbox.classList.remove('active');$lightbox.setAttribute('aria-hidden','true');$viewImg.removeAttribute('src');}
+    $search.addEventListener('input',render);
+    $sort.addEventListener('change',render);
+    function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;','\'':'&#39;'}[c]));}
+    loadItems().then(items=>{records=items.map((it,i)=>({key:i+'-'+(Math.random().toString(36).slice(2)),...parseImgur(it.imgur),name:it.name,price:it.price,createdAt:Date.now()-i*1000}));render();});
+  </script>
+</body>
+</html>
+
