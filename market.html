@@ -134,12 +134,13 @@ function render(){
         </div>
         <div class="label">
           <div class="title">${rec.name}</div>
-          <div class="price">${rec.price} IC</div>
+          <div class="price">${rec.price.toLocaleString()} IC</div>
         </div>
       </article>`;
   }
   document.getElementById("empty").style.display = list.length ? "none" : "block";
 }
+
 
 document.addEventListener("click", e=>{
   if(e.target.matches("[data-close]")) return closeLightbox();
@@ -191,3 +192,4 @@ init();
 </script>
 </body>
 </html>
+
