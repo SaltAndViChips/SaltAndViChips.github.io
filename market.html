@@ -90,7 +90,6 @@ h1{margin:0}
   color:var(--text);
 }
 
-/* Buttons */
 button{
   background:var(--accent);
   border:none;
@@ -106,7 +105,6 @@ button:hover{
   box-shadow:0 0 15px var(--accent);
 }
 
-/* Grid */
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
@@ -141,7 +139,6 @@ button:hover{
 }
 .title{font-weight:bold;font-size:14px}
 
-/* Lightbox */
 .lightbox {
   position:fixed;
   inset:0;
@@ -218,7 +215,6 @@ button:hover{
   <div id="empty" class="muted">No items found</div>
 </div>
 
-<!-- Lightbox -->
 <div id="lightbox" class="lightbox">
   <div class="backdrop" data-close></div>
   <div class="viewer"><img id="viewImg" alt=""></div>
@@ -235,8 +231,9 @@ async function loadItems() {
     if(!res.ok) throw new Error("Failed to fetch Gist");
     const data = await res.json();
     return data.map(it => ({
-      ...it,
-      imgur: it.imgur || "",
+      name: it.name,
+      imgur: it.img || "",
+      price: it.price,
       key: Math.random().toString(36).slice(2),
       createdAt: Date.now()
     }));
@@ -247,8 +244,9 @@ async function loadItems() {
 }
 
 function imgUrl(link){
-  const m = link.match(/(?:i\.)?imgur\.com\/([a-zA-Z0-9]{5,10})(?:\.(jpg|jpeg|png|gif|webp))?/);
-  return m ? `https://i.imgur.com/${m[1]}.${m[2]||'jpg'}` : link;
+  // Convert Imgur page URL to direct image URL
+  const m = link.match(/imgur\.com\/([a-zA-Z0-9]{5,10})/);
+  return m ? `https://i.imgur.com/${m[1]}.jpg` : link;
 }
 
 function render(){
@@ -273,7 +271,7 @@ function render(){
         </div>
         <div class="label">
           <div class="title">${rec.name}</div>
-          <div class="muted">${rec.price.toFixed(2)} IC</div>
+          <div class="muted">${Math.floor(rec.price)} IC</div>
         </div>
       </article>`;
   }
@@ -318,8 +316,7 @@ document.getElementById("sort").addEventListener("change", render);
 document.getElementById("refresh").addEventListener("click", init);
 
 async function init(){
-  const items = await loadItems();
-  records = items;
+  records = await loadItems();
   render();
 }
 
