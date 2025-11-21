@@ -115,7 +115,6 @@ h1{margin:0}
   <div id="empty" class="muted" style="display:none">No items found</div>
 </div>
 
-
 <!-- Lightbox -->
 <div id="lightbox" class="lightbox">
   <div class="backdrop" data-close></div>
@@ -123,29 +122,21 @@ h1{margin:0}
   <button class="close" data-close>✕</button>
 </div>
 
-
 <script>
-const PASTEBIN_RAW_URL = "https://pastebin.com/raw/YOUR_NEW_PASTE_HERE";
-const PROXY_URL = "https://api.allorigins.win/raw?url=";
+const GIST_RAW_URL = "https://gist.githubusercontent.com/YOUR_USERNAME/YOUR_GIST_ID/raw/inventory.json";
+
+let records = [];
 
 async function loadItems(){
-  const res = await fetch(PROXY_URL + encodeURIComponent(PASTEBIN_RAW_URL) + "&_=" + Date.now());
-  if(!res.ok) return [];
-  const text = await res.text();
-  localStorage.setItem("cachedPaste", text);
-  return parseItems(text);
-}
-
-function parseItems(text){
-  return text.trim().split(/\n+/).map(line => {
-    const parts = line.split("|");
-    if(parts.length < 3) return null;
-    return {
-      name: parts[0].trim(),
-      imgur: parts[1].trim(),
-      price: parseFloat(parts[2].trim())
-    };
-  }).filter(Boolean);
+  try {
+    const res = await fetch(GIST_RAW_URL + "?_=" + Date.now());
+    if(!res.ok) return [];
+    const data = await res.json();
+    return data.map(it=>({ ...it, key: Math.random().toString(36).slice(2), createdAt: Date.now() }));
+  } catch(e) {
+    console.warn("Failed to fetch Gist:", e);
+    return [];
+  }
 }
 
 function imgUrl(link){
@@ -153,14 +144,11 @@ function imgUrl(link){
   return m ? `https://i.imgur.com/${m[1]}.${m[2]||'jpg'}` : "";
 }
 
-let records = [];
-
 function render(){
   const q = document.getElementById("search").value.toLowerCase();
   const sort = document.getElementById("sort").value;
   let list = [...records];
-
-  if(q) list = list.filter(r => r.name.toLowerCase().includes(q));
+  if(q) list = list.filter(r=>r.name.toLowerCase().includes(q));
 
   list.sort((a,b)=>{
     if(sort==="name") return a.name.localeCompare(b.name);
@@ -170,7 +158,6 @@ function render(){
 
   const grid = document.getElementById("grid");
   grid.innerHTML = "";
-
   for(const rec of list){
     grid.innerHTML += `
       <article class="card">
@@ -183,34 +170,27 @@ function render(){
         </div>
       </article>`;
   }
-
   document.getElementById("empty").style.display = list.length ? "none" : "block";
 }
 
 document.addEventListener("click", e=>{
   if(e.target.matches("[data-close]")) return closeLightbox();
-
   const t = e.target.closest("[data-key]");
   if(!t) return;
-
   const rec = records.find(r=>r.key===t.dataset.key);
   if(!rec) return;
 
   const img = t.querySelector("img");
   const r = img.getBoundingClientRect();
-
   const viewer = document.querySelector(".viewer");
   const viewImg = document.getElementById("viewImg");
   viewImg.src = imgUrl(rec.imgur);
-
   viewer.style.width = r.width+"px";
   viewer.style.height = r.height+"px";
   viewer.style.top = r.top+"px";
   viewer.style.left = r.left+"px";
   viewer.style.transform = "translate(0,0)";
-
-  const lb = document.getElementById("lightbox");
-  lb.classList.add("active");
+  document.getElementById("lightbox").classList.add("active");
 
   requestAnimationFrame(()=>{
     viewer.style.width = window.innerWidth*0.8+"px";
@@ -222,8 +202,7 @@ document.addEventListener("click", e=>{
 });
 
 function closeLightbox(){
-  const lb = document.getElementById("lightbox");
-  lb.classList.remove("active");
+  document.getElementById("lightbox").classList.remove("active");
   document.getElementById("viewImg").src = "";
 }
 
@@ -231,26 +210,14 @@ document.getElementById("search").addEventListener("input", render);
 document.getElementById("sort").addEventListener("change", render);
 document.getElementById("refresh").addEventListener("click", init);
 
-function init(){
-  loadItems().then(items=>{
-    records = items.map((it,i)=>({
-      key: i+"-"+Math.random().toString(36).slice(2),
-      ...it,
-      createdAt: Date.now() - i*1000
-    }));
-    render();
-  });
-}
-
-const cached = localStorage.getItem("cachedPaste");
-if(cached){
-  records = parseItems(cached).map((it,i)=>({
-    key: i+"-"+Math.random().toString(36).slice(2),
-    ...it,
-    createdAt: Date.now() - i*1000
-  }));
+async function init(){
+  const items = await loadItems();
+  records = items;
   render();
 }
+
+// Auto-refresh every 10 seconds
+setInterval(init, 10000);
 
 init();
 </script>
