@@ -1,35 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salt's Market</title>
+<style>
+:root{
+  --bg:#0b0d10;
+  --panel:#13161d;
+  --panel-2:#0f1117;
+  --text:#e8ecf1;
+  --muted:#9aa4b2;
+  --accent:#ffd700;
+  --shadow:0 10px 30px rgba(0,0,0,.35);
+  --radius:18px;
+}
+body{margin:0;font-family:sans-serif;background:var(--bg);color:var(--text);}
+.container{max-width:1100px;margin:24px auto;padding:0 16px;text-align:center;}
+header{display:flex;align-items:center;gap:16px;justify-content:space-between;flex-wrap:wrap;margin-bottom:18px;}
+.brand{display:flex;align-items:center;gap:12px;justify-content:center;}
+.logo{width:40px;height:40px;border-radius:12px;background:#ffd700;box-shadow:0 0 10px var(--accent);}
+h1{margin:0}
+.muted{color:var(--muted)}
+
+.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;}
+.control, .btn{background:var(--panel);border:1px solid var(--accent);color:var(--accent);border-radius:12px;padding:6px 10px;cursor:pointer;box-shadow:var(--shadow);}
+.control input,.control select{background:transparent;color:var(--text);border:none;outline:none;font-size:14px;}
+.control option{background-color:var(--panel);color:var(--text);}
+
+/* grid */
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));margin-top:16px;}
+.card{background:var(--panel);border:1px solid #202435;border-radius:var(--radius);overflow:hidden;position:relative;box-shadow:var(--shadow);cursor:pointer;}
+.thumb{position:relative;aspect-ratio:1/1;background:var(--panel-2)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.label{padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.title{font-size:14px;font-weight:bold}
+.muted-small{font-size:12px;color:var(--muted);}
+
+/* Lightbox */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  display: none;
+  z-index: 50;
+}
+.lightbox.active { display: block; }
+.backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 0; }
+.viewer { position: fixed; border-radius:20px; box-shadow:var(--shadow); z-index: 10; transition: all 0.3s ease; transform-origin: center center; background: var(--panel-2); overflow: hidden; cursor: pointer; }
+.viewer img { width: 100%; height: 100%; object-fit: contain; }
+.close { position: fixed; top: 10px; right: 10px; background: var(--panel); color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 6px 10px; cursor: pointer; z-index: 20; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <h1>Salt's Market</h1>
+        <div class="muted-small">Prices are Negotiable and NOT FINAL</div>
+      </div>
+    </div>
+    <div class="controls">
+      <label class="control">🔎 <input id="search" type="search" placeholder="Search items" /></label>
+      <label class="control">Sort:
+        <select id="sort">
+          <option value="new">Newest</option>
+          <option value="name">Name A→Z</option>
+          <option value="price">Price Low→High</option>
+        </select>
+      </label>
+      <button class="control btn" id="refresh">Refresh</button>
+    </div>
+  </header>
+
+  <div id="grid" class="grid"></div>
+  <div id="empty" class="muted-small" style="display:none">No items found</div>
+</div>
+
+<!-- Lightbox -->
+<div id="lightbox" class="lightbox">
+  <div class="backdrop" data-close></div>
+  <div class="viewer"><img id="viewImg" alt=""></div>
+  <button class="close" data-close>✕</button>
+</div>
+
 <script>
 const GIST_RAW_URL = "https://gist.githubusercontent.com/SaltAndViChips/8abb282bb5818fc1f1f8728d801df383/raw/inventory.json";
 let records = [];
 
-async function loadItems() {
+function imgUrl(link){
+  try {
+    const m = link.match(/imgur\.com\/([a-zA-Z0-9]{5,10})/);
+    return m ? `https://i.imgur.com/${m[1]}.jpg` : link;
+  } catch(e) { return link; }
+}
+
+async function loadItems(){
   try {
     const res = await fetch(GIST_RAW_URL + "?t=" + Date.now(), { cache: "no-store" });
-    if(!res.ok) throw new Error("Failed to fetch Gist");
+    if(!res.ok) throw new Error("Failed to fetch");
     const data = await res.json();
     return data.map(it => ({
       name: it.name,
       imgur: it.img || "",
-      price: it.price,
+      price: Math.floor(it.price),
       key: Math.random().toString(36).slice(2),
       createdAt: Date.now()
     }));
   } catch(e) {
-    console.warn("Failed to fetch Gist:", e);
+    console.warn("Fetch failed:", e);
     return [];
   }
-}
-
-function imgUrl(link){
-  const m = link.match(/imgur\.com\/([a-zA-Z0-9]{5,10})/);
-  return m ? `https://i.imgur.com/${m[1]}.jpg` : link;
 }
 
 function render(){
   const q = document.getElementById("search").value.toLowerCase();
   const sort = document.getElementById("sort").value;
   let list = [...records];
-  if(q) list = list.filter(r=>r.name.toLowerCase().includes(q));
+  if(q) list = list.filter(r => r.name.toLowerCase().includes(q));
 
   list.sort((a,b)=>{
     if(sort==="name") return a.name.localeCompare(b.name);
@@ -47,7 +137,7 @@ function render(){
         </div>
         <div class="label">
           <div class="title">${rec.name}</div>
-          <div class="muted">${Math.floor(rec.price)} IC</div>
+          <div class="muted-small">${rec.price} IC</div>
         </div>
       </article>`;
   }
@@ -103,12 +193,10 @@ async function refreshItems(){
   btn.disabled = false;
 }
 
-// Bind refresh button
 document.getElementById("refresh").addEventListener("click", refreshItems);
-
-// Auto-refresh every 10 seconds
 setInterval(refreshItems, 10000);
-
-// Initial load
 refreshItems();
 </script>
+
+</body>
+</html>
