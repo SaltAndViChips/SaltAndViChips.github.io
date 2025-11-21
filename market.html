@@ -11,57 +11,54 @@
   --panel-2:#0f1117;
   --text:#e8ecf1;
   --muted:#9aa4b2;
-  --accent:#ffd700;
+  --accent:#f1c40f;
   --shadow:0 10px 30px rgba(0,0,0,.35);
   --radius:18px;
 }
+
 body{margin:0;font-family:sans-serif;background:var(--bg);color:var(--text);}
-.container{max-width:1100px;margin:24px auto;padding:0 16px;text-align:center;}
+.container{max-width:1100px;margin:24px auto;padding:0 16px;}
+
 header{display:flex;align-items:center;gap:16px;justify-content:space-between;flex-wrap:wrap;margin-bottom:18px;}
-.brand{display:flex;align-items:center;gap:12px;justify-content:center;}
-.logo{width:40px;height:40px;border-radius:12px;background:#ffd700;box-shadow:0 0 10px var(--accent);}
+.brand{display:flex;align-items:center;gap:12px;}
+.logo{width:40px;height:40px;border-radius:12px;background: url('profile.png') center/contain no-repeat;box-shadow:0 0 10px var(--accent);}
 h1{margin:0}
 .muted{color:var(--muted)}
 
-.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;}
-.control, .btn{background:var(--panel);border:1px solid var(--accent);color:var(--accent);border-radius:12px;padding:6px 10px;cursor:pointer;box-shadow:var(--shadow);}
+.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.control{background:var(--panel);border:1px solid var(--accent);color:var(--text);border-radius:12px;padding:6px 10px;box-shadow:var(--shadow);display:flex;align-items:center;gap:6px;cursor:pointer;}
 .control input,.control select{background:transparent;color:var(--text);border:none;outline:none;font-size:14px;}
 .control option{background-color:var(--panel);color:var(--text);}
+.control.btn{background:var(--accent);color:#000;border:none;font-weight:bold;}
 
-/* grid */
-.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));margin-top:16px;}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));}
 .card{background:var(--panel);border:1px solid #202435;border-radius:var(--radius);overflow:hidden;position:relative;box-shadow:var(--shadow);cursor:pointer;}
-.thumb{position:relative;aspect-ratio:1/1;background:var(--panel-2)}
-.thumb img{width:100%;height:100%;object-fit:cover;display:block}
-.label{padding:12px 14px;display:flex;flex-direction:column;gap:6px}
-.title{font-size:14px;font-weight:bold}
-.muted-small{font-size:12px;color:var(--muted);}
+.thumb{position:relative;aspect-ratio:1/1;background:var(--panel-2);}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.label{padding:12px 14px;display:flex;flex-direction:column;gap:6px;}
+.title{font-size:14px;font-weight:bold;}
+.price{color:var(--accent);font-weight:bold;}
 
 /* Lightbox */
-.lightbox {
-  position: fixed;
-  inset: 0;
-  display: none;
-  z-index: 50;
-}
-.lightbox.active { display: block; }
-.backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 0; }
-.viewer { position: fixed; border-radius:20px; box-shadow:var(--shadow); z-index: 10; transition: all 0.3s ease; transform-origin: center center; background: var(--panel-2); overflow: hidden; cursor: pointer; }
-.viewer img { width: 100%; height: 100%; object-fit: contain; }
-.close { position: fixed; top: 10px; right: 10px; background: var(--panel); color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 6px 10px; cursor: pointer; z-index: 20; }
+.lightbox{position:fixed;inset:0;display:none;z-index:50;}
+.lightbox.active{display:block;}
+.backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:0;}
+.viewer{position:fixed;border-radius:20px;box-shadow:var(--shadow);z-index:10;transition:all 0.3s ease;transform-origin:center center;background:var(--panel-2);overflow:hidden;cursor:pointer;}
+.viewer img{width:100%;height:100%;object-fit:contain;}
+.close{position:fixed;top:10px;right:10px;background:var(--panel);color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:6px 10px;cursor:pointer;z-index:20;}
 </style>
 </head>
 <body>
-
 <div class="container">
   <header>
     <div class="brand">
       <div class="logo"></div>
       <div>
         <h1>Salt's Market</h1>
-        <div class="muted-small">Prices are Negotiable and NOT FINAL</div>
+        <div class="muted" style="font-size:12px">Prices are Negotiable and NOT FINAL</div>
       </div>
     </div>
+
     <div class="controls">
       <label class="control">🔎 <input id="search" type="search" placeholder="Search items" /></label>
       <label class="control">Sort:
@@ -71,12 +68,12 @@ h1{margin:0}
           <option value="price">Price Low→High</option>
         </select>
       </label>
-      <button class="control btn" id="refresh">Refresh</button>
+      <div class="control btn" id="refresh">Refresh</div>
     </div>
   </header>
 
   <div id="grid" class="grid"></div>
-  <div id="empty" class="muted-small" style="display:none">No items found</div>
+  <div id="empty" class="muted" style="display:none">No items found</div>
 </div>
 
 <!-- Lightbox -->
@@ -87,125 +84,110 @@ h1{margin:0}
 </div>
 
 <script>
-(() => {
+const GIST_RAW_URL = "https://gist.githubusercontent.com/SaltAndViChips/8abb282bb5818fc1f1f8728d801df383/raw/inventory.json";
+const PROXY = "https://api.allorigins.win/raw?url=";
+
+let records = [];
+
+async function loadItems() {
   try {
-    const GIST_RAW_URL = "https://gist.githubusercontent.com/SaltAndViChips/8abb282bb5818fc1f1f8728d801df383/raw/inventory.json";
-    let records = [];
-
-    function imgUrl(link){
-      try {
-        if(!link) return "";
-        const m = link.match(/imgur\.com\/([a-zA-Z0-9]{5,10})/);
-        return m ? `https://i.imgur.com/${m[1]}.jpg` : link;
-      } catch(e) { return link; }
-    }
-
-    async function loadItems(){
-      try {
-        const res = await fetch(GIST_RAW_URL + "?t=" + Date.now(), { cache: "no-store" });
-        if(!res.ok) throw new Error("Failed to fetch");
-        const data = await res.json();
-        return data.map(it => ({
-          name: it.name,
-          imgur: it.img || "",
-          price: Math.floor(it.price),
-          key: Math.random().toString(36).slice(2),
-          createdAt: Date.now()
-        }));
-      } catch(e) {
-        console.warn("Fetch failed:", e);
-        return [];
-      }
-    }
-
-    function render(){
-      const q = document.getElementById("search").value.toLowerCase();
-      const sort = document.getElementById("sort").value;
-      let list = [...records];
-      if(q) list = list.filter(r => r.name.toLowerCase().includes(q));
-
-      list.sort((a,b)=>{
-        if(sort==="name") return a.name.localeCompare(b.name);
-        if(sort==="price") return a.price - b.price;
-        return b.createdAt - a.createdAt;
-      });
-
-      const grid = document.getElementById("grid");
-      grid.innerHTML = "";
-      for(const rec of list){
-        grid.innerHTML += `
-          <article class="card">
-            <div class="thumb btn" data-key="${rec.key}">
-              <img src="${imgUrl(rec.imgur)}" alt="${rec.name}">
-            </div>
-            <div class="label">
-              <div class="title">${rec.name}</div>
-              <div class="muted-small">${rec.price} IC</div>
-            </div>
-          </article>`;
-      }
-      document.getElementById("empty").style.display = list.length ? "none" : "block";
-    }
-
-    document.addEventListener("click", e=>{
-      if(e.target.matches("[data-close]")) return closeLightbox();
-      const t = e.target.closest("[data-key]");
-      if(!t) return;
-      const rec = records.find(r=>r.key===t.dataset.key);
-      if(!rec) return;
-
-      const img = t.querySelector("img");
-      const r = img.getBoundingClientRect();
-      const viewer = document.querySelector(".viewer");
-      const viewImg = document.getElementById("viewImg");
-      viewImg.src = imgUrl(rec.imgur);
-      viewer.style.width = r.width+"px";
-      viewer.style.height = r.height+"px";
-      viewer.style.top = r.top+"px";
-      viewer.style.left = r.left+"px";
-      viewer.style.transform = "translate(0,0)";
-      document.getElementById("lightbox").classList.add("active");
-
-      requestAnimationFrame(()=>{
-        viewer.style.width = window.innerWidth*0.8+"px";
-        viewer.style.height = window.innerHeight*0.8+"px";
-        viewer.style.top = "50%";
-        viewer.style.left = "50%";
-        viewer.style.transform = "translate(-50%,-50%)";
-      });
-    });
-
-    function closeLightbox(){
-      document.getElementById("lightbox").classList.remove("active");
-      document.getElementById("viewImg").src = "";
-    }
-
-    document.getElementById("search").addEventListener("input", render);
-    document.getElementById("sort").addEventListener("change", render);
-
-    async function refreshItems(){
-      const btn = document.getElementById("refresh");
-      btn.textContent = "Refreshing...";
-      btn.disabled = true;
-      const items = await loadItems();
-      if(items.length){
-        records = items;
-        render();
-      }
-      btn.textContent = "Refresh";
-      btn.disabled = false;
-    }
-
-    document.getElementById("refresh").addEventListener("click", refreshItems);
-    setInterval(refreshItems, 10000);
-    refreshItems();
-
+    const res = await fetch(PROXY + encodeURIComponent(GIST_RAW_URL));
+    if (!res.ok) throw new Error("Failed to fetch");
+    const data = await res.json();
+    return data.map(it => ({
+      name: it.name,
+      imgur: it.img,
+      price: Math.floor(it.price),
+      key: Math.random().toString(36).slice(2),
+      createdAt: Date.now()
+    }));
   } catch(e) {
-    console.error("Unexpected error:", e);
-    document.body.innerHTML = "<h1 style='color:red;text-align:center;margin-top:40px;'>Error loading page</h1>";
+    console.warn("Failed to fetch Gist:", e);
+    return [];
   }
-})();
-</script>
+}
 
+function imgUrl(link){
+  const m = link.match(/(?:https?:\/\/)?(?:i\.)?imgur\.com\/([a-zA-Z0-9]{5,10})(?:\.(jpg|jpeg|png|gif|webp))?/);
+  return m ? `https://i.imgur.com/${m[1]}.${m[2]||'jpg'}` : "";
+}
+
+function render(){
+  const q = document.getElementById("search").value.toLowerCase();
+  const sort = document.getElementById("sort").value;
+  let list = [...records];
+  if(q) list = list.filter(r=>r.name.toLowerCase().includes(q));
+
+  list.sort((a,b)=>{
+    if(sort==="name") return a.name.localeCompare(b.name);
+    if(sort==="price") return a.price - b.price;
+    return b.createdAt - a.createdAt;
+  });
+
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  for(const rec of list){
+    grid.innerHTML += `
+      <article class="card">
+        <div class="thumb btn" data-key="${rec.key}">
+          <img src="${imgUrl(rec.imgur)}" alt="${rec.name}">
+        </div>
+        <div class="label">
+          <div class="title">${rec.name}</div>
+          <div class="price">${rec.price} IC</div>
+        </div>
+      </article>`;
+  }
+  document.getElementById("empty").style.display = list.length ? "none" : "block";
+}
+
+document.addEventListener("click", e=>{
+  if(e.target.matches("[data-close]")) return closeLightbox();
+  const t = e.target.closest("[data-key]");
+  if(!t) return;
+  const rec = records.find(r=>r.key===t.dataset.key);
+  if(!rec) return;
+
+  const img = t.querySelector("img");
+  const r = img.getBoundingClientRect();
+  const viewer = document.querySelector(".viewer");
+  const viewImg = document.getElementById("viewImg");
+  viewImg.src = imgUrl(rec.imgur);
+  viewer.style.width = r.width+"px";
+  viewer.style.height = r.height+"px";
+  viewer.style.top = r.top+"px";
+  viewer.style.left = r.left+"px";
+  viewer.style.transform = "translate(0,0)";
+  document.getElementById("lightbox").classList.add("active");
+
+  requestAnimationFrame(()=>{
+    viewer.style.width = window.innerWidth*0.8+"px";
+    viewer.style.height = window.innerHeight*0.8+"px";
+    viewer.style.top = "50%";
+    viewer.style.left = "50%";
+    viewer.style.transform = "translate(-50%,-50%)";
+  });
+});
+
+function closeLightbox(){
+  document.getElementById("lightbox").classList.remove("active");
+  document.getElementById("viewImg").src = "";
+}
+
+document.getElementById("search").addEventListener("input", render);
+document.getElementById("sort").addEventListener("change", render);
+document.getElementById("refresh").addEventListener("click", init);
+
+async function init(){
+  const items = await loadItems();
+  records = items;
+  render();
+}
+
+// Auto-refresh every 10 seconds
+setInterval(init, 10000);
+
+init();
+</script>
 </body>
 </html>
