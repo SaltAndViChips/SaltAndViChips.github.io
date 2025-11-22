@@ -1,195 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Salt's Market</title>
-<style>
-:root{
-  --bg:#0b0d10;
-  --panel:#13161d;
-  --panel-2:#0f1117;
-  --text:#e8ecf1;
-  --muted:#9aa4b2;
-  --accent:#f1c40f;
-  --shadow:0 10px 30px rgba(0,0,0,.35);
-  --radius:18px;
-}
-
-body{margin:0;font-family:sans-serif;background:var(--bg);color:var(--text);}
-.container{max-width:1100px;margin:24px auto;padding:0 16px;}
-
-header{display:flex;align-items:center;gap:16px;justify-content:space-between;flex-wrap:wrap;margin-bottom:18px;}
-.brand{display:flex;align-items:center;gap:12px;}
-.logo{width:40px;height:40px;border-radius:12px;background: url('profile.png') center/contain no-repeat;box-shadow:0 0 10px var(--accent);}
-h1{margin:0}
-.muted{color:var(--muted)}
-
-.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
-.control{background:var(--panel);border:1px solid var(--accent);color:var(--text);border-radius:12px;padding:6px 10px;box-shadow:var(--shadow);display:flex;align-items:center;gap:6px;cursor:pointer;}
-.control input,.control select{background:transparent;color:var(--text);border:none;outline:none;font-size:14px;}
-.control option{background-color:var(--panel);color:var(--text);}
-.control.btn{background:var(--accent);color:#000;border:none;font-weight:bold;}
-
-.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));}
-.card{background:var(--panel);border:1px solid #202435;border-radius:var(--radius);overflow:hidden;position:relative;box-shadow:var(--shadow);cursor:pointer;}
-.thumb{position:relative;aspect-ratio:1/1;background:var(--panel-2);}
-.thumb img{width:100%;height:100%;object-fit:cover;display:block;}
-.label{padding:12px 14px;display:flex;flex-direction:column;gap:6px;}
-.title{font-size:14px;font-weight:bold;}
-.price{color:var(--accent);font-weight:bold;}
-
-/* Lightbox */
-.lightbox{position:fixed;inset:0;display:none;z-index:50;}
-.lightbox.active{display:block;}
-.backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:0;}
-.viewer{position:fixed;border-radius:20px;box-shadow:var(--shadow);z-index:10;transition:all 0.3s ease;transform-origin:center center;background:var(--panel-2);overflow:hidden;cursor:pointer;}
-.viewer img{width:100%;height:100%;object-fit:contain;}
-.close{position:fixed;top:10px;right:10px;background:var(--panel);color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:6px 10px;cursor:pointer;z-index:20;}
-</style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Salt's Market — Viewer</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="container">
   <header>
     <div class="brand">
-      <div class="logo"></div>
+      <div class="logo" aria-hidden="true"></div>
       <div>
         <h1>Salt's Market</h1>
-        <div class="muted" style="font-size:12px">Prices are Negotiable and NOT FINAL</div>
+        <div class="muted">Prices are Negotiable and NOT FINAL</div>
       </div>
     </div>
 
-    <div class="controls">
+    <div class="controls" role="region" aria-label="controls">
       <label class="control">🔎 <input id="search" type="search" placeholder="Search items" /></label>
       <label class="control">Sort:
-        <select id="sort">
+        <select id="sort" aria-label="Sort">
           <option value="new">Newest</option>
           <option value="name">Name A→Z</option>
           <option value="price">Price Low→High</option>
         </select>
       </label>
-      <div class="control btn" id="refresh">Refresh</div>
+      <button id="refresh" class="control btn">Refresh</button>
     </div>
   </header>
 
-  <div id="grid" class="grid"></div>
-  <div id="empty" class="muted" style="display:none">No items found</div>
+  <main>
+    <div id="grid" class="grid" role="list"></div>
+    <div id="empty" style="display:none">No items found</div>
+  </main>
 </div>
 
 <!-- Lightbox -->
-<div id="lightbox" class="lightbox">
+<div id="lightbox" class="lightbox" aria-hidden="true">
   <div class="backdrop" data-close></div>
-  <div class="viewer"><img id="viewImg" alt=""></div>
-  <button class="close" data-close>✕</button>
+  <div class="viewer" role="dialog" aria-modal="true"><img id="viewImg" alt=""></div>
+  <button class="close" data-close aria-label="Close">✕</button>
 </div>
 
 <script>
-const GIST_RAW_URL = "https://gist.githubusercontent.com/SaltAndViChips/8abb282bb5818fc1f1f8728d801df383/raw/inventory.json";
-const PROXY = "https://api.allorigins.win/raw?url=";
+(() => {
+  const GIST_RAW_URL = "https://gist.githubusercontent.com/SaltAndViChips/8abb282bb5818fc1f1f8728d801df383/raw/inventory.json";
+  const PROXY = "https://api.allorigins.win/raw?url=";
+  const AUTO_REFRESH_MS = 10000;
 
-let records = [];
+  let records = [];
 
-async function loadItems() {
-  try {
-    const res = await fetch(PROXY + encodeURIComponent(GIST_RAW_URL));
-    if (!res.ok) throw new Error("Failed to fetch");
-    const data = await res.json();
-    return data.map(it => ({
-      name: it.name,
-      imgur: it.img,
-      price: Math.floor(it.price),
-      key: Math.random().toString(36).slice(2),
-      createdAt: Date.now()
-    }));
-  } catch(e) {
-    console.warn("Failed to fetch Gist:", e);
-    return [];
+  function qs(id){ return document.getElementById(id); }
+
+  function toImgurDirect(link){
+    if(!link) return "";
+    try{
+      let m = link.match(/i\.imgur\.com\/([a-zA-Z0-9]{5,10})(?:\.(jpg|jpeg|png|gif|webp))?/);
+      if(m) return `https://i.imgur.com/${m[1]}.${m[2]||'jpg'}`;
+      m = link.match(/imgur\.com\/([a-zA-Z0-9]{5,10})/);
+      if(m) return `https://i.imgur.com/${m[1]}.jpg`;
+      return link;
+    }catch(e){ return link; }
   }
-}
 
-function imgUrl(link){
-  const m = link.match(/(?:https?:\/\/)?(?:i\.)?imgur\.com\/([a-zA-Z0-9]{5,10})(?:\.(jpg|jpeg|png|gif|webp))?/);
-  return m ? `https://i.imgur.com/${m[1]}.${m[2]||'jpg'}` : "";
-}
-
-function render(){
-  const q = document.getElementById("search").value.toLowerCase();
-  const sort = document.getElementById("sort").value;
-  let list = [...records];
-  if(q) list = list.filter(r=>r.name.toLowerCase().includes(q));
-
-  list.sort((a,b)=>{
-    if(sort==="name") return a.name.localeCompare(b.name);
-    if(sort==="price") return a.price - b.price;
-    return b.createdAt - a.createdAt;
-  });
-
-  const grid = document.getElementById("grid");
-  grid.innerHTML = "";
-  for(const rec of list){
-    grid.innerHTML += `
-      <article class="card">
-        <div class="thumb btn" data-key="${rec.key}">
-          <img src="${imgUrl(rec.imgur)}" alt="${rec.name}">
-        </div>
-        <div class="label">
-          <div class="title">${rec.name}</div>
-          <div class="price">${rec.price.toLocaleString()} IC</div>
-        </div>
-      </article>`;
+  async function loadFromGist(){
+    try{
+      const res = await fetch(PROXY + encodeURIComponent(GIST_RAW_URL) + "&_=" + Date.now(), { cache: "no-store" });
+      if(!res.ok) throw new Error("network "+res.status);
+      const data = await res.json();
+      if(!Array.isArray(data)) return [];
+      return data.map((it, idx) => ({
+        name: String(it.name||""),
+        imgur: toImgurDirect(it.img || it.imgur || ""),
+        price: Math.floor(Number(it.price)||0),
+        SaltOwned: !!it.SaltOwned,
+        key: "g_" + idx + "_" + Math.random().toString(36).slice(2),
+        createdAt: Date.now()
+      }));
+    }catch(e){
+      console.warn("loadFromGist failed:", e);
+      return [];
+    }
   }
-  document.getElementById("empty").style.display = list.length ? "none" : "block";
-}
 
+  function fmt(n){ return Number(n).toLocaleString(); }
 
-document.addEventListener("click", e=>{
-  if(e.target.matches("[data-close]")) return closeLightbox();
-  const t = e.target.closest("[data-key]");
-  if(!t) return;
-  const rec = records.find(r=>r.key===t.dataset.key);
-  if(!rec) return;
+  function render(){
+    const q = (qs("search").value||"").toLowerCase();
+    const sort = qs("sort").value;
+    let list = [...records];
+    if(q) list = list.filter(r => (r.name||"").toLowerCase().includes(q));
+    list.sort((a,b)=>{
+      if(sort==="name") return (a.name||"").localeCompare(b.name||"");
+      if(sort==="price") return (a.price||0) - (b.price||0);
+      return (b.createdAt||0) - (a.createdAt||0);
+    });
+    const grid = qs("grid");
+    grid.innerHTML = "";
+    if(list.length === 0){ qs("empty").style.display = "block"; return; } else qs("empty").style.display = "none";
+    for(const rec of list){
+      const card = document.createElement("article");
+      card.className = "card" + (rec.SaltOwned ? " salt-owned" : "");
+      card.setAttribute("data-key", rec.key);
 
-  const img = t.querySelector("img");
-  const r = img.getBoundingClientRect();
-  const viewer = document.querySelector(".viewer");
-  const viewImg = document.getElementById("viewImg");
-  viewImg.src = imgUrl(rec.imgur);
-  viewer.style.width = r.width+"px";
-  viewer.style.height = r.height+"px";
-  viewer.style.top = r.top+"px";
-  viewer.style.left = r.left+"px";
-  viewer.style.transform = "translate(0,0)";
-  document.getElementById("lightbox").classList.add("active");
+      const thumb = document.createElement("div");
+      thumb.className = "thumb btn";
+      const img = document.createElement("img");
+      img.src = rec.imgur || ""; img.alt = rec.name || "";
+      thumb.appendChild(img);
 
-  requestAnimationFrame(()=>{
-    viewer.style.width = window.innerWidth*0.8+"px";
-    viewer.style.height = window.innerHeight*0.8+"px";
-    viewer.style.top = "50%";
-    viewer.style.left = "50%";
-    viewer.style.transform = "translate(-50%,-50%)";
-  });
-});
+      const label = document.createElement("div");
+      label.className = "label";
 
-function closeLightbox(){
-  document.getElementById("lightbox").classList.remove("active");
-  document.getElementById("viewImg").src = "";
-}
+      const titleRow = document.createElement("div");
+      titleRow.className = "title-row";
+      const title = document.createElement("div");
+      title.className = "title"; title.textContent = rec.name || "(unnamed)";
+      titleRow.appendChild(title);
+      if(rec.SaltOwned){
+        const star = document.createElement("div");
+        star.className = "star";
+        star.textContent = "★";
+        titleRow.appendChild(star);
+      }
+      label.appendChild(titleRow);
 
-document.getElementById("search").addEventListener("input", render);
-document.getElementById("sort").addEventListener("change", render);
-document.getElementById("refresh").addEventListener("click", init);
+      const price = document.createElement("div");
+      price.className = "price";
+      price.textContent = `${fmt(rec.price||0)} IC`;
+      label.appendChild(price);
 
-async function init(){
-  const items = await loadItems();
-  records = items;
-  render();
-}
+      card.appendChild(thumb);
+      card.appendChild(label);
+      grid.appendChild(card);
 
-// Auto-refresh every 10 seconds
-setInterval(init, 10000);
+      thumb.addEventListener("click", () => openLightbox(rec));
+    }
+  }
 
-init();
+  function openLightbox(rec){
+    const viewerImg = qs("viewImg");
+    viewerImg.src = rec.imgur || "";
+    document.getElementById("lightbox").classList.add("active");
+    document.getElementById("lightbox").style.display = "block";
+  }
+  function closeLightbox(){ document.getElementById("lightbox").classList.remove("active"); document.getElementById("lightbox").style.display = "none"; qs("viewImg").src = ""; }
+
+  async function refresh(){
+    const btn = qs("refresh");
+    btn.textContent = "Refreshing...";
+    btn.disabled = true;
+    try{
+      const gistItems = await loadFromGist();
+      records = gistItems;
+      render();
+    }catch(e){ console.warn(e); }
+    btn.textContent = "Refresh"; btn.disabled = false;
+  }
+
+  qs("search").addEventListener("input", render);
+  qs("sort").addEventListener("change", render);
+  qs("refresh").addEventListener("click", refresh);
+  document.addEventListener("click", (e)=>{ if(e.target.matches("[data-close]")||e.target.closest("[data-close]")) closeLightbox(); });
+  window.addEventListener("keydown",(e)=>{ if(e.key==="Escape") closeLightbox(); });
+
+  // initial load + auto refresh
+  (async ()=>{ await refresh(); setInterval(refresh, AUTO_REFRESH_MS); })();
+})();
 </script>
 </body>
 </html>
-
