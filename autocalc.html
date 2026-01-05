@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Weapon OCR Simulator</title>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<style>
+body{
+  margin:0;
+  padding:24px;
+  background:#050506;
+  color:#eee;
+  font-family:Inter,system-ui,sans-serif;
+}
+.container{
+  max-width:1000px;
+  margin:auto;
+  background:#0d0d11;
+  border-radius:18px;
+  border:1px solid #2a2a2f;
+  padding:24px;
+}
+h1{color:#d4af37}
+.upload{
+  display:flex;
+  gap:16px;
+  align-items:center;
+}
+#uploadBox{
+  width:140px;
+  height:140px;
+  border:2px dashed #d4af37;
+  border-radius:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:52px;
+  cursor:pointer;
+}
+#imgur{
+  flex:1;
+  padding:12px;
+  background:#070709;
+  border:1px solid #2a2a2f;
+  border-radius:10px;
+  color:#eee;
+}
+img{
+  display:none;
+  margin-top:16px;
+  max-width:100%;
+  border-radius:14px;
+}
+button{
+  margin-top:16px;
+  padding:12px 18px;
+  border-radius:10px;
+  background:#d4af37;
+  border:none;
+  font-weight:700;
+}
+.section{margin-top:20px}
+.talent{
+  margin-top:10px;
+  padding:10px;
+  border:1px solid #2a2a2f;
+  border-radius:10px;
+}
+.stat{display:flex;justify-content:space-between}
+.modified{color:#d4af37}
+</style>
+</head>
+
+<body>
+<div class="container">
+<h1>WEAPON OCR</h1>
+
+<div class="upload">
+  <div id="uploadBox">⬆</div>
+  <input type="file" id="file" hidden>
+  <input id="imgur" placeholder="Paste Imgur link and press Enter">
+</div>
+
+<img id="preview">
+
+<button id="run">Run OCR</button>
+<div id="status"></div>
+
+<div id="stats" class="section"></div>
+<div id="talents" class="section"></div>
+</div>
+
+<script>
+const uploadBox=document.getElementById('uploadBox');
+const file=document.getElementById('file');
+const imgur=document.getElementById('imgur');
+const preview=document.getElementById('preview');
+const run=document.getElementById('run');
+const status=document.getElementById('status');
+const stats=document.getElementById('stats');
+const talents=document.getElementById('talents');
+
+let canvas,weapon;
+
+uploadBox.onclick=()=>file.click();
+
+function load(src){
+  return new Promise(r=>{
+    const img=new Image();
+    img.crossOrigin='anonymous';
+    img.onload=()=>{
+      canvas=document.createElement('canvas');
+      canvas.width=img.width;
+      canvas.height=img.height;
+      canvas.getContext('2d').drawImage(img,0,0);
+      preview.src=canvas.toDataURL();
+      preview.style.display='block';
+      r();
+    };
+    img.src=src;
+  });
+}
+
+file.onchange=async()=>{
+  if(!file.files[0])return;
+  await load(URL.createObjectURL(file.files[0]));
+};
+
+imgur.onkeydown=async e=>{
+  if(e.key!=='Enter')return;
+  const id=imgur.value.trim().split('/').pop();
+  await load(`https://i.imgur.com/${id}.jpeg`);
+};
+
+run.onclick=async()=>{
+  status.textContent='OCR running…';
+  const r=await Tesseract.recognize(canvas,'eng');
+  weapon=parse(r.data.text);
+  render();
+  status.textContent='Done';
+};
+
+/* ===== PARSER ===== */
+function parse(text){
+  const lines=text.split(/\n+/).map(l=>l.trim()).filter(Boolean);
+  const row=lines.find(l=>/^\d+(\.\d+)?\s+\d+\s+\d+/.test(l));
+  const nums=row.match(/\d+(\.\d+)?/g);
+
+  const base={dmg:+nums[0],rpm:+nums[1],mag:+nums[2]};
+  const talents=[];
+  let cur=null;
+
+  lines.forEach(l=>{
+    if(l.includes('| Unlocks')){
+      cur={name:l.split('|')[0],body:'',dmg:0,tf:0,enabled:false};
+      talents.push(cur);
+      return;
+    }
+    if(!cur)return;
+
+    cur.body+=` ${l}`;
+
+    const pct=l.match(/(\d+(?:\.\d+)?)%/);
+    if(!pct)return;
+
+    if(/damage/i.test(l)) cur.dmg+=+pct[1];
+
+    if(/trigger finger/i.test(cur.name))
+      cur.tf+=+pct[1];
+  });
+
+  return {base,talents};
+}
+
+/* ===== RPM ===== */
+function actualRPM(rpm){
+  if(!isFinite(rpm)) return 3960;
+  const sps=rpm/60;
+  const ticks=Math.ceil(66/sps);
+  return Math.floor((66/ticks)*60);
+}
+
+/* ===== RENDER ===== */
+function render(){
+  function recalc(){
+    let dmg=weapon.base.dmg;
+    let rpm=weapon.base.rpm;
+
+    weapon.talents.forEach(t=>{
+      if(!t.enabled)return;
+      if(t.dmg)dmg*=1+t.dmg/100;
+      if(t.tf){
+        const f=t.tf/100;
+        rpm=(1-f)<=0?Infinity:rpm/(1-f);
+      }
+    });
+
+    const act=actualRPM(rpm);
+    const stk=Math.ceil(100/dmg);
+    const armD=dmg*0.7;
+    const stkA=Math.ceil(100/armD);
+
+    stats.innerHTML=`
+      <h3>Stats</h3>
+      <div class="stat">DMG <span class="modified">${dmg.toFixed(2)}</span></div>
+      <div class="stat">RPM <span class="modified">${isFinite(rpm)?Math.floor(rpm):'∞'}</span></div>
+      <div class="stat">Actual RPM <span class="modified">${act}</span></div>
+      <div class="stat">MAG <span>${weapon.base.mag}</span></div>
+      <hr>
+      <div class="stat">Shots to Kill <span>${stk}</span></div>
+      <div class="stat">Armored Damage <span>${armD.toFixed(2)}</span></div>
+      <div class="stat">Shots to Kill Armor <span>${stkA}</span></div>
+    `;
+  }
+
+  talents.innerHTML='<h3>Talents</h3>';
+  weapon.talents.forEach(t=>{
+    const d=document.createElement('div');
+    d.className='talent';
+
+    const c=document.createElement('input');
+    c.type='checkbox';
+    c.onchange=()=>{t.enabled=c.checked;recalc();};
+
+    d.append(c,' ',t.name,document.createElement('div'));
+    d.lastChild.textContent=t.body;
+    talents.appendChild(d);
+  });
+
+  recalc();
+}
+</script>
+</body>
+</html>
