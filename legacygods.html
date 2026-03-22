@@ -1,1 +1,184 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Random Character Picker</title>
+<style>
+  body {
+    background-color: #121212;
+    color: #00fa9a;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+    margin: 0;
+  }
+  button {
+    background-color: #00fa9a;
+    color: #121212;
+    border: none;
+    padding: 1em 2em;
+    font-size: 1.2em;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+  button:hover {
+    background-color: #00c98b;
+  }
+  .slot-container {
+    height: 5em;
+    overflow: hidden;
+    width: 220px;
+    border: 2px solid #00fa9a;
+    margin-top: 30px;
+    position: relative;
+  }
+  .slot {
+    display: flex;
+    flex-direction: column;
+    will-change: transform;
+  }
+  .slot-item {
+    height: 5em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-shadow: 1px 1px 2px black;
+    user-select: none;
+    font-weight: 400;
+    color: #00fa9a;
+    transition: color 0.3s, background-color 0.3s;
+    padding: 0 8px;
+    box-sizing: border-box;
+  }
+  .slot-item > div:first-child {
+    font-size: 1.8em;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 0.3em;
+  }
+  .aspect-line {
+    font-size: 1.1em;
+    color: #00fa9a;
+    font-weight: 400;
+    line-height: 1;
+    user-select: none;
+  }
+  /* Flash animation: text color toggles black/teal, background and glow fade in/out */
+  .highlight {
+    animation: flash 1s ease-in-out 2;
+  }
+  @keyframes flash {
+    0%, 100% {
+      background-color: transparent;
+      color: #00fa9a;
+      box-shadow: none;
+    }
+    50% {
+      background-color: #00fa9a;
+      color: #121212;
+      box-shadow: 0 0 20px 8px #00fa9a;
+    }
+  }
+</style>
+</head>
+<body>
+<h1>Random Character Picker</h1>
+<button id="spin-button" onclick="spinCharacter()">Pick a Character</button>
+<div class="slot-container">
+  <div id="slot" class="slot"></div>
+</div>
+
+<script>
+  const verticalPadding = 6;
+
+  const characters = ["King Arthur", "Lancelot", "Merlin", "Morgan Le Fay",
+"Gilgamesh", "Ishtar", "Tiamat",
+"Artio", "Cernunnos", "Cliodhna", "Cu Chulainn", "The Morrigan",
+"Ao Kuang", "Chang'e", "Da Ji", "Erlang Shen", "Guan Yu", "He Bo", "Hou Yi", "Jing Wei", "Mulan", "Ne Zha", "Nu Wa", "Sun Wukong", "Xing Tian", "Yu Huang", "Zhong Kui",
+"Anhur", "Anubis", "Bastet", "Eset", "Geb", "Horus", "Khepri", "Neith", "Nut", "Osiris", "Ra", "Serqet", "Set", "Sobek", "Thoth",
+"Cthulhu",
+"Achilles", "Aphrodite", "Apollo", "Arachne", "Ares", "Artemis", "Athena", "Atlas", "Cerberus", "Charon", "Charybdis", "Chiron", "Chronos", "Hades", "Hera", "Martichoras", "Medusa", "Nemesis", "Nike", "Persephone", "Poseidon", "Scylla", "Thanatos", "Zeus",
+"Agni", "Bakasura", "Ganesha", "Kali", "Kumbhakarna", "Rama", "Ravana", "Shiva", "Vamana",
+"Amaterasu", "Bake Kujira", "Danzaburou", "Hachiman", "Izanami", "Kuzenbo", "Raijin", "Susano", "Tsukuyomi",
+"Ah Muzen Cab", "Ah Puch", "Awilix", "Cabrakan", "Camazotz", "Chaac", "Hun Batz", "Ix Chel", "Kukulkan", "Xbalanque",
+"Fafnir", "Fenrir", "Freya", "Heimdallr", "Hel", "Jormungandr", "Loki", "Odin", "Ratatoskr", "Skadi", "Sol", "Surtr", "Thor", "Tyr", "Ullr", "Ymir",
+"Maui", "Pele",
+"Bacchus", "Bellona", "Cupid", "Discordia", "Hercules", "Janus", "Mercury", "Nox", "Sylvanus", "Terra", "Vulcan",
+"Baba Yaga", "Chernobog",
+"Baron Samedi", "Maman Brigitte",
+"Olorun", "Yemoja"]
+
+  function spinCharacter() {
+  const button = document.getElementById('spin-button');
+  const slot = document.getElementById('slot');
+  button.disabled = true;
+
+  document.querySelectorAll('.slot-item.highlight').forEach(el => {
+    el.classList.remove('highlight');
+    void el.offsetWidth; // reflow to restart animation
+  });
+
+  slot.innerHTML = '';
+  slot.style.transition = 'none';
+  slot.style.transform = 'translateY(0px)';
+
+  const spinList = [];
+  for (let i = 0; i < 30; i++) {
+    const char = characters[Math.floor(Math.random() * characters.length)];
+    spinList.push(`
+      <div class="slot-item">
+        <div>${char}</div>
+      </div>
+    `);
+  }
+  const finalChar = characters[Math.floor(Math.random() * characters.length)];
+  spinList.push(`
+    <div class="slot-item final-item">
+      <div>${finalChar}</div>
+    </div>
+  `);
+
+  slot.innerHTML = spinList.join('');
+
+  const itemHeight = slot.querySelector('.slot-item').offsetHeight;
+  const containerHeight = document.querySelector('.slot-container').offsetHeight;
+  const targetOffset = itemHeight * (spinList.length - 1);
+  const centeredOffset = targetOffset - Math.floor((containerHeight - itemHeight) / 2) + verticalPadding;
+
+  requestAnimationFrame(() => {
+    slot.style.transition = 'transform 3.5s cubic-bezier(0.25, 1, 0.5, 1)';
+    slot.style.transform = `translateY(-${centeredOffset}px)`;
+  });
+
+  setTimeout(() => {
+    const finalItem = document.querySelector('.final-item');
+    if (finalItem) {
+      finalItem.classList.add('highlight');
+      
+      // Play corresponding .ogg sound based on god name
+      const godName = finalItem.querySelector('div:first-child').textContent;
+      // Sanitize godName for filename if needed (remove spaces, etc.)
+      const filename = 'Sounds/' + godName.replace(/ /g, '') + '.ogg';
+
+      const audio = new Audio(filename);
+      audio.play().catch(e => {
+        console.warn(`Could not play sound file: ${filename}`, e);
+      });
+    }
+    button.disabled = false;
+  }, 3700);
+}
+
+</script>
+</body>
+</html>
