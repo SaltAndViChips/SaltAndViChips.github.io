@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Salt's Quick Access</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px 20px;
+            min-height: 100vh;
+
+            background: #121212;
+            color: #ffffff;
+
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Page title */
+        h1 {
+            margin: 0 0 35px;
+            text-align: center;
+            font-size: 2.2rem;
+        }
+
+        /* Category */
+        .category {
+            margin-bottom: 35px;
+        }
+
+        .category-title {
+            margin: 0 0 15px;
+            font-size: 1.35rem;
+            color: #c084fc;
+            border-bottom: 1px solid #333;
+            padding-bottom: 8px;
+        }
+
+        /* Link grid */
+        .links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        /* Purple button */
+        .link-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            min-height: 55px;
+            padding: 12px 18px;
+
+            background: #7c3aed;
+            color: #ffffff;
+
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+
+            transition:
+                background 0.15s ease,
+                transform 0.15s ease,
+                box-shadow 0.15s ease;
+
+            overflow-wrap: anywhere;
+        }
+
+        .link-button:hover {
+            background: #9333ea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.3);
+        }
+
+        .link-button:active {
+            transform: translateY(0);
+        }
+
+        /* Empty states */
+        .empty {
+            color: #777;
+            font-style: italic;
+        }
+
+        /* Smaller screens */
+        @media (max-width: 500px) {
+            body {
+                padding: 25px 15px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .links {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Quick Access</h1>
+
+    <!--
+        ============================================================
+        ADD / EDIT YOUR LINKS HERE
+        ============================================================
+
+        You can have:
+        - Multiple categories
+        - A category with no name
+        - No categories at all
+        - Links with no names
+
+        Examples:
+
+        Category WITH a name:
+            <section class="category">
+                <h2 class="category-title">Social</h2>
+
+                <div class="links">
+                    <a class="link-button" href="https://discord.com">
+                        Discord
+                    </a>
+
+                    <a class="link-button" href="https://reddit.com">
+                        Reddit
+                    </a>
+                </div>
+            </section>
+
+        Category WITHOUT a name:
+            <section class="category">
+                <div class="links">
+                    <a class="link-button" href="https://example.com">
+                        Example
+                    </a>
+                </div>
+            </section>
+
+        Link WITHOUT a name:
+            <a class="link-button" href="https://example.com">
+                https://example.com
+            </a>
+
+        ============================================================
+    -->
+
+
+    <!-- CATEGORY 1 -->
+    <section class="category">
+
+        <h2 class="category-title">Tools</h2>
+
+        <div class="links">
+
+            <a class="link-button" href="https://nicecock.ca/" target="_blank">
+                Calculator
+            </a>
+
+            <a class="link-button" href="https://nicecock.ca/gods" target="_blank">
+                Smite 2 Random Gods
+            </a>
+			
+			<a class="link-button" href="https://nicecock.ca/legacygods" target="_blank">
+                Smite 1 Random Gods
+            </a>
+
+            <a class="link-button" href="https://nicecock.ca/DnD" target="_blank">
+                DnD Wiki
+            </a>
+
+        </div>
+    </section>
+
+
+    <!-- CATEGORY 2 -->
+    <section class="category">
+
+        <h2 class="category-title">Destiny</h2>
+
+        <div class="links">
+
+            <a class="link-button" href="https://docs.google.com/spreadsheets/d/1JM-0SlxVDAi-C6rGVlLxa-J1WGewEeL8Qvq4htWZHhY/htmlview?gid=1789798057&pru=AAABn-6ZfTM*EJY4cBE3d14fTJZaK5IJ4w#gid=324500912" target="_blank">
+                Tier List
+            </a>
+
+            <a class="link-button" href="https://raid.report/xb/4611686018430612456" target="_blank">
+                Raids
+            </a>
+
+        </div>
+    </section>
+
+
+    <!--
+        ============================================================
+        UNCATEGORIZED LINKS
+
+        You can simply add links outside of a category if you
+        don't want to use categories.
+
+        <div class="links">
+            <a class="link-button" href="https://example.com">
+                Example
+            </a>
+        </div>
+
+        ============================================================
+    -->
+
+</div>
+
+</body>
+</html>
