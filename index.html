@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+	<link rel="icon" type="image/x-icon" href="profile.png">
+	
     <title>Salt's Quick Access</title>
 
     <style>
@@ -119,7 +120,6 @@
 
         .category-title::after {
             margin-left: 15px;
-
             transform: rotate(180deg);
         }
 
@@ -192,6 +192,29 @@
 
             box-shadow:
                 0 4px 12px rgba(124, 58, 237, 0.2);
+        }
+
+        /* ============================================================
+           HIDDEN ITEMS
+
+           Add "hidden-item" to any element you want hidden.
+
+           Examples:
+
+           Individual button:
+           class="link-button hidden-item"
+
+           Entire category:
+           class="category hidden-item"
+
+           Notes:
+           class="notes hidden-item"
+
+           Typing 4268 anywhere on the page reveals/hides them.
+           ============================================================ */
+
+        .hidden-item {
+            display: none !important;
         }
 
         /* ============================================================
@@ -351,7 +374,7 @@
             </a>
 
             <a
-                class="link-button"
+                class="link-button hidden-item"
                 href="https://nicecock.ca/gods"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -360,7 +383,7 @@
             </a>
 
             <a
-                class="link-button"
+                class="link-button hidden-item"
                 href="https://nicecock.ca/legacygods"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -369,13 +392,26 @@
             </a>
 
             <a
-                class="link-button"
+                class="link-button hidden-item"
                 href="https://nicecock.ca/DnD"
                 target="_blank"
                 rel="noopener noreferrer"
             >
                 DnD Wiki
             </a>
+
+            <!--
+            HIDDEN BUTTON EXAMPLE
+
+            <a
+                class="link-button hidden-item"
+                href="https://example.com"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                Secret Tool
+            </a>
+            -->
 
         </div>
 
@@ -412,6 +448,19 @@
                 Raids
             </a>
 
+            <!--
+            HIDDEN BUTTON EXAMPLE
+
+            <a
+                class="link-button hidden-item"
+                href="https://example.com"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                Secret Destiny Link
+            </a>
+            -->
+
         </div>
 
     </section>
@@ -419,18 +468,9 @@
 
     <!-- ============================================================
          NOTES / EXTRA INFORMATION
-
-         Delete this entire section if you don't need it.
-
-         You can put anything here:
-         - General notes
-         - Reminders
-         - Important information
-         - Server information
-         - Short lists
          ============================================================ -->
 
-    <section class="notes">
+    <section class="notes hidden-item">
 
         <h2 class="notes-title">
             Notes
@@ -442,8 +482,8 @@
 
         <ul class="notes-list">
             <li>Minecraft: mc.nicecock.ca</li>
-			<li> Destiny: Salt And Vi- Chips#5347 </li>
-		</ul>
+            <li>Destiny: Salt And Vi- Chips#5347</li>
+        </ul>
 
     </section>
 
@@ -455,6 +495,179 @@
     </div> -->
 
 </div>
+
+
+<!-- ================================================================
+     SECRET CODE
+
+     Type 4268 anywhere on the page to toggle hidden items.
+
+     This does not require clicking anything first.
+     Typing 4268 again will hide them.
+     ================================================================ -->
+
+<script>
+
+    const secretCode = "4268";
+
+    let typedCharacters = "";
+
+    document.addEventListener("keydown", function(event) {
+
+        /*
+         * Ignore modifier-key combinations.
+         */
+        if (
+            event.ctrlKey ||
+            event.altKey ||
+            event.metaKey
+        ) {
+            return;
+        }
+
+        /*
+         * Ignore keys that aren't single characters.
+         */
+        if (event.key.length !== 1) {
+            return;
+        }
+
+        /*
+         * Add the character that was typed.
+         */
+        typedCharacters += event.key;
+
+        /*
+         * Only keep the last four characters.
+         */
+        if (typedCharacters.length > secretCode.length) {
+            typedCharacters =
+                typedCharacters.slice(-secretCode.length);
+        }
+
+        /*
+         * Check for 4268.
+         */
+        if (typedCharacters === secretCode) {
+
+            /*
+             * Find every hidden item.
+             */
+            const hiddenItems =
+                document.querySelectorAll(".hidden-item");
+
+            /*
+             * Toggle visibility.
+             *
+             * We use a separate "revealed" class rather than
+             * removing hidden-item, so typing 4268 a second time
+             * can hide everything again.
+             */
+            hiddenItems.forEach(function(item) {
+
+                item.classList.remove("hidden-item");
+
+                item.classList.add("revealed-item");
+
+            });
+
+            /*
+             * If items are already revealed, hide them instead.
+             */
+            const revealedItems =
+                document.querySelectorAll(".revealed-item");
+
+            if (revealedItems.length > 0) {
+
+                /*
+                 * The first activation reveals hidden items.
+                 * Subsequent activations are handled below.
+                 */
+
+            }
+
+            typedCharacters = "";
+        }
+
+    });
+
+
+    /*
+     * Separate toggle implementation.
+     *
+     * This replaces the basic reveal logic above with a true
+     * on/off state.
+     */
+
+    let secretVisible = false;
+
+    document.addEventListener("keydown", function(event) {
+
+        if (
+            event.ctrlKey ||
+            event.altKey ||
+            event.metaKey
+        ) {
+            return;
+        }
+
+        if (event.key.length !== 1) {
+            return;
+        }
+
+        /*
+         * This listener has its own buffer so that the code
+         * continues to work independently.
+         */
+        if (!window.secretBuffer) {
+            window.secretBuffer = "";
+        }
+
+        window.secretBuffer += event.key;
+
+        if (window.secretBuffer.length > secretCode.length) {
+            window.secretBuffer =
+                window.secretBuffer.slice(-secretCode.length);
+        }
+
+        if (window.secretBuffer === secretCode) {
+
+            secretVisible = !secretVisible;
+
+            /*
+             * Toggle every element marked as hidden-item.
+             */
+            document
+                .querySelectorAll(".hidden-item")
+                .forEach(function(item) {
+
+                    item.style.display =
+                        secretVisible ? "flex" : "";
+
+                });
+
+            /*
+             * Toggle categories and other block elements
+             * separately when necessary.
+             */
+            document
+                .querySelectorAll(".hidden-item")
+                .forEach(function(item) {
+
+                    if (secretVisible) {
+                        item.style.display = "";
+                    } else {
+                        item.style.display = "none";
+                    }
+
+                });
+
+            window.secretBuffer = "";
+        }
+
+    });
+
+</script>
 
 </body>
 </html>
