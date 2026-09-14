@@ -11,102 +11,303 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --background: #0d0d0f;
+            --surface: #16161a;
+            --surface-light: #1d1d23;
+            --border: #2b2b33;
+
+            --purple: #7c3aed;
+            --purple-light: #a855f7;
+            --purple-soft: #c084fc;
+
+            --text: #ffffff;
+            --text-muted: #a1a1aa;
+        }
+
         body {
             margin: 0;
-            padding: 40px 20px;
+            padding: 50px 20px;
             min-height: 100vh;
 
-            background: #121212;
-            color: #ffffff;
+            background:
+                radial-gradient(
+                    circle at top,
+                    rgba(124, 58, 237, 0.12),
+                    transparent 45%
+                ),
+                var(--background);
+
+            color: var(--text);
 
             font-family: Arial, Helvetica, sans-serif;
         }
 
+        /* Main page container */
         .container {
             width: 100%;
-            max-width: 1100px;
+            max-width: 1000px;
             margin: 0 auto;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        /* Page title */
-        h1 {
-            margin: 0 0 35px;
+        /* Page header */
+        .page-header {
             text-align: center;
-            font-size: 2.2rem;
+            margin-bottom: 45px;
         }
 
-        /* Category */
+        h1 {
+            margin: 0;
+
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+
+            text-shadow:
+                0 0 25px rgba(168, 85, 247, 0.25);
+        }
+
+        .subtitle {
+            margin-top: 10px;
+
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Categories */
         .category {
-            margin-bottom: 35px;
+            width: 100%;
+            margin-bottom: 38px;
         }
 
         .category-title {
-            margin: 0 0 15px;
-            font-size: 1.35rem;
-            color: #c084fc;
-            border-bottom: 1px solid #333;
-            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin: 0 0 18px;
+
+            font-size: 1.3rem;
+            font-weight: 600;
+
+            color: var(--purple-soft);
+
+            letter-spacing: 0.3px;
+        }
+
+        .category-title::before,
+        .category-title::after {
+            content: "";
+
+            width: 70px;
+            height: 1px;
+
+            background: linear-gradient(
+                to right,
+                transparent,
+                var(--border)
+            );
+        }
+
+        .category-title::before {
+            margin-right: 15px;
+        }
+
+        .category-title::after {
+            margin-left: 15px;
+
+            transform: rotate(180deg);
         }
 
         /* Link grid */
         .links {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px;
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(190px, 1fr));
+
+            gap: 14px;
+
+            width: 100%;
         }
 
-        /* Purple button */
+        /* Link buttons */
         .link-button {
+            position: relative;
+
             display: flex;
             align-items: center;
             justify-content: center;
 
-            min-height: 55px;
-            padding: 12px 18px;
+            min-height: 58px;
+            padding: 13px 18px;
 
-            background: #7c3aed;
+            background: linear-gradient(
+                145deg,
+                #7c3aed,
+                #6d28d9
+            );
+
             color: #ffffff;
 
+            border: 1px solid rgba(192, 132, 252, 0.18);
             border-radius: 10px;
+
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 600;
+
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.25);
 
             transition:
-                background 0.15s ease,
-                transform 0.15s ease,
-                box-shadow 0.15s ease;
+                transform 0.18s ease,
+                background 0.18s ease,
+                box-shadow 0.18s ease,
+                border-color 0.18s ease;
 
             overflow-wrap: anywhere;
         }
 
         .link-button:hover {
-            background: #9333ea;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.3);
+            background: linear-gradient(
+                145deg,
+                #9333ea,
+                #7c3aed
+            );
+
+            border-color: rgba(192, 132, 252, 0.45);
+
+            transform: translateY(-3px);
+
+            box-shadow:
+                0 8px 22px rgba(124, 58, 237, 0.28);
         }
 
         .link-button:active {
-            transform: translateY(0);
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 4px 12px rgba(124, 58, 237, 0.2);
         }
 
-        /* Empty states */
+        /* ============================================================
+           NOTES / EXTRA INFORMATION
+           ============================================================ */
+
+        .notes {
+            width: 100%;
+
+            margin-top: 5px;
+            margin-bottom: 20px;
+
+            padding: 24px 28px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(29, 29, 35, 0.95),
+                    rgba(20, 20, 24, 0.95)
+                );
+
+            border: 1px solid var(--border);
+            border-radius: 14px;
+
+            box-shadow:
+                0 8px 30px rgba(0, 0, 0, 0.25);
+
+            text-align: center;
+        }
+
+        .notes-title {
+            margin: 0 0 12px;
+
+            font-size: 1.15rem;
+            font-weight: 600;
+
+            color: var(--purple-soft);
+        }
+
+        .notes-content {
+            margin: 0;
+
+            color: var(--text-muted);
+
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .notes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+
+            margin: 12px 0 0;
+            padding: 0;
+
+            list-style: none;
+        }
+
+        .notes-list li {
+            color: var(--text-muted);
+        }
+
+        .notes-list li::before {
+            content: "•";
+
+            margin-right: 8px;
+
+            color: var(--purple-light);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 15px;
+
+            color: #52525b;
+
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        /* Empty state */
         .empty {
-            color: #777;
+            padding: 15px;
+
+            color: #666;
+
             font-style: italic;
+            text-align: center;
         }
 
-        /* Smaller screens */
-        @media (max-width: 500px) {
+        /* Mobile */
+        @media (max-width: 600px) {
             body {
-                padding: 25px 15px;
+                padding: 30px 15px;
             }
 
             h1 {
-                font-size: 1.8rem;
+                font-size: 2rem;
+            }
+
+            .page-header {
+                margin-bottom: 35px;
+            }
+
+            .category-title::before,
+            .category-title::after {
+                width: 35px;
             }
 
             .links {
                 grid-template-columns: 1fr;
+            }
+
+            .notes {
+                padding: 20px;
             }
         }
     </style>
@@ -116,117 +317,145 @@
 
 <div class="container">
 
-    <h1>Quick Access</h1>
+    <!-- PAGE HEADER -->
+    <header class="page-header">
 
-    <!--
-        ============================================================
-        ADD / EDIT YOUR LINKS HERE
-        ============================================================
+        <h1>Quick Access</h1>
 
-        You can have:
-        - Multiple categories
-        - A category with no name
-        - No categories at all
-        - Links with no names
+        <!-- <div class="subtitle">
+            Useful links and resources
+        </div> -->
 
-        Examples:
-
-        Category WITH a name:
-            <section class="category">
-                <h2 class="category-title">Social</h2>
-
-                <div class="links">
-                    <a class="link-button" href="https://discord.com">
-                        Discord
-                    </a>
-
-                    <a class="link-button" href="https://reddit.com">
-                        Reddit
-                    </a>
-                </div>
-            </section>
-
-        Category WITHOUT a name:
-            <section class="category">
-                <div class="links">
-                    <a class="link-button" href="https://example.com">
-                        Example
-                    </a>
-                </div>
-            </section>
-
-        Link WITHOUT a name:
-            <a class="link-button" href="https://example.com">
-                https://example.com
-            </a>
-
-        ============================================================
-    -->
+    </header>
 
 
-    <!-- CATEGORY 1 -->
+    <!-- ============================================================
+         CATEGORY 1
+         ============================================================ -->
+
     <section class="category">
 
-        <h2 class="category-title">Tools</h2>
+        <h2 class="category-title">
+            Tools
+        </h2>
 
         <div class="links">
 
-            <a class="link-button" href="https://nicecock.ca/" target="_blank">
+            <a
+                class="link-button"
+                href="https://nicecock.ca/"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
                 Calculator
             </a>
 
-            <a class="link-button" href="https://nicecock.ca/gods" target="_blank">
+            <a
+                class="link-button"
+                href="https://nicecock.ca/gods"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
                 Smite 2 Random Gods
             </a>
-			
-			<a class="link-button" href="https://nicecock.ca/legacygods" target="_blank">
+
+            <a
+                class="link-button"
+                href="https://nicecock.ca/legacygods"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
                 Smite 1 Random Gods
             </a>
 
-            <a class="link-button" href="https://nicecock.ca/DnD" target="_blank">
+            <a
+                class="link-button"
+                href="https://nicecock.ca/DnD"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
                 DnD Wiki
             </a>
 
         </div>
+
     </section>
 
 
-    <!-- CATEGORY 2 -->
+    <!-- ============================================================
+         CATEGORY 2
+         ============================================================ -->
+
     <section class="category">
 
-        <h2 class="category-title">Destiny</h2>
+        <h2 class="category-title">
+            Destiny
+        </h2>
 
         <div class="links">
 
-            <a class="link-button" href="https://docs.google.com/spreadsheets/d/1JM-0SlxVDAi-C6rGVlLxa-J1WGewEeL8Qvq4htWZHhY/htmlview?gid=1789798057&pru=AAABn-6ZfTM*EJY4cBE3d14fTJZaK5IJ4w#gid=324500912" target="_blank">
+            <a
+                class="link-button"
+                href="https://docs.google.com/spreadsheets/d/1JM-0SlxVDAi-C6rGVlLxa-J1WGewEeL8Qvq4htWZHhY/htmlview?gid=1789798057&pru=AAABn-6ZfTM*EJY4cBE3d14fTJZaK5IJ4w#gid=324500912"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
                 Tier List
             </a>
 
-            <a class="link-button" href="https://raid.report/xb/4611686018430612456" target="_blank">
+            <a
+                class="link-button"
+                href="https://raid.report/xb/4611686018430612456"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
                 Raids
             </a>
 
         </div>
+
     </section>
 
 
-    <!--
-        ============================================================
-        UNCATEGORIZED LINKS
+    <!-- ============================================================
+         NOTES / EXTRA INFORMATION
 
-        You can simply add links outside of a category if you
-        don't want to use categories.
+         Delete this entire section if you don't need it.
 
-        <div class="links">
-            <a class="link-button" href="https://example.com">
-                Example
-            </a>
-        </div>
+         You can put anything here:
+         - General notes
+         - Reminders
+         - Important information
+         - Server information
+         - Short lists
+         ============================================================ -->
 
-        ============================================================
-    -->
+    <section class="notes">
+
+        <h2 class="notes-title">
+            Notes
+        </h2>
+
+        <!-- <p class="notes-content">
+            
+        </p> -->
+
+        <ul class="notes-list">
+            <li>Minecraft: mc.nicecock.ca</li>
+			<li> Destiny: Salt And Vi- Chips#5347 </li>
+		</ul>
+
+    </section>
+
+
+    <!-- FOOTER -->
+
+    <!-- <div class="footer">
+        Salt's Quick Access
+    </div> -->
 
 </div>
 
 </body>
 </html>
+
