@@ -30,7 +30,7 @@ select,.file-label,.artist-search{background:#171021;border:1px solid var(--bord
 .home-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(320px,.7fr);gap:18px}
 .artist-table{display:flex;flex-direction:column;gap:7px}.artist-row{display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:13px;padding:11px;border-radius:13px;cursor:pointer}.artist-row:hover{background:#241534}
 .rank{font-weight:800;color:#8f7aa2;text-align:center}.artist-mini{width:42px;height:42px;border-radius:9px;object-fit:cover;background:#261635}.artist-row-main{min-width:0}.artist-row-name{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.artist-row-meta{font-size:12px;color:var(--muted)}.artist-row-score{font-size:20px;font-weight:800;color:#d9c7ff}
-.all-artists{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:510px;overflow:auto}.artist-chip{display:flex;align-items:center;gap:10px;padding:9px;border:1px solid transparent;border-radius:11px;cursor:pointer}.artist-chip:hover{background:#241534;border-color:var(--border)}.artist-chip img{width:38px;height:38px;border-radius:8px;object-fit:cover;background:#261635}.artist-chip-name{min-width:0}.artist-chip-name strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.artist-chip-name span{color:var(--muted);font-size:11px}
+.all-artists{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:510px;overflow:auto;padding:4px}.artist-chip{display:flex;align-items:center;gap:10px;padding:9px;border:1px solid transparent;border-radius:11px;cursor:pointer}.artist-chip:hover{background:#241534;border-color:var(--border)}.artist-chip img{width:38px;height:38px;border-radius:8px;object-fit:cover;background:#261635}.artist-chip-name{min-width:0}.artist-chip-name strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.artist-chip-name span{color:var(--muted);font-size:11px}
 .home-note{margin-top:12px;color:var(--muted);font-size:12px}
 .hidden{display:none!important}
 footer{color:#756b80;text-align:center;font-size:12px;margin-top:25px}
@@ -140,7 +140,7 @@ function albumsFor(artist){
   if(!map.has(id))map.set(id,{name:t.album.name,image:img(t.album.images),tracks:[]});
   map.get(id).tracks.push(t);
  }
- return [...map.values()].sort((a,b)=>avg(b.tracks)-avg(a.tracks));
+ return [...map.values()].filter(a=>a.tracks.length>0).sort((a,b)=>avg(b.tracks)-avg(a.tracks));
 }
 function artistStats(){
  return [...artists.entries()].map(([name,ts])=>({
@@ -154,12 +154,21 @@ function buildArtists(){
  renderHome();
 }
 function updateArtistControls(){
- const stats=artistStats(),query=artistSearch.value.trim().toLowerCase();
- const filtered=stats.filter(a=>a.name.toLowerCase().includes(query));
+ const stats=artistStats();
+ const query=artistSearch.value.trim().toLowerCase();
+ const filtered=stats
+  .filter(a=>a.name.toLowerCase().includes(query))
+  .sort((a,b)=>a.name.localeCompare(b.name,undefined,{sensitivity:"base"}));
+
  artistSelect.innerHTML=filtered.map(a=>`<option value="${esc(a.name)}">${esc(a.name)}</option>`).join("");
+
  if(currentArtist&&!filtered.some(a=>a.name===currentArtist)){
   artistSelect.value="";
- }else if(currentArtist)artistSelect.value=currentArtist;
+ }else if(currentArtist){
+  artistSelect.value=currentArtist;
+ }
+
+ updateAllArtistsFilter();
 }
 function setImage(el,url){
  if(url){el.src=url;el.style.display="block";el.onerror=()=>{el.removeAttribute("src");el.style.display="none"}}
@@ -191,11 +200,37 @@ function renderHome(){
    <div class="artist-row-score">${fmt(a.average)}</div>
   </div>`).join("")||'<div class="empty">No artists have more than 5 rated songs yet.</div>';
 
- allArtists.innerHTML=stats.map(a=>`
-  <div class="artist-chip" data-artist="${esc(a.name)}">
+ const alphabetical=[...stats].sort((a,b)=>a.name.localeCompare(b.name,undefined,{sensitivity:"base"}));
+ allArtists.innerHTML=alphabetical.map(a=>`
+  <div class="artist-chip" data-artist="${esc(a.name)}" data-artist-name="${esc(a.name.toLowerCase())}">
    <img src="${esc(a.image)}" alt="" onerror="this.style.display='none'">
    <div class="artist-chip-name"><strong>${esc(a.name)}</strong><span>${a.tracks.length} songs · ${fmt(a.average)} avg</span></div>
   </div>`).join("")||'<div class="empty">No artists found.</div>';
+ updateAllArtistsFilter();
+}
+
+function updateAllArtistsFilter(){
+ const query=artistSearch.value.trim().toLowerCase();
+ const chips=allArtists.querySelectorAll(".artist-chip");
+ let visible=0;
+ chips.forEach(chip=>{
+  const name=chip.dataset.artistName||"";
+  const match=!query||name.includes(query);
+  chip.style.display=match?"":"none";
+  if(match)visible++;
+ });
+ let empty=allArtists.querySelector(".search-empty");
+ if(!visible && chips.length){
+  if(!empty){
+   empty=document.createElement("div");
+   empty.className="empty search-empty";
+   allArtists.appendChild(empty);
+  }
+  empty.textContent=`No artists match "${artistSearch.value.trim()}".`;
+  empty.style.display="";
+ }else if(empty){
+  empty.style.display="none";
+ }
 }
 function renderArtist(){
  const ts=artists.get(currentArtist)||[],als=albumsFor(currentArtist);
@@ -234,7 +269,7 @@ function drawPie(canvas,rows,legendEl){
  legendEl.innerHTML=rows.filter(r=>r.count).map((r,i)=>`<div class="legend-row"><i class="dot" style="background:${COLORS[i%COLORS.length]}"></i><span>${r.rating}/5 · ${r.count} (${(r.count/total*100).toFixed(1)}%)</span></div>`).join("");
 }
 homeBtn.addEventListener("click",()=>{currentArtist="";showHome()});
-artistSearch.addEventListener("input",()=>{updateArtistControls()});
+artistSearch.addEventListener("input",()=>{updateArtistControls();updateAllArtistsFilter()});
 artistSearch.addEventListener("keydown",e=>{
  if(e.key==="Enter"){
   const name=artistSelect.value;
@@ -246,10 +281,56 @@ topArtists.addEventListener("click",e=>{const el=e.target.closest("[data-artist]
 allArtists.addEventListener("click",e=>{const el=e.target.closest("[data-artist]");if(el)showArtist(el.dataset.artist)});
 albumSelect.addEventListener("change",e=>{currentAlbum=Number(e.target.value);renderAlbum()});
 albumList.addEventListener("click",e=>{const el=e.target.closest(".album");if(!el)return;currentAlbum=Number(el.dataset.i);albumSelect.value=currentAlbum;renderAlbum()});
-fileInput.addEventListener("change",async e=>{
- const f=e.target.files?.[0];if(!f)return;
- try{tracks=flatten(JSON.parse(await f.text()));currentArtist="";currentAlbum=0;buildArtists();showHome()}
- catch(err){alert("Could not read that JSON file.")}
+function readFileText(file){
+ return new Promise((resolve,reject)=>{
+  if(file && typeof file.text==="function"){
+   file.text().then(resolve).catch(reject);
+   return;
+  }
+  const reader=new FileReader();
+  reader.onload=()=>resolve(String(reader.result||""));
+  reader.onerror=()=>reject(reader.error||new Error("Could not read file"));
+  reader.readAsText(file);
+ });
+}
+
+async function loadRatingsFile(file){
+ if(!file)return;
+
+ try{
+  const raw=await readFileText(file);
+  const parsed=JSON.parse(raw);
+
+  // The expected export is an array of rating buckets. Also accept
+  // common wrappers such as {ratings:[...]} or {data:[...]}.
+  const data=Array.isArray(parsed)
+   ? parsed
+   : Array.isArray(parsed?.ratings)
+    ? parsed.ratings
+    : Array.isArray(parsed?.data)
+     ? parsed.data
+     : null;
+
+  if(!data)throw new Error("JSON is valid, but it is not a ratings export.");
+
+  const nextTracks=flatten(data);
+  if(!nextTracks.length)throw new Error("JSON contained no rated tracks.");
+
+  tracks=nextTracks;
+  currentArtist="";
+  currentAlbum=0;
+  buildArtists();
+  showHome();
+ }catch(err){
+  console.error("Ratings JSON load failed:",err);
+  alert("Could not read that JSON file. Make sure it is a valid ratings-export JSON file.");
+ }
+}
+
+fileInput.addEventListener("change",e=>{
+ const f=e.target.files?.[0];
+ loadRatingsFile(f);
+ e.target.value="";
 });
 window.addEventListener("resize",()=>{if(!artistPage.classList.contains("hidden"))renderArtist()});
 tracks=flatten(embeddedData);buildArtists();showHome();
