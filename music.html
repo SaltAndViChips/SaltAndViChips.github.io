@@ -145,12 +145,15 @@ function img(images){
  for(const x of images){const u=spotifyImageUrl(x);if(u)return u}
  return "";
 }
+const COMPILATION=/^(various( artists?)?|v\.?\s?a\.?|multiple artists|unknown artist)$/i;
 function flatten(data){
  const out=[];
  for(const bucket of data||[])for(const t of bucket.tracks||[]){
   const rating=Number(bucket.rating);
   if(!t?.album?.name||!Number.isFinite(rating))continue;
-  const main=t.album.artist?.name||t.artists?.[0]?.name||"Unknown Artist";
+  const albumArtist=(t.album.artist?.name||"").trim(),own=t.artists?.[0]?.name;
+  // compilation-style album artists are credited to the track's own artist
+  const main=albumArtist&&!COMPILATION.test(albumArtist)?albumArtist:(own||albumArtist||"Unknown Artist");
   out.push({...t,rating,mainArtist:main});
  }
  return out;
