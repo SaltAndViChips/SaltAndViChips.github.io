@@ -10,7 +10,7 @@
 <link rel="icon" type="image/x-icon" href="profile.png">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>Music Ratings — Artist Analytics</title>
+<title>Music Ratings</title>
 <style>
 :root{--bg:#0b0712;--panel:#130d1d;--panel2:#191025;--border:#2c1c3d;--purple:#9b5cff;--purple2:#7c3aed;--text:#f4effa;--muted:#a99eb6;--shadow:0 18px 60px #00000059}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% -10%,#9b5cff2e,transparent 34rem),radial-gradient(circle at 100% 0%,#7c3aed1f,transparent 30rem),var(--bg);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
@@ -27,7 +27,7 @@ select,.file-label,.artist-search{background:#171021;border:1px solid var(--bord
 .artist h2{margin:0;font-size:28px;letter-spacing:-.03em}.artist p{margin:4px 0;color:var(--muted)}.score{text-align:right}.score .num{font-size:44px;font-weight:800;line-height:1}.score small{color:var(--muted)}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}.card{background:linear-gradient(180deg,#171021,#120c19);border:1px solid var(--border);border-radius:18px;padding:18px;box-shadow:0 10px 35px #0003}
 .stat .label{color:var(--muted);font-size:13px}.stat .value{font-size:25px;font-weight:750;margin-top:4px}
-.grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(360px,.85fr);gap:18px}.card h3{margin:0 0 4px;font-size:17px}.hint{color:var(--muted);font-size:13px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(360px,.85fr);gap:18px}.card h3{margin:0 0 12px;font-size:17px}.card h3+.hint{margin-top:-8px}.hint{color:var(--muted);font-size:13px;margin-bottom:14px}
 .chart-wrap{height:350px;display:flex;align-items:center;justify-content:center}canvas{max-width:100%;max-height:100%}.legend{display:grid;grid-template-columns:repeat(2,1fr);gap:7px 12px;margin-top:4px}.legend-row{display:flex;align-items:center;gap:8px;color:#c9c0d3;font-size:13px}.dot{width:10px;height:10px;border-radius:3px;flex:none}
 .album-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.album-head select{max-width:280px}.album-list{max-height:410px;overflow:auto;padding-right:4px}
 .album{display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center;padding:9px;border-radius:12px;cursor:pointer}.album:hover,.album.active{background:#241534}
@@ -60,7 +60,7 @@ footer{color:#756b80;text-align:center;font-size:12px;margin-top:25px}
 <body>
 <div class="wrap">
 <header>
-<div><h1>Music Ratings</h1><p class="subtitle">Artist-by-artist album and song rating analytics</p></div>
+<div><h1>Music Ratings</h1></div>
 <div class="controls">
 <button id="homeBtn" class="home-btn active">Home</button>
 <button id="topBtn" class="home-btn">Top Songs</button>
@@ -72,7 +72,7 @@ footer{color:#756b80;text-align:center;font-size:12px;margin-top:25px}
 
 <main id="homePage">
 <section class="hero">
-<div><h2 style="margin:0;font-size:28px">All Artists</h2><p class="subtitle">Your complete rating overview. Rankings only include artists with enough rated songs (adjustable below).</p></div>
+<div><h2 style="margin:0;font-size:28px">All Artists</h2></div>
 <div class="score"><div class="num" id="totalSongCount">—</div><small>rated songs</small></div>
 </section>
 <section class="stats">
@@ -81,7 +81,7 @@ footer{color:#756b80;text-align:center;font-size:12px;margin-top:25px}
 <div class="card stat"><div class="label">Rated albums</div><div class="value" id="homeAlbums">—</div></div>
 <div class="card stat"><div class="label">Overall average</div><div class="value" id="homeAverage">—</div><div id="homeAverageStars" style="margin-top:6px"></div></div>
 </section>
-<section class="card tools" style="margin-bottom:18px"><label>Rank artists by <select id="rankMode"><option value="raw">Average rating</option><option value="adj">Confidence-adjusted</option></select></label><label>Min songs to rank <input id="minRank" type="number" min="1" value="6"></label><label>Min songs per album <input id="minAlbum" type="number" min="1" value="3"></label><span class="hint">Adjusted pulls artists with few songs toward your overall average.</span></section>
+<section class="card tools" style="margin-bottom:18px"><label>Rank artists by <select id="rankMode" title="Adjusted pulls artists with few songs toward your overall average"><option value="raw">Average rating</option><option value="adj">Adjusted</option></select></label><label>Min songs to rank <input id="minRank" type="number" min="1" value="6"></label><label>Min songs per album <input id="minAlbum" type="number" min="1" value="3"></label></section>
 <section class="home-grid">
 <div class="card">
 <h3>Highest artist averages</h3>
@@ -90,11 +90,11 @@ footer{color:#756b80;text-align:center;font-size:12px;margin-top:25px}
 </div>
 <div class="card">
 <h3>All artists</h3>
-<div class="hint">Search above or select an artist to open their detailed page.</div>
+
 <div id="allArtists" class="all-artists"></div>
 </div>
 </section>
-<section class="card" style="margin-top:18px"><h3>Average rating by decade</h3><div class="hint">Average rating of all your rated songs by release decade.</div><div class="chart-wrap" style="height:270px"><canvas id="homeDecadeChart" style="width:100%;height:100%"></canvas></div></section>
+<section class="card" style="margin-top:18px"><h3>Average rating by decade</h3><div class="chart-wrap" style="height:270px"><canvas id="homeDecadeChart" style="width:100%;height:100%"></canvas></div></section>
 </main>
 
 <main id="artistPage" class="hidden">
@@ -109,22 +109,22 @@ footer{color:#756b80;text-align:center;font-size:12px;margin-top:25px}
 <div class="card stat"><div class="label">Lowest album average</div><div class="value" id="lowAlbum">—</div></div>
 </section>
 <section class="grid">
-<div class="card"><h3>Overall song rating distribution</h3><div class="hint">Share of this artist's rated songs at each rating.</div><div class="chart-wrap"><canvas id="overallChart" width="560" height="330"></canvas></div><div class="legend" id="overallLegend"></div></div>
-<div class="card"><div class="album-head"><div><h3>Album averages</h3><div class="hint">Albums with at least <span id="albumRule">3</span> rated songs. Click one to inspect its song distribution.</div></div><select id="albumSelect" aria-label="Select album"></select></div><div class="album-list" id="albumList"></div></div>
+<div class="card"><h3>Overall song rating distribution</h3><div class="chart-wrap"><canvas id="overallChart" width="560" height="330"></canvas></div><div class="legend" id="overallLegend"></div></div>
+<div class="card"><div class="album-head"><div><h3>Album averages</h3><div class="hint">Albums with <span id="albumRule">3</span>+ rated songs</div></div><select id="albumSelect" aria-label="Select album"></select></div><div class="album-list" id="albumList"></div></div>
 </section>
-<section class="card" style="margin-top:18px"><h3 id="albumChartTitle">Album song rating distribution</h3><div class="hint" id="albumChartHint">Select an album above.</div><div class="chart-wrap"><canvas id="albumChart" width="700" height="340"></canvas></div><div class="legend" id="albumLegend"></div></section>
-<section class="card" style="margin-top:18px"><h3>Average rating by decade</h3><div class="hint">Average rating of this artist's songs by release decade.</div><div class="chart-wrap" style="height:270px"><canvas id="artistDecadeChart" style="width:100%;height:100%"></canvas></div></section>
+<section class="card" style="margin-top:18px"><h3 id="albumChartTitle">Album song rating distribution</h3><div class="hint" id="albumChartHint"></div><div class="chart-wrap"><canvas id="albumChart" width="700" height="340"></canvas></div><div class="legend" id="albumLegend"></div></section>
+<section class="card" style="margin-top:18px"><h3>Average rating by decade</h3><div class="chart-wrap" style="height:270px"><canvas id="artistDecadeChart" style="width:100%;height:100%"></canvas></div></section>
 <section class="card" style="margin-top:18px"><div class="album-head"><div><h3>All rated songs</h3><div class="hint" id="songsHint" style="margin-bottom:0">—</div></div><button id="songsToggle" class="home-btn" type="button" aria-expanded="false" aria-controls="songList">Show songs</button></div><div id="songTools" class="tools hidden"><input id="songSearch" class="artist-search" type="search" placeholder="Search songs or albums…"><label>Min rating <select id="songMin"><option value="0">All</option><option value="3">3+</option><option value="3.5">3.5+</option><option value="4">4+</option><option value="4.5">4.5+</option><option value="5">5</option></select></label><label>Sort <select id="songSort"><option value="high">Highest rated</option><option value="low">Lowest rated</option><option value="az">Title A–Z</option><option value="album">Album</option></select></label></div><div id="songList" class="song-list hidden"></div></section>
 </main>
-<main id="topPage" class="hidden"><section class="hero"><div><h2 style="margin:0;font-size:28px">Top Rated Songs</h2><p class="subtitle">Your highest-rated songs across every artist.</p></div><div class="score"><div class="num" id="topCount">—</div><small>matching songs</small></div></section>
+<main id="topPage" class="hidden"><section class="hero"><div><h2 style="margin:0;font-size:28px">Top Rated Songs</h2></div><div class="score"><div class="num" id="topCount">—</div><small>matching songs</small></div></section>
 <section class="card"><div class="tools"><input id="topSearch" class="artist-search" type="search" placeholder="Search title, artist or album…"><label>Min rating <select id="topMin"><option value="5">5</option><option value="4.5" selected>4.5+</option><option value="4">4+</option><option value="3.5">3.5+</option><option value="0">All</option></select></label></div><div id="topList" class="song-list" style="max-height:720px"></div></section></main>
-<footer>Data is calculated entirely in your browser. No data is uploaded anywhere.<div id="dataSource"></div></footer>
+<footer><div id="dataSource"></div></footer>
 </div>
 
 <script>
 let tracks=[],artists=new Map(),currentArtist="",currentAlbum=0;
 const RATINGS=[0,.5,1,1.5,2,2.5,3,3.5,4,4.5,5];
-let MIN_ALBUM_SONGS=3; // releases with fewer rated songs (singles/EPs) are not treated as albums
+let MIN_ALBUM_SONGS=3; // releases below this are not treated as albums
 const COLORS=["#3b205d","#5b2b8a","#7c3aed","#9855f5","#b67cff","#d8b9ff","#eadcff","#f4edff","#fff"];
 
 function spotifyImageUrl(value){
@@ -232,7 +232,7 @@ function renderHome(){
    <img class="artist-mini" src="${esc(a.image)}" alt="" onerror="this.style.visibility='hidden'">
    <div class="artist-row-main"><div class="artist-row-name">${esc(a.name)}</div><div class="artist-row-meta">${a.tracks.length} songs · ${a.albums.length} albums${adj?` · avg ${fmt(a.average)}`:""}</div></div>
    <div class="artist-row-score"><span>${fmt(a.score)}</span>${stars(a.score,"sm")}</div>
-  </div>`).join("")||`<div class="empty">No artists have at least ${minN} rated songs yet.</div>`;
+  </div>`).join("")||`<div class="empty">No artists with ${minN}+ rated songs.</div>`;
 
  const alphabetical=[...stats].sort((a,b)=>a.name.localeCompare(b.name,undefined,{sensitivity:"base"}));
  allArtists.innerHTML=alphabetical.map(a=>`
@@ -282,7 +282,7 @@ function renderArtist(){
  albumList.innerHTML=als.map((a,i)=>`<div class="album ${i==currentAlbum?"active":""}" data-i="${i}">
  <img class="thumb" src="${esc(a.image)}" alt="" onerror="this.style.display='none'">
  <div><div class="album-name">${esc(a.name)}</div><div class="album-meta">${a.tracks.length} song${a.tracks.length==1?"":"s"}</div><div class="bar"><i style="width:${avg(a.tracks)/5*100}%"></i></div></div>
- <div class="album-score"><span>${fmt(avg(a.tracks))}</span>${stars(avg(a.tracks),"sm")}</div></div>`).join("")||`<div class="empty">No albums with at least ${MIN_ALBUM_SONGS} rated songs.</div>`;
+ <div class="album-score"><span>${fmt(avg(a.tracks))}</span>${stars(avg(a.tracks),"sm")}</div></div>`).join("")||`<div class="empty">No albums with ${MIN_ALBUM_SONGS}+ rated songs.</div>`;
  drawPie(overallChart,dist(ts),overallLegend);renderAlbum();drawDecades(artistDecadeChart,ts);
 }
 let songsOpen=false;
@@ -316,7 +316,7 @@ function renderTop(){
  const q=topSearch.value.trim().toLowerCase(),min=Number(topMin.value),CAP=300;
  const all=tracks.filter(t=>t.rating>=min&&(!q||[t.name,t.mainArtist,t.album.name].some(x=>String(x||"").toLowerCase().includes(q)))).sort((a,b)=>b.rating-a.rating||a.mainArtist.localeCompare(b.mainArtist)||byName(a,b));
  topCount.textContent=all.length.toLocaleString();
- topList.innerHTML=all.slice(0,CAP).map((t,i)=>songRow(t,i,true)).join("")+(all.length>CAP?`<div class="empty">Showing the first ${CAP} of ${all.length.toLocaleString()}. Raise the minimum rating or search to narrow it down.</div>`:"")||'<div class="empty">No songs match.</div>';
+ topList.innerHTML=all.slice(0,CAP).map((t,i)=>songRow(t,i,true)).join("")+(all.length>CAP?`<div class="empty">Showing the first ${CAP} of ${all.length.toLocaleString()}.</div>`:"")||'<div class="empty">No songs match.</div>';
  topList.scrollTop=0;
 }
 function showTop(){
@@ -324,7 +324,7 @@ function showTop(){
 }
 function renderAlbum(){
  const als=albumsFor(currentArtist),a=als[Number(currentAlbum)||0];
- if(!a){albumChartTitle.textContent="Album song rating distribution";albumChartHint.textContent="No album selected.";drawPie(albumChart,[],albumLegend);return}
+ if(!a){albumChartTitle.textContent="Album song rating distribution";albumChartHint.textContent="";drawPie(albumChart,[],albumLegend);return}
  albumChartTitle.textContent=a.name;albumChartHint.innerHTML=`${a.tracks.length} rated song${a.tracks.length==1?"":"s"} · average ${fmt(avg(a.tracks))} ${stars(avg(a.tracks),"sm")}`;
  drawPie(albumChart,dist(a.tracks),albumLegend);
  [...albumList.children].forEach((el,i)=>el.classList.toggle("active",i==currentAlbum));
@@ -390,7 +390,7 @@ function readFileText(file){
  });
 }
 
-// Accepts an array of rating buckets, or {ratings:[...]} / {data:[...]} wrappers.
+// Accepts an array of rating buckets or {ratings:[...]} / {data:[...]}.
 function parseRatings(parsed){
  const data=Array.isArray(parsed)?parsed:Array.isArray(parsed?.ratings)?parsed.ratings:Array.isArray(parsed?.data)?parsed.data:null;
  if(!data)throw new Error("JSON is valid, but it is not a ratings export.");
@@ -399,23 +399,23 @@ function parseRatings(parsed){
  return next;
 }
 function setSource(msg){dataSource.textContent=msg}
-// On every page load, try ratings-export.json (same folder as this page); fall back to the built-in data.
+// Load ratings-export.json on every page load.
 async function autoLoad(){
  const FILE="ratings-export.json";
  try{
-  // relative path works at the site root or under a repo sub-path; the query string skips stale CDN/browser copies
+  // relative path + query string avoids stale cached copies
   const res=await fetch(FILE+"?v="+Date.now(),{cache:"no-store"});
   if(!res.ok)throw new Error("HTTP "+res.status);
   tracks=parseRatings(await res.json());currentArtist="";currentAlbum=0;
   buildArtists();showHome();
-  setSource(`Loaded ${tracks.length.toLocaleString()} rated songs from ${FILE}`);
+  setSource(`Loaded ${tracks.length.toLocaleString()} songs from ${FILE}`);
  }catch(err){
   console.info("Could not load "+FILE+":",err);
-  const why=location.protocol==="file:"?"browsers block local file reads on file:// pages, so open this page through a web server":err.message;
+  const why=location.protocol==="file:"?"blocked on file:// pages":err.message;
   tracks=[];currentArtist="";currentAlbum=0;
   buildArtists();showHome();
-  topArtists.innerHTML=`<div class="empty">Couldn't load ${esc(FILE)} (${esc(why)}).<br>Use “Load JSON” above to open a ratings export instead.</div>`;
-  setSource(`Couldn't read ${FILE} (${why}).`);
+  topArtists.innerHTML=`<div class="empty">Couldn't load ${esc(FILE)} (${esc(why)}). Use Load JSON to pick a file.</div>`;
+  setSource(`Couldn't load ${FILE}: ${why}`);
  }
 }
 async function loadRatingsFile(file){
@@ -430,10 +430,10 @@ async function loadRatingsFile(file){
   currentAlbum=0;
   buildArtists();
   showHome();
-  setSource(`Loaded ${tracks.length.toLocaleString()} rated songs from ${file.name}`);
+  setSource(`Loaded ${tracks.length.toLocaleString()} songs from ${file.name}`);
  }catch(err){
   console.error("Ratings JSON load failed:",err);
-  alert("Could not read that JSON file. Make sure it is a valid ratings-export JSON file.");
+  alert("Couldn't read that file. Expected a ratings export JSON.");
  }
 }
 
