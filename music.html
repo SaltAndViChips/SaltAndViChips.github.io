@@ -8,7 +8,7 @@
 <meta content="https://saltandvichips.github.io/SaltAndViChips.github.io/profile.png" property="og:image" />
 <meta content="#00fa9a" data-react-helmet="true" name="theme-color" />
 <link rel="icon" type="image/x-icon" href="profile.png">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 
 <title>Music Ratings</title>
 <style>
@@ -55,20 +55,209 @@ input[type=number]{width:76px;background:#171021;border:1px solid var(--border);
 footer{color:#756b80;text-align:center;font-size:12px;margin-top:25px}
 @media(max-width:900px){header{align-items:stretch;flex-direction:column}.hero{grid-template-columns:1fr}.score{text-align:left}.stats{grid-template-columns:repeat(2,1fr)}.grid,.home-grid{grid-template-columns:1fr}}
 @media(max-width:600px){.wrap{padding:18px 12px 40px}.stats{grid-template-columns:1fr 1fr}.artist h2{font-size:22px}.cover{width:72px;height:72px}.legend{grid-template-columns:1fr}.controls{width:100%}.artist-search{width:100%;flex:1}.all-artists{grid-template-columns:1fr}}
+
+/* ================= POLISH ================= */
+:root{color-scheme:dark;--ease:cubic-bezier(.2,.8,.2,1)}
+::selection{background:#9b5cff66;color:#fff}
+*{scrollbar-width:thin;scrollbar-color:#3a2452 transparent}
+body{background:radial-gradient(60rem 34rem at 15% -10%,#9b5cff33,transparent 60%),radial-gradient(44rem 30rem at 105% 0%,#7c3aed26,transparent 60%),radial-gradient(40rem 30rem at 50% 120%,#5b2b8a22,transparent 60%),var(--bg);background-attachment:fixed;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-variant-numeric:tabular-nums}
+h1{background:linear-gradient(90deg,#fff,#d4bbff 55%,#9b5cff);-webkit-background-clip:text;background-clip:text;color:transparent}
+:focus-visible{outline:2px solid #b67cff99;outline-offset:2px}
+input:focus-visible,select:focus-visible{outline:none}
+select:focus,input:focus{border-color:var(--purple);box-shadow:0 0 0 3px #9b5cff26}
+.home-btn,.file-label,select,.artist-search,input[type=number]{transition:border-color .2s,background-color .2s,box-shadow .2s,transform .15s var(--ease)}
+.home-btn:hover,.file-label:hover{background-color:#21142f;border-color:#6f42a8}
+.home-btn:active,.file-label:active{transform:scale(.97)}
+.home-btn.active{background:linear-gradient(180deg,#3a1f5c,#2b1742);border-color:var(--purple);box-shadow:0 0 0 3px #9b5cff1f,0 6px 20px #7c3aed33}
+select{appearance:none;-webkit-appearance:none;padding-right:38px;cursor:pointer;background-repeat:no-repeat;background-position:right 14px center;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23a99eb6' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+select option{background:#171021;color:var(--text)}
+.artist-search{padding-left:38px;background-repeat:no-repeat;background-position:13px center;background-size:16px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a99eb6' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-4-4'/%3E%3C/svg%3E")}
+input[type=checkbox]{accent-color:var(--purple);width:17px;height:17px;margin:0;cursor:pointer}
+.tools label.check{cursor:pointer;color:#c9c0d3}
+.card{background:linear-gradient(180deg,#1a1225f2,#130c1bf2);border-color:#2f1f42;box-shadow:inset 0 1px 0 #ffffff0d,0 12px 40px #0000003d;transition:border-color .25s,box-shadow .25s,transform .3s var(--ease)}
+.stat:hover{border-color:#4a2f6b;transform:translateY(-2px)}
+.hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#1d1230,#110b18 70%);border-color:#38234f;box-shadow:inset 0 1px 0 #ffffff0f,var(--shadow)}
+.hero::before{content:"";position:absolute;top:-45%;right:-8%;width:26rem;height:26rem;background:radial-gradient(circle,#9b5cff33,transparent 65%);pointer-events:none}
+.hero>*{position:relative}
+.score .num{background:linear-gradient(180deg,#fff,#c9a8ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.cover{box-shadow:0 14px 34px #000a,0 0 0 1px #ffffff14;transition:transform .35s var(--ease)}
+.cover:hover{transform:scale(1.04) rotate(-1deg)}
+.artist-mini,.thumb,.song-thumb,.artist-chip img{box-shadow:0 4px 14px #0006}
+.artist-row,.album,.song,.artist-chip{transition:background-color .18s,transform .18s var(--ease),border-color .18s,box-shadow .18s}
+.artist-row:active,.album:active,.artist-chip:active{transform:scale(.99)}
+.album.active{background:linear-gradient(90deg,#2f1a48,#221335);box-shadow:inset 3px 0 0 var(--purple)}
+@media (hover:hover){.artist-row:hover,.song:hover,.album:hover{background:linear-gradient(90deg,#2a1840,#1f1230)}.artist-row:hover{transform:translateX(3px)}.album.active:hover{background:linear-gradient(90deg,#341d52,#261638)}}
+.rank{display:grid;place-items:center;aspect-ratio:1;width:100%;max-width:28px;justify-self:center;border-radius:50%;background:#20122f;font-size:13px}
+.artist-table .artist-row:nth-child(1) .rank{background:linear-gradient(135deg,#f9d976,#e0a422);color:#3a2600}
+.artist-table .artist-row:nth-child(2) .rank{background:linear-gradient(135deg,#eef0f6,#aeb4c4);color:#2a2f3b}
+.artist-table .artist-row:nth-child(3) .rank{background:linear-gradient(135deg,#e6a06b,#b8683a);color:#3a1c08}
+.song-rating>span:first-child{padding:2px 9px;border-radius:999px;background:#2a1a3d;font-size:14px;text-align:center}
+.song[data-tier=top] .song-rating>span:first-child{background:linear-gradient(135deg,#f5c451,#e0a422);color:#2b1c00}
+.song[data-tier=good] .song-rating>span:first-child{background:#4c2a80;color:#efe4ff}
+.song[data-tier=mid] .song-rating>span:first-child{background:#2f2040;color:#c9b9df}
+.song[data-tier=low] .song-rating>span:first-child{background:#241a2f;color:#8f7f9f}
+.star b{text-shadow:0 0 10px #f5c45155}
+.bar{height:6px;background:#241830}
+.bar>i{box-shadow:0 0 12px #9b5cff66;transform-origin:left center;animation:barGrow .8s var(--ease) both}
+.dot{border-radius:50%;box-shadow:0 0 0 2px #ffffff10}
+.empty{border:1px dashed #33224a;border-radius:14px;margin:6px 0}
+@keyframes barGrow{from{transform:scaleX(0)}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+main:not(.hidden)>*{animation:rise .5s var(--ease) both}
+main:not(.hidden)>*:nth-child(2){animation-delay:.04s}
+main:not(.hidden)>*:nth-child(3){animation-delay:.08s}
+main:not(.hidden)>*:nth-child(4){animation-delay:.12s}
+main:not(.hidden)>*:nth-child(5){animation-delay:.16s}
+main:not(.hidden)>*:nth-child(n+6){animation-delay:.2s}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* artist search dropdown */
+.controls{position:relative}
+.suggest{position:absolute;z-index:70;left:0;top:100%;width:320px;max-height:min(60vh,430px);overflow:auto;padding:6px;border-radius:16px;background:#150d20f5;border:1px solid #3a2452;box-shadow:0 24px 60px #000a,0 0 0 1px #9b5cff14;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);animation:sgIn .16s var(--ease)}
+.suggest[hidden]{display:none}
+@keyframes sgIn{from{opacity:0;transform:translateY(-6px) scale(.985)}}
+.sg-item{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:11px;align-items:center;padding:8px 10px;border-radius:11px;cursor:pointer}
+.sg-item.active{background:linear-gradient(90deg,#3a2058,#2a1741);box-shadow:inset 3px 0 0 var(--purple)}
+.sg-img{width:38px;height:38px;border-radius:8px;object-fit:cover;background:#261635}
+.sg-main{min-width:0}
+.sg-main strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:650}
+.sg-main strong mark{background:none;color:#d9b8ff;text-decoration:underline;text-decoration-color:#9b5cff;text-underline-offset:3px}
+.sg-main span{font-size:12px;color:var(--muted)}
+.sg-score{font-weight:800;color:#d9c7ff}
+.sg-empty{padding:14px;text-align:center;color:var(--muted);font-size:13px}
+.sg-hint{display:flex;justify-content:space-between;gap:10px;padding:8px 10px 4px;color:#7d7090;font-size:11px}
+@media (hover:none){.sg-hint.keys{display:none}.artist-row:hover,.album:hover,.song:hover,.artist-chip:hover{background:none;border-color:transparent}.album.active{background:#241534}}
+
+/* ================= MOBILE VIEW ================= */
+.mnav{display:none}
+@media (max-width:700px){
+ html,body{overflow-x:hidden}
+ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px));-webkit-tap-highlight-color:transparent}
+ .wrap{padding:14px 12px 20px}
+ header{margin-bottom:14px;gap:10px}
+ h1{font-size:24px}
+ #homeBtn,#topBtn{display:none}
+ .controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;width:100%}
+ #artistSearch{grid-column:1/-1;width:100%}
+ #artistSelect{width:100%;min-width:0}
+ .file-label{white-space:nowrap;text-align:center}
+ select,input:not([type=checkbox]),.file-label,.home-btn{min-height:44px;font-size:16px}
+ .hero{padding:16px;gap:12px;border-radius:18px}
+ .hero h2{font-size:22px!important}
+ .cover{width:64px;height:64px;border-radius:12px}
+ .artist{gap:14px}
+ .score .num{font-size:34px}
+ .stats{gap:10px}
+ .card{padding:14px;border-radius:16px}
+ .stat .label{font-size:12px}
+ .stat .value{font-size:18px;overflow-wrap:anywhere}
+ .tools{gap:10px}
+ .tools label{width:100%;justify-content:space-between}
+ .tools label.check{justify-content:flex-start}
+ .tools select,.tools input[type=number]{min-width:130px}
+ .tools .artist-search{width:100%}
+ .home-grid,.grid{gap:14px}
+ .artist-row{grid-template-columns:24px 40px minmax(0,1fr) auto;gap:10px;padding:10px 6px}
+ .artist-row-score{font-size:18px}
+ .all-artists{grid-template-columns:1fr;max-height:56vh}
+ .artist-chip{padding:10px 8px}
+ .album-head{flex-direction:column;align-items:stretch}
+ .album-head:has(#songsToggle){flex-direction:row;align-items:center}
+ .album-head select{max-width:none;width:100%}
+ .album-list{max-height:340px}
+ .album{grid-template-columns:44px minmax(0,1fr) auto;padding:10px 6px}
+ .thumb{width:44px;height:44px}
+ .song-list{max-height:none!important;overflow:visible}
+ .song{grid-template-columns:24px 38px minmax(0,1fr) auto;gap:10px;padding:8px 6px}
+ .song-thumb{width:38px;height:38px}
+ .song-name{font-size:14px}
+ .song-rating{flex-direction:column;align-items:flex-end;gap:2px;font-size:16px}
+ .chart-wrap{height:260px}
+ .legend{grid-template-columns:1fr}
+ footer{margin:16px 0 4px}
+ .mnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:50;gap:6px;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));background:#0f0918f2;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--border)}
+ .mnav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:52px;padding:6px 4px;background:none;border:0;border-radius:12px;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer}
+ .mnav button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+ .mnav button.active{color:var(--text);background:#2b1742}
+}
+
+/* ================= LANDING / LOADING ================= */
+#landing{display:none}
+body[data-state=loading] #landing,body[data-state=empty] #landing{display:grid;place-items:center;min-height:62vh}
+body[data-state=loading] .landing-empty,body[data-state=empty] .landing-loading{display:none}
+body:not([data-state=ready]) main,body:not([data-state=ready]) .controls,body:not([data-state=ready]) .mnav,body:not([data-state=ready]) footer{display:none!important}
+.landing-card{position:relative;overflow:hidden;width:100%;max-width:540px;padding:44px 32px 32px;text-align:center;background:linear-gradient(160deg,#1d1230,#110b18 75%);border:1px solid #38234f;border-radius:26px;box-shadow:inset 0 1px 0 #ffffff0f,var(--shadow);animation:rise .5s var(--ease) both}
+.landing-card::before{content:"";position:absolute;top:-40%;left:50%;width:30rem;height:30rem;transform:translateX(-50%);background:radial-gradient(circle,#9b5cff38,transparent 65%);pointer-events:none}
+.landing-card>*{position:relative}
+.landing-icon{width:76px;height:76px;margin:0 auto 20px;display:grid;place-items:center;border-radius:24px;background:linear-gradient(135deg,#7c3aed,#b67cff);box-shadow:0 14px 40px #7c3aed66,inset 0 1px 0 #ffffff40}
+.landing-icon svg{width:36px;height:36px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.landing-card h2{margin:0 0 8px;font-size:28px;letter-spacing:-.03em}
+.landing-card p{margin:0 auto 22px;max-width:400px;color:var(--muted)}
+.btn-primary{display:inline-flex;align-items:center;gap:10px;padding:14px 26px;border:0;border-radius:14px;background:linear-gradient(135deg,#7c3aed,#9b5cff);color:#fff;font-weight:700;font-size:16px;cursor:pointer;box-shadow:0 10px 30px #7c3aed66,inset 0 1px 0 #ffffff40;transition:transform .2s var(--ease),box-shadow .2s}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 36px #7c3aed88,inset 0 1px 0 #ffffff40}
+.btn-primary:active{transform:scale(.97)}
+.btn-primary svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.landing-or{margin:16px auto 0;font-size:13px;color:#8b7d98}
+.landing-msg{margin:18px auto 0!important;padding:10px 14px;border-radius:12px;background:#2a1220;border:1px solid #5a2440;color:#ffb3c8!important;font-size:13px;text-align:left}
+.landing-msg[hidden]{display:none}
+.landing-format{margin-top:22px;text-align:left;font-size:13px;color:var(--muted)}
+.landing-format summary{cursor:pointer;text-align:center;color:#b9a9d0}
+.landing-format summary:hover{color:var(--text)}
+.landing-format pre{margin:12px 0 0;padding:14px;overflow:auto;background:#0e0916;border:1px solid var(--border);border-radius:12px;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#cbbfe0}
+.landing-format p{margin:10px 0 0;max-width:none;font-size:12px}
+.landing-loading{padding:30px 0}
+.landing-loading p{margin:16px auto 0}
+.spinner{width:38px;height:38px;margin:0 auto;border-radius:50%;border:3px solid #33224a;border-top-color:var(--purple);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;inset:12px;z-index:100;display:grid;place-items:center;border:2px dashed var(--purple);border-radius:24px;background:#0b0712d9;color:#e7d9ff;font-size:20px;font-weight:700;pointer-events:none}
 </style>
 </head>
-<body>
+<body data-state="loading">
 <div class="wrap">
 <header>
 <div><h1>Music Ratings</h1></div>
 <div class="controls">
 <button id="homeBtn" class="home-btn active">Home</button>
 <button id="topBtn" class="home-btn">Top Songs</button>
-<input id="artistSearch" class="artist-search" type="search" placeholder="Search artists…" aria-label="Search artists">
+<input id="artistSearch" class="artist-search" type="search" placeholder="Search artists…" aria-label="Search artists" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="artistSuggest" aria-autocomplete="list">
 <select id="artistSelect" aria-label="Select artist"></select>
 <label class="file-label">Load JSON<input id="fileInput" type="file" accept=".json,application/json"></label>
+<div id="artistSuggest" class="suggest" role="listbox" hidden></div>
 </div>
 </header>
+
+<section id="landing" aria-live="polite">
+<div class="landing-card">
+ <div class="landing-loading">
+  <div class="spinner" aria-hidden="true"></div>
+  <p>Loading your ratings…</p>
+ </div>
+ <div class="landing-empty">
+  <div class="landing-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l11-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></div>
+  <h2>Import your ratings</h2>
+  <p>Load a ratings export to explore your artists, albums and top songs. The file is read in your browser and isn't uploaded anywhere.</p>
+  <button type="button" id="importBtn" class="btn-primary"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4"/><path d="M7 9l5-5 5 5"/><path d="M5 20h14"/></svg>Import ratings JSON</button>
+  <div class="landing-or">or drop a .json file anywhere on this page</div>
+  <p id="landingMsg" class="landing-msg" role="alert" hidden></p>
+  <details class="landing-format">
+   <summary>What format does it expect?</summary>
+<pre>[
+  { "rating": 4.5,
+    "tracks": [
+      { "name": "Song title",
+        "uri": "spotify:track:…",
+        "artists": [{ "name": "Artist" }],
+        "album": { "name": "Album",
+                   "artist": { "name": "Artist" },
+                   "images": [] },
+        "release": { "isoString": "2019-05-17" } }
+    ] }
+]</pre>
+   <p>One entry per rating value, each with its list of tracks. A top-level <code>{ "ratings": [...] }</code> or <code>{ "data": [...] }</code> wrapper also works. To skip this step, put <code>ratings-export.json</code> in the same folder as this page and it loads automatically.</p>
+  </details>
+ </div>
+</div>
+</section>
 
 <main id="homePage">
 <section class="hero">
@@ -81,10 +270,11 @@ footer{color:#756b80;text-align:center;font-size:12px;margin-top:25px}
 <div class="card stat"><div class="label">Rated albums</div><div class="value" id="homeAlbums">—</div></div>
 <div class="card stat"><div class="label">Overall average</div><div class="value" id="homeAverage">—</div><div id="homeAverageStars" style="margin-top:6px"></div></div>
 </section>
-<section class="card tools" style="margin-bottom:18px"><label>Rank artists by <select id="rankMode" title="Adjusted pulls artists with few songs toward your overall average"><option value="raw">Average rating</option><option value="adj">Adjusted</option></select></label><label>Min songs to rank <input id="minRank" type="number" min="1" value="6"></label><label>Min songs per album <input id="minAlbum" type="number" min="1" value="3"></label></section>
+<section class="card tools" style="margin-bottom:18px"><label>Rank artists by <select id="rankMode" title="Adjusted pulls artists with few songs toward your overall average"><option value="raw">Average rating</option><option value="adj">Adjusted</option></select></label><label>Min songs to rank <input id="minRank" type="number" min="1" value="6"></label><label>Min songs per album <input id="minAlbum" type="number" min="1" value="3"></label><label class="check" title="A song with the same title and artist on several albums counts once, at its highest rating"><input id="dedupeToggle" type="checkbox" checked> Merge duplicate songs</label></section>
 <section class="home-grid">
 <div class="card">
 <h3>Highest artist averages</h3>
+<div class="hint" id="rankHint"></div>
 <div id="topArtists" class="artist-table"></div>
 
 </div>
@@ -121,11 +311,18 @@ footer{color:#756b80;text-align:center;font-size:12px;margin-top:25px}
 <footer><div id="dataSource"></div></footer>
 </div>
 
+<nav class="mnav" aria-label="Main navigation">
+<button type="button" data-go="home" class="active"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Home</button>
+<button type="button" data-go="top"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>Top Songs</button>
+<button type="button" data-go="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>Search</button>
+</nav>
+
 <script>
-let tracks=[],artists=new Map(),currentArtist="",currentAlbum=0;
+let rawTracks=[],tracks=[],artists=new Map(),currentArtist="",currentAlbum=0,dedupeOn=true,dupeCount=0,sourceName="";
 const RATINGS=[0,.5,1,1.5,2,2.5,3,3.5,4,4.5,5];
 let MIN_ALBUM_SONGS=3; // releases below this are not treated as albums
-const COLORS=["#3b205d","#5b2b8a","#7c3aed","#9855f5","#b67cff","#d8b9ff","#eadcff","#f4edff","#fff"];
+// one fixed color per rating value, so slices and legend always match
+const ratingColor=r=>r>=5?"#f5c451":`hsl(${Math.round(268-(r/4.5)*8)},${Math.round(62+r*6)}%,${Math.round(20+(r/4.5)*54)}%)`;
 
 function spotifyImageUrl(value){
  if(!value)return "";
@@ -158,9 +355,36 @@ function flatten(data){
  }
  return out;
 }
+
+/* ---- duplicate songs: same title + same (first) artist on different albums count once, at the highest rating ---- */
+function songKey(t){
+ const name=String(t.name||"")
+  .replace(/\s*[\(\[][^\)\]]*\bremaster(?:ed)?\b[^\)\]]*[\)\]]/gi,"") // "(Remastered 2011)"
+  .replace(/\s+[-–]\s+[^-–]*\bremaster(?:ed)?\b.*$/i,"")               // "- 2011 Remaster"
+  .replace(/\s+/g," ").trim().toLowerCase();
+ if(!name)return null; // untitled tracks are never merged
+ const artist=String(t.artists?.[0]?.name||t.mainArtist||"").replace(/\s+/g," ").trim().toLowerCase();
+ return name+"\u0001"+artist;
+}
+const released=t=>String(t.release?.isoString||"9999");
+function dedupe(list){
+ const best=new Map(),loose=[];
+ for(const t of list){
+  const k=songKey(t);
+  if(k===null){loose.push(t);continue}
+  const cur=best.get(k);
+  // higher rating wins; on a tie the earlier release (usually the original album) wins
+  if(!cur||t.rating>cur.rating||(t.rating===cur.rating&&released(t)<released(cur)))best.set(k,t);
+ }
+ const kept=[...best.values(),...loose];
+ return {list:kept,removed:list.length-kept.length};
+}
+
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function avg(ts){return ts.length?ts.reduce((s,t)=>s+t.rating,0)/ts.length:0}
 function fmt(n){return Number.isInteger(n)?n.toFixed(0):n.toFixed(2)}
+const norm=s=>String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+const byAlpha=(a,b)=>a.localeCompare(b,undefined,{sensitivity:"base"});
 function stars(v,size){
  v=Math.max(0,Math.min(5,Number(v)||0));const label=String(+v.toFixed(2));
  let h="";for(let i=0;i<5;i++)h+=`<i class="star"><b style="width:${Math.max(0,Math.min(1,v-i))*100}%">★</b>★</i>`;
@@ -183,41 +407,45 @@ function artistStats(){
   name,tracks:ts,albums:albumsFor(name),average:avg(ts),image:img(ts[0]?.album?.images)
  })).sort((a,b)=>b.average-a.average||b.tracks.length-a.tracks.length||a.name.localeCompare(b.name));
 }
+function applyData(){
+ if(dedupeOn){const r=dedupe(rawTracks);tracks=r.list;dupeCount=r.removed}
+ else{tracks=rawTracks;dupeCount=0}
+ document.body.dataset.state=tracks.length?"ready":"empty";
+ if(tracks.length)setLandingMsg("");
+ buildArtists();
+}
+function setLandingMsg(text){landingMsg.textContent=text;landingMsg.hidden=!text}
 function buildArtists(){
  artists=new Map();
  for(const t of tracks){if(!artists.has(t.mainArtist))artists.set(t.mainArtist,[]);artists.get(t.mainArtist).push(t)}
  updateArtistControls();
  renderHome();
 }
+/* The dropdown always starts with a placeholder option. With a single search result the <select>
+   used to have that result pre-selected, so choosing it never fired "change". */
 function updateArtistControls(){
- const stats=artistStats();
- const query=artistSearch.value.trim().toLowerCase();
- const filtered=stats
-  .filter(a=>a.name.toLowerCase().includes(query))
-  .sort((a,b)=>a.name.localeCompare(b.name,undefined,{sensitivity:"base"}));
-
- artistSelect.innerHTML=filtered.map(a=>`<option value="${esc(a.name)}">${esc(a.name)}</option>`).join("");
-
- if(currentArtist&&!filtered.some(a=>a.name===currentArtist)){
-  artistSelect.value="";
- }else if(currentArtist){
-  artistSelect.value=currentArtist;
- }
-
+ const q=norm(artistSearch.value.trim());
+ const names=[...artists.keys()].filter(n=>!q||norm(n).includes(q)).sort(byAlpha);
+ artistSelect.innerHTML='<option value="">'+(names.length?"Select artist…":"No matches")+'</option>'+names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join("");
+ artistSelect.value=names.includes(currentArtist)?currentArtist:"";
  updateAllArtistsFilter();
 }
 function setImage(el,url){
  if(url){el.src=url;el.style.display="block";el.onerror=()=>{el.removeAttribute("src");el.style.display="none"}}
  else{el.removeAttribute("src");el.style.display="none"}
 }
+function pageChanged(page){
+ document.querySelectorAll(".mnav [data-go]").forEach(b=>b.classList.toggle("active",b.dataset.go===page));
+ window.scrollTo(0,0);
+}
 function showHome(){
- homePage.classList.remove("hidden");artistPage.classList.add("hidden");topPage.classList.add("hidden");homeBtn.classList.add("active");topBtn.classList.remove("active");drawDecades(homeDecadeChart,tracks);
+ homePage.classList.remove("hidden");artistPage.classList.add("hidden");topPage.classList.add("hidden");homeBtn.classList.add("active");topBtn.classList.remove("active");drawDecades(homeDecadeChart,tracks);pageChanged("home");
 }
 function showArtist(name){
  if(!artists.has(name))return;
  currentArtist=name;artistSearch.value="";updateArtistControls();
  homePage.classList.add("hidden");artistPage.classList.remove("hidden");topPage.classList.add("hidden");homeBtn.classList.remove("active");topBtn.classList.remove("active");
- currentAlbum=0;songSearch.value="";songMin.value="0";songSort.value="high";renderArtist();renderSongs();
+ currentAlbum=0;songSearch.value="";songMin.value="0";songSort.value="high";renderArtist();renderSongs();pageChanged("artist");
 }
 function renderHome(){
  const stats=artistStats(),allSongs=tracks.length,albumTotal=stats.reduce((n,a)=>n+a.albums.length,0);
@@ -228,6 +456,9 @@ function renderHome(){
  homeAverage.textContent=allSongs?fmt(avg(tracks)):"—";homeAverageStars.innerHTML=allSongs?stars(avg(tracks)):"";
 
  const minN=Math.max(1,parseInt(minRank.value)||1),adj=rankMode.value==="adj",C=avg(tracks),PRIOR=5;
+ rankHint.textContent=adj
+  ?`Adjusted: each artist is blended with ${PRIOR} imaginary songs rated ${fmt(C)} (your overall average), so artists with few songs are pulled toward it.`
+  :"Plain average of each artist's rated songs.";
  const eligible=stats.filter(a=>a.tracks.length>=minN).map(a=>({...a,score:adj?(a.tracks.length*a.average+PRIOR*C)/(a.tracks.length+PRIOR):a.average})).sort((x,y)=>y.score-x.score||y.tracks.length-x.tracks.length||x.name.localeCompare(y.name));
  topArtists.innerHTML=eligible.map((a,i)=>`
   <div class="artist-row" data-artist="${esc(a.name)}">
@@ -237,7 +468,7 @@ function renderHome(){
    <div class="artist-row-score"><span>${fmt(a.score)}</span>${stars(a.score,"sm")}</div>
   </div>`).join("")||`<div class="empty">No artists with ${minN}+ rated songs.</div>`;
 
- const alphabetical=[...stats].sort((a,b)=>a.name.localeCompare(b.name,undefined,{sensitivity:"base"}));
+ const alphabetical=[...stats].sort((a,b)=>byAlpha(a.name,b.name));
  allArtists.innerHTML=alphabetical.map(a=>`
   <div class="artist-chip" data-artist="${esc(a.name)}" data-artist-name="${esc(a.name.toLowerCase())}">
    <img src="${esc(a.image)}" alt="" onerror="this.style.display='none'">
@@ -245,14 +476,12 @@ function renderHome(){
   </div>`).join("")||'<div class="empty">No artists found.</div>';
  updateAllArtistsFilter();
 }
-
 function updateAllArtistsFilter(){
- const query=artistSearch.value.trim().toLowerCase();
+ const query=norm(artistSearch.value.trim());
  const chips=allArtists.querySelectorAll(".artist-chip");
  let visible=0;
  chips.forEach(chip=>{
-  const name=chip.dataset.artistName||"";
-  const match=!query||name.includes(query);
+  const match=!query||norm(chip.dataset.artistName||"").includes(query);
   chip.style.display=match?"":"none";
   if(match)visible++;
  });
@@ -298,9 +527,9 @@ function setSongsOpen(open){
  songsToggle.textContent=open?"Hide songs":`Show songs (${n})`;
 }
 function songRow(t,i,withArtist){
- const url=trackUrl(t),title=esc(t.name||"Untitled");
+ const url=trackUrl(t),title=esc(t.name||"Untitled"),r=t.rating,tier=r>=4.5?"top":r>=3.5?"good":r>=2.5?"mid":"low";
  const meta=(withArtist?`<span class="song-artist" data-artist="${esc(t.mainArtist)}">${esc(t.mainArtist)}</span> · `:"")+esc(t.album.name);
- return `<div class="song">
+ return `<div class="song" data-tier="${tier}">
    <div class="song-num">${i+1}</div>
    <img class="song-thumb" src="${esc(img(t.album.images))}" alt="" onerror="this.style.visibility='hidden'">
    <div class="song-main"><div class="song-name">${url?`<a href="${esc(url)}" target="_blank" rel="noopener">${title}</a>`:title}</div><div class="song-meta">${meta}</div></div>
@@ -323,7 +552,7 @@ function renderTop(){
  topList.scrollTop=0;
 }
 function showTop(){
- homePage.classList.add("hidden");artistPage.classList.add("hidden");topPage.classList.remove("hidden");homeBtn.classList.remove("active");topBtn.classList.add("active");renderTop();
+ homePage.classList.add("hidden");artistPage.classList.add("hidden");topPage.classList.remove("hidden");homeBtn.classList.remove("active");topBtn.classList.add("active");renderTop();pageChanged("top");
 }
 function renderAlbum(){
  const als=albumsFor(currentArtist),a=als[Number(currentAlbum)||0];
@@ -332,48 +561,151 @@ function renderAlbum(){
  drawPie(albumChart,dist(a.tracks),albumLegend);
  [...albumList.children].forEach((el,i)=>el.classList.toggle("active",i==currentAlbum));
 }
+
+/* ---- charts ---- */
+function setupCanvas(canvas){
+ const ctx=canvas.getContext("2d"),dpr=window.devicePixelRatio||1,rect=canvas.getBoundingClientRect();
+ canvas.width=Math.max(1,rect.width*dpr);canvas.height=Math.max(1,rect.height*dpr);
+ ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,rect.width,rect.height);
+ return {ctx,w:rect.width,h:rect.height};
+}
+function topRounded(ctx,x,y,w,h,r){
+ ctx.beginPath();ctx.moveTo(x,y+h);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);
+ ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h);ctx.closePath();
+}
 function drawDecades(canvas,ts){
- const ctx=canvas.getContext("2d"),dpr=devicePixelRatio||1,rect=canvas.getBoundingClientRect();
- canvas.width=Math.max(1,rect.width*dpr);canvas.height=Math.max(1,rect.height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
- const w=rect.width,h=rect.height,m=new Map();ctx.clearRect(0,0,w,h);
+ const {ctx,w,h}=setupCanvas(canvas),m=new Map();
  for(const t of ts){const y=+String(t.release?.isoString||"").slice(0,4);if(!y)continue;const d=Math.floor(y/10)*10;if(!m.has(d))m.set(d,[]);m.get(d).push(t.rating)}
  const rows=[...m].sort((a,b)=>a[0]-b[0]).map(([d,r])=>({d,n:r.length,a:r.reduce((x,y)=>x+y,0)/r.length}));
  if(!rows.length){ctx.fillStyle="#8b7d98";ctx.font="14px system-ui";ctx.textAlign="center";ctx.fillText("No release dates",w/2,h/2);return}
- const L=30,B=40,T=22,pw=w-L-8,ph=h-B-T,bw=Math.min(60,pw/rows.length*.62);
- ctx.strokeStyle="#2c1c3d";ctx.fillStyle="#8b7d98";ctx.font="11px system-ui";ctx.textAlign="right";
- for(let v=0;v<=5;v++){const y=T+ph-ph*v/5;ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(w-8,y);ctx.stroke();ctx.fillText(v,L-6,y+4)}
- rows.forEach((r,i)=>{const x=L+pw*(i+.5)/rows.length,bh=ph*r.a/5;
-  ctx.fillStyle="#9b5cff";ctx.fillRect(x-bw/2,T+ph-bh,bw,bh);ctx.textAlign="center";
-  ctx.fillStyle="#d9c7ff";ctx.font="700 12px system-ui";ctx.fillText(fmt(r.a),x,T+ph-bh-6);
-  ctx.fillStyle="#a99eb6";ctx.font="11px system-ui";ctx.fillText(r.d+"s",x,h-22);ctx.fillText(r.n+" song"+(r.n==1?"":"s"),x,h-8)});
+ const L=30,B=40,T=22,pw=w-L-8,ph=h-B-T,bw=Math.min(56,pw/rows.length*.6);
+ ctx.lineWidth=1;ctx.setLineDash([2,5]);ctx.strokeStyle="#33224a";ctx.fillStyle="#8b7d98";ctx.font="11px system-ui";ctx.textAlign="right";
+ for(let v=0;v<=5;v++){const y=Math.round(T+ph-ph*v/5)+.5;ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(w-8,y);ctx.stroke();ctx.fillText(v,L-6,y+4)}
+ ctx.setLineDash([]);
+ rows.forEach((r,i)=>{
+  const x=L+pw*(i+.5)/rows.length,bh=Math.max(2,ph*r.a/5),y=T+ph-bh;
+  const g=ctx.createLinearGradient(0,y,0,T+ph);g.addColorStop(0,"#c39bff");g.addColorStop(1,"#6a2fd0");
+  ctx.fillStyle=g;ctx.shadowColor="#9b5cff66";ctx.shadowBlur=14;
+  topRounded(ctx,x-bw/2,y,bw,bh,Math.min(8,bw/2,bh));ctx.fill();ctx.shadowBlur=0;
+  ctx.textAlign="center";ctx.fillStyle="#d9c7ff";ctx.font="700 12px system-ui";ctx.fillText(fmt(r.a),x,y-6);
+  ctx.fillStyle="#a99eb6";ctx.font="11px system-ui";ctx.fillText(r.d+"s",x,h-22);ctx.fillText(r.n+" song"+(r.n==1?"":"s"),x,h-8);
+ });
 }
 function drawPie(canvas,rows,legendEl){
- const ctx=canvas.getContext("2d"),dpr=devicePixelRatio||1,rect=canvas.getBoundingClientRect();
- canvas.width=Math.max(1,rect.width*dpr);canvas.height=Math.max(1,rect.height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
- const w=rect.width,h=rect.height;ctx.clearRect(0,0,w,h);const total=rows.reduce((s,r)=>s+r.count,0);
+ const {ctx,w,h}=setupCanvas(canvas),total=rows.reduce((s,r)=>s+r.count,0);
  if(!total){ctx.fillStyle="#8b7d98";ctx.font="14px system-ui";ctx.textAlign="center";ctx.fillText("No rated songs",w/2,h/2);legendEl.innerHTML="";return}
- const cx=w/2,cy=h/2,r=Math.min(w,h)*.34,inner=r*.58;let a=-Math.PI/2;
- rows.forEach((row,i)=>{if(!row.count)return;const sw=row.count/total*Math.PI*2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,a,a+sw);ctx.closePath();ctx.fillStyle=COLORS[i%COLORS.length];ctx.fill();a+=sw});
- ctx.beginPath();ctx.arc(cx,cy,inner,0,Math.PI*2);ctx.fillStyle="#15101c";ctx.fill();
- ctx.fillStyle="#fff";ctx.font="700 25px system-ui";ctx.textAlign="center";ctx.fillText(total,cx,cy+4);ctx.font="12px system-ui";ctx.fillStyle="#a99eb6";ctx.fillText("songs",cx,cy+23);
- legendEl.innerHTML=rows.filter(r=>r.count).map((r,i)=>`<div class="legend-row"><i class="dot" style="background:${COLORS[i%COLORS.length]}"></i>${stars(r.rating,"sm")}<span>${r.rating}/5 · ${r.count} (${(r.count/total*100).toFixed(1)}%)</span></div>`).join("");
+ const cx=w/2,cy=h/2,r=Math.min(w,h)*.36,inner=r*.62,used=rows.filter(x=>x.count).length;
+ let a=-Math.PI/2;
+ for(const row of rows){
+  if(!row.count)continue;
+  const sw=row.count/total*Math.PI*2,g=used>1?Math.min(.02,sw/4):0;
+  ctx.beginPath();ctx.arc(cx,cy,r,a+g,a+sw-g);ctx.arc(cx,cy,inner,a+sw-g,a+g,true);ctx.closePath();
+  ctx.fillStyle=ratingColor(row.rating);ctx.fill();a+=sw;
+ }
+ ctx.textAlign="center";ctx.fillStyle="#fff";ctx.font="700 26px system-ui";ctx.fillText(total,cx,cy+4);
+ ctx.font="12px system-ui";ctx.fillStyle="#a99eb6";ctx.fillText("songs",cx,cy+23);
+ legendEl.innerHTML=rows.filter(x=>x.count).map(x=>`<div class="legend-row"><i class="dot" style="background:${ratingColor(x.rating)}"></i>${stars(x.rating,"sm")}<span>${x.rating}/5 · ${x.count} (${(x.count/total*100).toFixed(1)}%)</span></div>`).join("");
 }
+
+/* ---- artist search dropdown: highlighted result, arrows + Enter ---- */
+let sgItems=[],sgActive=0;
+function sgMatches(q){
+ const nq=norm(q),out=[];
+ for(const [name,ts] of artists){
+  const n=norm(name),i=n.indexOf(nq);
+  if(i<0)continue;
+  out.push({name,ts,rank:i===0?0:/[\s\-&.,(]/.test(n[i-1])?1:2});
+ }
+ // prefix matches first, then word-start, then anywhere; most-rated first within a group
+ return out.sort((a,b)=>a.rank-b.rank||b.ts.length-a.ts.length||byAlpha(a.name,b.name));
+}
+function sgPlace(){
+ const c=artistSearch.parentElement,w=Math.max(artistSearch.offsetWidth,Math.min(340,c.offsetWidth));
+ artistSuggest.style.width=w+"px";
+ artistSuggest.style.left=Math.max(0,Math.min(artistSearch.offsetLeft,c.offsetWidth-w))+"px";
+ artistSuggest.style.top=(artistSearch.offsetTop+artistSearch.offsetHeight+8)+"px";
+}
+function sgHighlight(name,nq){
+ const n=norm(name);
+ if(n.length!==name.length)return esc(name);
+ const i=n.indexOf(nq);
+ if(i<0)return esc(name);
+ return esc(name.slice(0,i))+"<mark>"+esc(name.slice(i,i+nq.length))+"</mark>"+esc(name.slice(i+nq.length));
+}
+function closeSuggest(){artistSuggest.hidden=true;artistSearch.setAttribute("aria-expanded","false");artistSearch.removeAttribute("aria-activedescendant")}
+function renderSuggest(){
+ const q=artistSearch.value.trim();
+ if(!q){closeSuggest();return}
+ const all=sgMatches(q),nq=norm(q);
+ sgItems=all.slice(0,8);
+ sgActive=Math.min(sgActive,Math.max(sgItems.length-1,0));
+ if(sgItems.length){
+  artistSuggest.innerHTML=sgItems.map((m,i)=>{
+   const u=img(m.ts[0]?.album?.images);
+   return `<div class="sg-item${i===sgActive?" active":""}" role="option" id="sg-${i}" aria-selected="${i===sgActive}" data-artist="${esc(m.name)}">
+    <img class="sg-img" alt="" ${u?`src="${esc(u)}"`:""} onerror="this.style.visibility='hidden'">
+    <div class="sg-main"><strong>${sgHighlight(m.name,nq)}</strong><span>${m.ts.length} song${m.ts.length==1?"":"s"}</span></div>
+    <div class="sg-score">${fmt(avg(m.ts))}</div></div>`;
+  }).join("")+
+  (all.length>sgItems.length?`<div class="sg-hint"><span>+${all.length-sgItems.length} more — keep typing</span></div>`:"")+
+  `<div class="sg-hint keys"><span>↑ ↓ to move</span><span>Enter to open</span></div>`;
+  artistSearch.setAttribute("aria-activedescendant","sg-"+sgActive);
+ }else{
+  artistSuggest.innerHTML=`<div class="sg-empty">No artists match “${esc(q)}”</div>`;
+ }
+ artistSuggest.hidden=false;artistSearch.setAttribute("aria-expanded","true");sgPlace();
+}
+function sgSetActive(i,scroll){
+ if(!sgItems.length)return;
+ sgActive=(i+sgItems.length)%sgItems.length;
+ artistSuggest.querySelectorAll(".sg-item").forEach((el,j)=>{el.classList.toggle("active",j===sgActive);el.setAttribute("aria-selected",String(j===sgActive))});
+ artistSearch.setAttribute("aria-activedescendant","sg-"+sgActive);
+ const el=document.getElementById("sg-"+sgActive);if(scroll&&el)el.scrollIntoView({block:"nearest"});
+}
+function chooseArtist(name){
+ if(!name||!artists.has(name))return;
+ closeSuggest();showArtist(name);artistSearch.blur();
+}
+
 homeBtn.addEventListener("click",()=>{currentArtist="";showHome()});
 topBtn.addEventListener("click",()=>{currentArtist="";showTop()});
+document.querySelector(".mnav").addEventListener("click",e=>{
+ const b=e.target.closest("button");if(!b)return;
+ if(b.dataset.go==="home")homeBtn.click();
+ else if(b.dataset.go==="top")topBtn.click();
+ else{window.scrollTo(0,0);artistSearch.focus()}
+});
 rankMode.addEventListener("change",renderHome);
 minRank.addEventListener("change",renderHome);
 minAlbum.addEventListener("change",()=>{MIN_ALBUM_SONGS=Math.max(1,parseInt(minAlbum.value)||1);minAlbum.value=MIN_ALBUM_SONGS;renderHome()});
+dedupeToggle.addEventListener("change",()=>{
+ dedupeOn=dedupeToggle.checked;applyData();drawDecades(homeDecadeChart,tracks);
+ if(sourceName)setSource(sourceNote());
+});
 for(const el of [songSearch])el.addEventListener("input",renderSongs);
 for(const el of [songMin,songSort])el.addEventListener("change",renderSongs);
 topSearch.addEventListener("input",renderTop);topMin.addEventListener("change",renderTop);
 topList.addEventListener("click",e=>{const el=e.target.closest("[data-artist]");if(el)showArtist(el.dataset.artist)});
-artistSearch.addEventListener("input",()=>{updateArtistControls();updateAllArtistsFilter()});
+artistSearch.addEventListener("input",()=>{sgActive=0;updateArtistControls();renderSuggest()});
+artistSearch.addEventListener("focus",()=>{if(artistSearch.value.trim())renderSuggest()});
+artistSearch.addEventListener("blur",()=>setTimeout(closeSuggest,120));
 artistSearch.addEventListener("keydown",e=>{
- if(e.key==="Enter"){
-  const name=artistSelect.value;
-  if(name)showArtist(name);
- }
+ if(e.isComposing)return;
+ if(e.key==="ArrowDown"||e.key==="ArrowUp"){
+  if(!artistSearch.value.trim())return;
+  e.preventDefault();
+  if(artistSuggest.hidden)renderSuggest();else sgSetActive(sgActive+(e.key==="ArrowDown"?1:-1),true);
+ }else if(e.key==="Enter"){
+  e.preventDefault();
+  if(!artistSearch.value.trim())return;
+  if(artistSuggest.hidden){sgItems=sgMatches(artistSearch.value.trim()).slice(0,8);sgActive=0}
+  if(sgItems[sgActive])chooseArtist(sgItems[sgActive].name);
+ }else if(e.key==="Escape")closeSuggest();
 });
+artistSuggest.addEventListener("mousedown",e=>e.preventDefault()); // keep focus in the input
+artistSuggest.addEventListener("click",e=>{const el=e.target.closest(".sg-item");if(el)chooseArtist(el.dataset.artist)});
+artistSuggest.addEventListener("mousemove",e=>{const el=e.target.closest(".sg-item");if(el){const i=+el.id.slice(3);if(i!==sgActive)sgSetActive(i,false)}});
+document.addEventListener("click",e=>{if(!artistSuggest.contains(e.target)&&e.target!==artistSearch)closeSuggest()});
 artistSelect.addEventListener("change",e=>{if(e.target.value)showArtist(e.target.value)});
 topArtists.addEventListener("click",e=>{const el=e.target.closest("[data-artist]");if(el)showArtist(el.dataset.artist)});
 allArtists.addEventListener("click",e=>{const el=e.target.closest("[data-artist]");if(el)showArtist(el.dataset.artist)});
@@ -402,6 +734,9 @@ function parseRatings(parsed){
  return next;
 }
 function setSource(msg){dataSource.textContent=msg}
+function sourceNote(){
+ return `Loaded ${tracks.length.toLocaleString()} songs from ${sourceName}`+(dupeCount?` · ${dupeCount.toLocaleString()} duplicate${dupeCount==1?"":"s"} merged`:"");
+}
 // Load ratings-export.json on every page load.
 async function autoLoad(){
  const FILE="ratings-export.json";
@@ -409,15 +744,17 @@ async function autoLoad(){
   // relative path + query string avoids stale cached copies
   const res=await fetch(FILE+"?v="+Date.now(),{cache:"no-store"});
   if(!res.ok)throw new Error("HTTP "+res.status);
-  tracks=parseRatings(await res.json());currentArtist="";currentAlbum=0;
-  buildArtists();showHome();
-  setSource(`Loaded ${tracks.length.toLocaleString()} songs from ${FILE}`);
+  rawTracks=parseRatings(await res.json());currentArtist="";currentAlbum=0;sourceName=FILE;
+  applyData();showHome();
+  setSource(sourceNote());
  }catch(err){
   console.info("Could not load "+FILE+":",err);
   const why=location.protocol==="file:"?"blocked on file:// pages":err.message;
-  tracks=[];currentArtist="";currentAlbum=0;
-  buildArtists();showHome();
-  topArtists.innerHTML=`<div class="empty">Couldn't load ${esc(FILE)} (${esc(why)}). Use Load JSON to pick a file.</div>`;
+  rawTracks=[];tracks=[];sourceName="";currentArtist="";currentAlbum=0;
+  applyData();showHome();
+  setLandingMsg(location.protocol==="file:"
+   ?`${FILE} can't be loaded automatically when the page is opened from your computer (file://). Import it below instead.`
+   :`Couldn't load ${FILE} (${why}). Import a file below, or check it's in the same folder as this page.`);
   setSource(`Couldn't load ${FILE}: ${why}`);
  }
 }
@@ -428,15 +765,17 @@ async function loadRatingsFile(file){
   const raw=await readFileText(file);
   const parsed=JSON.parse(raw);
 
-  tracks=parseRatings(parsed);
+  rawTracks=parseRatings(parsed);
   currentArtist="";
   currentAlbum=0;
-  buildArtists();
+  sourceName=file.name;
+  applyData();
   showHome();
-  setSource(`Loaded ${tracks.length.toLocaleString()} songs from ${file.name}`);
+  setSource(sourceNote());
  }catch(err){
   console.error("Ratings JSON load failed:",err);
-  alert("Couldn't read that file. Expected a ratings export JSON.");
+  const msg="Couldn't read that file. Expected a ratings export JSON.";
+  if(document.body.dataset.state==="ready")alert(msg);else setLandingMsg(msg);
  }
 }
 
@@ -445,7 +784,20 @@ fileInput.addEventListener("change",e=>{
  loadRatingsFile(f);
  e.target.value="";
 });
-window.addEventListener("resize",()=>{if(!artistPage.classList.contains("hidden"))renderArtist();else if(!homePage.classList.contains("hidden"))drawDecades(homeDecadeChart,tracks)});
+window.addEventListener("resize",()=>{
+ if(!artistSuggest.hidden)sgPlace();
+ if(!artistPage.classList.contains("hidden"))renderArtist();else if(!homePage.classList.contains("hidden"))drawDecades(homeDecadeChart,tracks);
+});
+importBtn.addEventListener("click",()=>fileInput.click());
+// drop a .json file anywhere on the page to import it
+const hasFiles=e=>[...(e.dataTransfer?.types||[])].includes("Files");
+window.addEventListener("dragover",e=>{if(!hasFiles(e))return;e.preventDefault();document.body.classList.add("dragging")});
+window.addEventListener("dragleave",e=>{if(!e.relatedTarget)document.body.classList.remove("dragging")});
+window.addEventListener("drop",e=>{
+ if(!hasFiles(e))return;
+ e.preventDefault();document.body.classList.remove("dragging");
+ loadRatingsFile(e.dataTransfer.files?.[0]);
+});
 autoLoad();
 </script>
 </body>
