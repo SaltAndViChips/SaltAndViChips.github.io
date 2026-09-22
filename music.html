@@ -646,8 +646,8 @@ function renderHome(){
 
  const minN=Math.max(1,parseInt(minRank.value)||1),adj=rankMode.value==="adj",C=avg(tracks),PRIOR=5;
  rankHint.textContent=adj
-  ?`Blends in ${PRIOR} songs rated ${fmt(C)} (your overall average), so artists with only a few songs don't shoot to the top.`
-  :"Just each artist's plain average.";
+  ?`Weighted Average (accounts for artists with less songs).`
+  :"Average Artist Rating.";
  const eligible=stats.filter(a=>a.tracks.length>=minN).map(a=>({...a,score:adj?(a.tracks.length*a.average+PRIOR*C)/(a.tracks.length+PRIOR):a.average})).sort((x,y)=>y.score-x.score||y.tracks.length-x.tracks.length||x.name.localeCompare(y.name));
  topArtists.innerHTML=eligible.map((a,i)=>`
   <div class="artist-row" data-artist="${esc(a.name)}">
