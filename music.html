@@ -601,6 +601,8 @@ function renderFeatured(){
  });
  const featArtists=weightedSample(artistNames,artistW,3,rng);
 
+ featuredHint.textContent="Refreshes Daily";
+ 
  featuredBody.innerHTML=
   `<div class="featured-artists">${featArtists.map(name=>{
     const ts=artists.get(name),u=img(ts[0]?.album?.images);
