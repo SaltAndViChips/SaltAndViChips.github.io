@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta content="Salt's Music" property="og:title" />
-<meta content="Made by Salt & Vi ♥" property="og:description" />
+<meta content="Made by Salt &amp; Vi ♥" property="og:description" />
 <meta content="https://github.com/SaltAndViChips/SaltAndViChips.github.io/tree/main" property="og:url" />
 <meta content="https://saltandvichips.github.io/SaltAndViChips.github.io/profile.png" property="og:image" />
 <meta content="#00fa9a" data-react-helmet="true" name="theme-color" />
@@ -157,6 +157,11 @@ main:not(.hidden)>*:nth-child(n+6){animation-delay:.2s}
 .sg-score{font-weight:800;color:#d9c7ff}
 .sg-empty{padding:14px;text-align:center;color:var(--muted);font-size:13px}
 .sg-hint{display:flex;justify-content:space-between;gap:10px;padding:8px 10px 4px;color:#7d7090;font-size:11px}
+.sg-group-label{padding:10px 10px 5px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#7d7090}
+.sg-badge{flex:none;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.02em;text-transform:uppercase}
+.sg-badge.artist{background:#2b1742;color:#c9a8ff}
+.sg-badge.song{background:#1d3b2c;color:#7de3a8}
+.sg-item .sg-score{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
 @media (hover:none){.sg-hint.keys{display:none}.artist-row:hover,.album:hover,.song:hover,.artist-chip:hover{background:none;border-color:transparent}.album.active{background:#241534}}
 
 /* ================= MOBILE VIEW ================= */
@@ -294,26 +299,38 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 #reqSortToggle.desc svg{transform:rotate(180deg)}
 @media(max-width:600px){.req-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}}
 
+/* ================= TOP SONGS: RECORD SLEEVE STACK ================= */
+.top-stack-wrap{position:relative;height:184px;margin:6px auto 20px;display:flex;align-items:center;justify-content:center;touch-action:pan-y}
+.top-stack{position:relative;width:148px;height:148px}
+.sleeve{position:absolute;inset:0;border-radius:14px;overflow:hidden;background:#1a1226;border:1px solid var(--border);box-shadow:0 14px 30px #0008;cursor:pointer;transition:transform .14s cubic-bezier(.16,1,.3,1),opacity .1s linear,box-shadow .3s;will-change:transform,opacity}
+.sleeve img{width:100%;height:100%;object-fit:cover;display:block}
+.sleeve .sleeve-name{position:absolute;left:0;right:0;bottom:0;padding:9px 10px 7px;font-size:12.5px;font-weight:700;background:linear-gradient(0deg,#000c,transparent 90%);color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sleeve.infinity{display:flex;align-items:center;justify-content:center;font-size:56px;line-height:1;color:#d9c7ff;background:linear-gradient(135deg,#291a3d,#170f22)}
+.sleeve:hover{box-shadow:0 18px 38px #000a}
+.top-stack-nav{flex:none;width:36px;height:36px;border-radius:50%;background:#170f22;border:1px solid var(--border);color:var(--text);display:grid;place-items:center;cursor:pointer;z-index:60;font-size:18px;user-select:none;transition:border-color .2s,transform .15s var(--ease)}
+.top-stack-nav:hover{border-color:#6f42a8;transform:scale(1.06)}
+.top-stack-nav.prev{margin-right:10px}
+.top-stack-nav.next{margin-left:10px}
+
 /* ================= TOP SONGS: VINYL GRID, GROUPED BY ARTIST ================= */
-.top-groups{display:flex;flex-direction:column;gap:24px}
-.top-group-head{display:flex;align-items:center;gap:10px;padding:2px 2px 10px;cursor:pointer;border-bottom:1px solid var(--border);margin-bottom:4px}
-.top-group-head:hover .top-group-name{color:#d9c7ff;text-decoration:underline}
-.top-group-head img{width:34px;height:34px;border-radius:8px;object-fit:cover;background:#261635;flex:none}
-.top-group-name{font-weight:750;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.top-group-head .hint{margin:0 0 0 auto;font-size:12px;color:var(--muted);white-space:nowrap;padding-left:10px}
-.vinyl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:14px}
-.song-vinyl{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;padding:14px 8px 10px;border-radius:16px;background:linear-gradient(180deg,#1a1226,#140d1e);border:1px solid var(--border);text-decoration:none;color:inherit;transition:transform .2s var(--ease),border-color .2s,box-shadow .2s}
-.song-vinyl:hover{transform:translateY(-3px);border-color:#6f42a8;box-shadow:0 14px 30px #0006}
-.song-vinyl:hover .vinyl{animation:vinylSpin 3.2s linear infinite}
-.song-vinyl .vinyl{position:relative;width:72%;aspect-ratio:1;border-radius:50%;margin-bottom:10px;background:repeating-radial-gradient(circle at center,#100a18 0 2px,#1c1329 2px 4px);box-shadow:0 10px 24px #0009,inset 0 0 0 1px #2c1c3d;display:grid;place-items:center}
+.song-shelf{display:flex;flex-direction:column;gap:14px}
+.vinyl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:14px}
+.song-vinyl{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;padding:14px 10px 12px;border-radius:16px;background:linear-gradient(160deg,#1d1329,#130c1c);border:1px solid var(--border);text-decoration:none;color:inherit;transition:transform .18s var(--ease),border-color .18s,box-shadow .18s}
+.song-vinyl:hover{transform:translateY(-4px) scale(1.02);border-color:#6f42a8;box-shadow:0 16px 34px #0007}
+.song-vinyl:hover .vinyl{animation:vinylSpin 2.8s linear infinite}
+.song-vinyl.tier-5{border-color:#5c4420;background:linear-gradient(160deg,#2a2013,#160f1e)}
+.song-vinyl.tier-5:hover{border-color:#e0b654;box-shadow:0 16px 34px #4a350012}
+.song-vinyl .vinyl{position:relative;width:76%;aspect-ratio:1;border-radius:50%;margin-bottom:10px;background:repeating-radial-gradient(circle at center,#100a18 0 2px,#1c1329 2px 4px);box-shadow:0 10px 22px #0009,inset 0 0 0 1px #2c1c3d;display:grid;place-items:center}
+.song-vinyl.tier-5 .vinyl{box-shadow:0 10px 22px #0009,inset 0 0 0 1px #7a5a22,0 0 22px -4px #e0b65466}
 .song-vinyl .vinyl::before{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 34% 28%,#ffffff17,transparent 55%);pointer-events:none}
-.song-vinyl .vinyl-label{position:relative;width:40%;aspect-ratio:1;border-radius:50%;overflow:hidden;background:#241633;box-shadow:0 0 0 3px #0b0712,0 0 0 4px #3a2452}
+.song-vinyl .vinyl-label{position:relative;width:42%;aspect-ratio:1;border-radius:50%;overflow:hidden;background:#241633;box-shadow:0 0 0 3px #0b0712,0 0 0 4px #3a2452}
 .song-vinyl .vinyl-label img{width:100%;height:100%;object-fit:cover;display:block}
-.song-vinyl .vinyl-hole{position:absolute;top:50%;left:50%;width:7px;height:7px;border-radius:50%;background:#0b0712;transform:translate(-50%,-50%);box-shadow:0 0 0 2px #05030899;z-index:1}
-.song-vinyl .sv-rating{position:absolute;top:8px;right:8px;padding:2px 9px;border-radius:999px;background:#0009;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:#f5c451;font-size:11px;font-weight:800}
-.song-vinyl .sv-title{font-weight:650;font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3;width:100%}
+.song-vinyl .vinyl-hole{position:absolute;top:50%;left:50%;width:6px;height:6px;border-radius:50%;background:#0b0712;transform:translate(-50%,-50%);box-shadow:0 0 0 2px #05030899;z-index:1}
+.song-vinyl .sv-stars{align-self:center;padding:2px 10px;border-radius:999px;background:#2a1a3d;color:#f5c451;font-size:11px;font-weight:800;margin-bottom:7px}
+.song-vinyl.tier-5 .sv-stars{background:#3a2b12;color:#f6d488}
+.song-vinyl .sv-title{font-weight:650;font-size:12.5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.28;width:100%}
 .song-vinyl .sv-album{font-size:11px;color:var(--muted);margin-top:3px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;width:100%}
-@media(max-width:600px){.vinyl-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}.top-group-head .hint{display:none}}
+@media(max-width:600px){.vinyl-grid{grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}}
 </style>
 </head>
 <body data-state="loading">
@@ -324,7 +341,7 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 <button id="homeBtn" class="home-btn active">Home</button>
 <button id="topBtn" class="home-btn">Top Songs</button>
 <button id="requestBtn" class="home-btn">Request Song</button>
-<input id="artistSearch" class="artist-search" type="search" placeholder="Search artists…" aria-label="Search artists" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="artistSuggest" aria-autocomplete="list">
+<input id="artistSearch" class="artist-search" type="search" placeholder="Search artists or songs…" aria-label="Search artists or songs" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="artistSuggest" aria-autocomplete="list">
 <label class="file-label icon-btn" title="Load ratings JSON" aria-label="Load ratings JSON"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h8V4"/><path d="M8 14h8v6H8z"/></svg><input id="fileInput" type="file" accept=".json,application/json"></label>
 <div id="artistSuggest" class="suggest" role="listbox" hidden></div>
 </div>
@@ -411,7 +428,14 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 <section class="card" data-accent="green" style="margin-top:18px"><div class="album-head"><div><h3>All rated songs</h3><div class="hint" id="songsHint" style="margin-bottom:0">—</div></div><button id="songsToggle" class="home-btn" type="button" aria-expanded="false" aria-controls="songList">Show songs</button></div><div id="songTools" class="tools hidden"><input id="songSearch" class="artist-search" type="search" placeholder="Search songs or albums…"><label>Min rating <select id="songMin"><option value="0">All</option><option value="3">3+</option><option value="3.5">3.5+</option><option value="4">4+</option><option value="4.5">4.5+</option><option value="5">5</option></select></label><label>Sort <select id="songSort"><option value="high">Highest rated</option><option value="low">Lowest rated</option><option value="az">Title A–Z</option><option value="album">Album</option></select></label></div><div id="songList" class="song-list hidden"></div></section>
 </main>
 <main id="topPage" class="hidden"><section class="hero"><div><h2 style="margin:0;font-size:28px">Top Rated Songs</h2></div><div class="score"><div class="num" id="topCount">—</div><small>matching songs</small></div></section>
-<section class="card" data-accent="gold"><div class="tools"><input id="topSearch" class="artist-search" type="search" placeholder="Search title, artist or album…"><label>Min rating <select id="topMin"><option value="5">5</option><option value="4.5" selected>4.5+</option><option value="4">4+</option><option value="3.5">3.5+</option><option value="0">All</option></select></label></div><div id="topList" class="top-groups"></div></section></main>
+<section class="card" data-accent="gold">
+<div class="top-stack-wrap" id="topStackWrap">
+ <div class="top-stack-nav prev" id="topStackPrev" aria-label="Previous artist">‹</div>
+ <div class="top-stack" id="topStack"></div>
+ <div class="top-stack-nav next" id="topStackNext" aria-label="Next artist">›</div>
+</div>
+<div class="tools"><input id="topSongSearch" class="artist-search" type="search" placeholder="Search songs…"></div>
+<div id="topList" class="song-shelf"></div></section></main>
 <main id="requestPage" class="hidden"><section class="hero"><div><h2 style="margin:0;font-size:28px">Request a Song</h2></div></section>
 <section class="card" data-accent="green">
 <form id="requestForm" class="tools" style="margin-bottom:4px">
@@ -786,38 +810,95 @@ function renderSongs(){
  songList.innerHTML=ts.map((t,i)=>songRow(t,i,false)).join("")||'<div class="empty">No songs match.</div>';
  songList.scrollTop=0;setSongsOpen(songsOpen);
 }
+let topArtistFilter="",sleeveItems=[],sleeveFront=0;
+function buildSleeveItems(){
+ const q=norm(artistSearch.value.trim());
+ const names=[...artists.keys()].filter(n=>(!q||norm(n).includes(q))&&artists.get(n).some(t=>t.rating>=4)).sort(byAlpha);
+ sleeveItems=[{key:"",label:"All Songs",infinity:true},...names.map(n=>({key:n,label:n,img:img(artists.get(n)[0]?.album?.images)}))];
+}
+// distance 0 = front (selected), 1..4 = the next few previewed behind it, N-1 = the sleeve
+// that just left the front (swings out to the left before rejoining the back of the deck),
+// everything else waits, hidden, at the back of the stack.
+function sleeveStyle(dist,N){
+ if(dist===0)return{transform:"translate(0,0) scale(1) rotate(0deg)",opacity:1,z:50};
+ if(dist===1)return{transform:"translate(20px,8px) scale(.94) rotate(2deg)",opacity:.85,z:44};
+ if(dist===2)return{transform:"translate(36px,14px) scale(.88) rotate(3.6deg)",opacity:.62,z:38};
+ if(dist===3)return{transform:"translate(50px,19px) scale(.82) rotate(5deg)",opacity:.4,z:32};
+ if(dist===4)return{transform:"translate(62px,23px) scale(.77) rotate(6.2deg)",opacity:.2,z:26};
+ if(dist===N-1)return{transform:"translate(-190px,-8px) scale(.9) rotate(-11deg)",opacity:0,z:10};
+ return{transform:"translate(62px,23px) scale(.74) rotate(6.2deg)",opacity:0,z:5};
+}
+function positionSleeves(){
+ const N=sleeveItems.length;
+ [...topStack.children].forEach((el,i)=>{
+  const dist=(i-sleeveFront+N)%N,st=sleeveStyle(dist,N);
+  el.style.transform=st.transform;el.style.opacity=st.opacity;el.style.zIndex=st.z;
+  el.style.pointerEvents=st.opacity>.05?"auto":"none";
+ });
+}
+function renderSleeveStack(){
+ buildSleeveItems();
+ const idx=sleeveItems.findIndex(s=>s.key===topArtistFilter);
+ sleeveFront=idx>=0?idx:0;
+ topArtistFilter=sleeveItems[sleeveFront]?.key||"";
+ topStack.innerHTML=sleeveItems.map((s,i)=>s.infinity
+  ?`<div class="sleeve infinity" data-i="${i}">∞</div>`
+  :`<div class="sleeve" data-i="${i}"><img src="${esc(s.img)}" alt="" onerror="this.style.display='none'"><span class="sleeve-name">${esc(s.label)}</span></div>`
+ ).join("");
+ positionSleeves();
+}
+function advanceSleeve(delta){
+ const N=sleeveItems.length;if(!N)return;
+ sleeveFront=(sleeveFront+delta+N)%N;
+ topArtistFilter=sleeveItems[sleeveFront].key;
+ positionSleeves();renderTop();
+}
+topStack.addEventListener("click",e=>{
+ const el=e.target.closest(".sleeve");if(!el)return;
+ const i=Number(el.dataset.i),N=sleeveItems.length,dist=(i-sleeveFront+N)%N;
+ if(dist)advanceSleeve(dist);
+});
+topStackPrev.addEventListener("click",()=>advanceSleeve(-1));
+topStackNext.addEventListener("click",()=>advanceSleeve(1));
+// Trackpads fire many tiny wheel events, which made stepping feel laggy; deltas are
+// accumulated and a step fires the instant the (low) threshold is crossed — just enough to
+// tell a deliberate flick from noise — with only a short lock matching the fast 140ms
+// transition, instead of waiting out a long cooldown.
+let sleeveWheelLock=false,wheelAccum=0;
+topStackWrap.addEventListener("wheel",e=>{
+ e.preventDefault();
+ wheelAccum+=e.deltaY||e.deltaX;
+ if(sleeveWheelLock||Math.abs(wheelAccum)<18)return;
+ wheelAccum=0;sleeveWheelLock=true;
+ advanceSleeve((e.deltaY||e.deltaX)>0?1:-1);
+ setTimeout(()=>sleeveWheelLock=false,80);
+},{passive:false});
+let sleeveDragX=null;
+topStackWrap.addEventListener("pointerdown",e=>{sleeveDragX=e.clientX});
+topStackWrap.addEventListener("pointerup",e=>{
+ if(sleeveDragX==null)return;
+ const dx=e.clientX-sleeveDragX;sleeveDragX=null;
+ if(Math.abs(dx)>24)advanceSleeve(dx<0?1:-1);
+});
 function vinylCard(t){
  const url=trackUrl(t),title=esc(t.name||"Untitled"),album=esc(t.album.name||"");
- const inner=`<span class="sv-rating">${t.rating}★</span>
+ const inner=`<div class="sv-stars">${t.rating.toFixed(1).replace(/\.0$/,"")} ★</div>
    <div class="vinyl"><div class="vinyl-hole"></div><div class="vinyl-label"><img src="${esc(img(t.album.images))}" alt="" onerror="this.style.display='none'"></div></div>
    <div class="sv-title">${title}</div><div class="sv-album">${album}</div>`;
- return url?`<a class="song-vinyl" href="${esc(url)}" target="_blank" rel="noopener">${inner}</a>`:`<div class="song-vinyl">${inner}</div>`;
+ const cls="song-vinyl"+(t.rating>=5?" tier-5":"");
+ return url?`<a class="${cls}" href="${esc(url)}" target="_blank" rel="noopener">${inner}</a>`:`<div class="${cls}">${inner}</div>`;
 }
 function renderTop(){
- const q=topSearch.value.trim().toLowerCase(),min=Number(topMin.value),GROUP_CAP=200;
- const all=tracks.filter(t=>t.rating>=min&&(!q||[t.name,t.mainArtist,t.album.name].some(x=>String(x||"").toLowerCase().includes(q))));
+ const q=topSongSearch.value.trim().toLowerCase(),CAP=500;
+ const all=tracks.filter(t=>(!topArtistFilter||t.mainArtist===topArtistFilter)&&(!q||[t.name,t.album.name].some(x=>String(x||"").toLowerCase().includes(q))))
+  .sort((a,b)=>b.rating-a.rating||byName(a,b));
  topCount.textContent=all.length.toLocaleString();
- const byArtist=new Map();
- for(const t of all){if(!byArtist.has(t.mainArtist))byArtist.set(t.mainArtist,[]);byArtist.get(t.mainArtist).push(t)}
- // groups ranked by their best song, then most matching songs, then name — artists worth
- // browsing first; within a group, highest rated first
- const groups=[...byArtist.entries()].map(([name,ts])=>({name,ts:ts.sort((a,b)=>b.rating-a.rating||byName(a,b))}))
-  .sort((a,b)=>b.ts[0].rating-a.ts[0].rating||b.ts.length-a.ts.length||a.name.localeCompare(b.name))
-  .slice(0,GROUP_CAP);
- topList.innerHTML=groups.map(g=>{
-  const u=img(g.ts[0]?.album?.images);
-  return `<div class="top-group">
-    <div class="top-group-head" data-artist="${esc(g.name)}">
-     <img src="${esc(u)}" alt="" onerror="this.style.visibility='hidden'">
-     <span class="top-group-name">${esc(g.name)}</span>
-     <span class="hint">${g.ts.length} song${g.ts.length==1?"":"s"}</span>
-    </div>
-    <div class="vinyl-grid">${g.ts.map(vinylCard).join("")}</div>
-   </div>`;
- }).join("")||'<div class="empty">No songs match.</div>';
+ if(!all.length){topList.innerHTML='<div class="empty">No songs match.</div>';return}
+ topList.innerHTML=`<div class="vinyl-grid">${all.slice(0,CAP).map(vinylCard).join("")}</div>`+
+  (all.length>CAP?`<div class="empty">Showing the top ${CAP} of ${all.length.toLocaleString()}.</div>`:"");
 }
 function showTop(){
- showPage("topPage","topBtn");renderTop();pageChanged("top");
+ showPage("topPage","topBtn");renderSleeveStack();renderTop();pageChanged("top");
 }
 function showRequest(){
  showPage("requestPage","requestBtn");pageChanged("request");
@@ -876,20 +957,40 @@ function drawPie(canvas,rows,legendEl){
  legendEl.innerHTML=rows.filter(x=>x.count).map(x=>`<div class="legend-row"><i class="dot" style="background:${ratingColor(x.rating)}"></i>${stars(x.rating,"sm")}<span>${x.rating}/5 · ${x.count} (${(x.count/total*100).toFixed(1)}%)</span></div>`).join("");
 }
 
-/* ---- artist search dropdown: highlighted result, arrows + Enter ---- */
+/* ---- artist search dropdown: combined artist + song results, highlighted, arrows + Enter ---- */
 let sgItems=[],sgActive=0;
-function sgMatches(q){
+const SG_ARTIST_MAX=5,SG_SONG_MAX=5;
+function sgArtistMatches(q){
  const nq=norm(q),out=[];
  for(const [name,ts] of artists){
   const n=norm(name),i=n.indexOf(nq);
   if(i<0)continue;
-  out.push({name,ts,rank:i===0?0:/[\s\-&.,(]/.test(n[i-1])?1:2});
+  out.push({type:"artist",name,ts,rank:i===0?0:/[\s\-&.,(]/.test(n[i-1])?1:2});
  }
  // prefix matches first, then word-start, then anywhere; most-rated first within a group
  return out.sort((a,b)=>a.rank-b.rank||b.ts.length-a.ts.length||byAlpha(a.name,b.name));
 }
+function sgSongMatches(q){
+ const nq=norm(q),out=[];
+ for(const t of tracks){
+  const n=norm(t.name||"");
+  const i=n.indexOf(nq);
+  if(i<0)continue;
+  out.push({type:"song",t,rank:i===0?0:/[\s\-&.,(]/.test(n[i-1])?1:2});
+ }
+ return out.sort((a,b)=>a.rank-b.rank||b.t.rating-a.t.rating||byName(a.t,b.t));
+}
+function sgMatches(q){
+ const artistTotal=sgArtistMatches(q),songTotal=sgSongMatches(q);
+ return {
+  artists:artistTotal,songs:songTotal,
+  combined:[...artistTotal.slice(0,SG_ARTIST_MAX),...songTotal.slice(0,SG_SONG_MAX)],
+  moreArtists:Math.max(0,artistTotal.length-SG_ARTIST_MAX),
+  moreSongs:Math.max(0,songTotal.length-SG_SONG_MAX)
+ };
+}
 function sgPlace(){
- const c=artistSearch.parentElement,w=Math.max(artistSearch.offsetWidth,Math.min(340,c.offsetWidth));
+ const c=artistSearch.parentElement,w=Math.max(artistSearch.offsetWidth,Math.min(360,c.offsetWidth));
  artistSuggest.style.width=w+"px";
  artistSuggest.style.left=Math.max(0,Math.min(artistSearch.offsetLeft,c.offsetWidth-w))+"px";
  artistSuggest.style.top=(artistSearch.offsetTop+artistSearch.offsetHeight+8)+"px";
@@ -901,26 +1002,47 @@ function sgHighlight(name,nq){
  if(i<0)return esc(name);
  return esc(name.slice(0,i))+"<mark>"+esc(name.slice(i,i+nq.length))+"</mark>"+esc(name.slice(i+nq.length));
 }
+function sgItemHtml(m,i,nq){
+ if(m.type==="artist"){
+  const u=img(m.ts[0]?.album?.images);
+  return `<div class="sg-item${i===sgActive?" active":""}" role="option" id="sg-${i}" aria-selected="${i===sgActive}" data-i="${i}">
+   <img class="sg-img" alt="" ${u?`src="${esc(u)}"`:""} onerror="this.style.visibility='hidden'">
+   <div class="sg-main"><strong>${sgHighlight(m.name,nq)}</strong><span>${m.ts.length} song${m.ts.length==1?"":"s"}</span></div>
+   <div class="sg-score"><span class="sg-badge artist">Artist</span>${fmt(avg(m.ts))}</div></div>`;
+ }
+ const u=img(m.t.album.images);
+ return `<div class="sg-item${i===sgActive?" active":""}" role="option" id="sg-${i}" aria-selected="${i===sgActive}" data-i="${i}">
+  <img class="sg-img" alt="" ${u?`src="${esc(u)}"`:""} onerror="this.style.visibility='hidden'">
+  <div class="sg-main"><strong>${sgHighlight(m.t.name||"Untitled",nq)}</strong><span>${esc(m.t.mainArtist)}</span></div>
+  <div class="sg-score"><span class="sg-badge song">Song</span>${fmt(m.t.rating)}</div></div>`;
+}
 function closeSuggest(){artistSuggest.hidden=true;artistSearch.setAttribute("aria-expanded","false");artistSearch.removeAttribute("aria-activedescendant")}
 function renderSuggest(){
  const q=artistSearch.value.trim();
  if(!q){closeSuggest();return}
- const all=sgMatches(q),nq=norm(q);
- sgItems=all.slice(0,8);
+ const {combined,artists:artistTotal,songs:songTotal,moreArtists,moreSongs}=sgMatches(q),nq=norm(q);
+ sgItems=combined;
  sgActive=Math.min(sgActive,Math.max(sgItems.length-1,0));
  if(sgItems.length){
-  artistSuggest.innerHTML=sgItems.map((m,i)=>{
-   const u=img(m.ts[0]?.album?.images);
-   return `<div class="sg-item${i===sgActive?" active":""}" role="option" id="sg-${i}" aria-selected="${i===sgActive}" data-artist="${esc(m.name)}">
-    <img class="sg-img" alt="" ${u?`src="${esc(u)}"`:""} onerror="this.style.visibility='hidden'">
-    <div class="sg-main"><strong>${sgHighlight(m.name,nq)}</strong><span>${m.ts.length} song${m.ts.length==1?"":"s"}</span></div>
-    <div class="sg-score">${fmt(avg(m.ts))}</div></div>`;
-  }).join("")+
-  (all.length>sgItems.length?`<div class="sg-hint"><span>+${all.length-sgItems.length} more — keep typing</span></div>`:"")+
-  `<div class="sg-hint keys"><span>↑ ↓ to move</span><span>Enter to open</span></div>`;
+  const artistCount=Math.min(artistTotal.length,SG_ARTIST_MAX),songCount=Math.min(songTotal.length,SG_SONG_MAX);
+  let html="";
+  if(artistCount){
+   html+=`<div class="sg-group-label">Artists</div>`;
+   html+=sgItems.slice(0,artistCount).map((m,i)=>sgItemHtml(m,i,nq)).join("");
+  }
+  if(songCount){
+   html+=`<div class="sg-group-label">Songs</div>`;
+   html+=sgItems.slice(artistCount,artistCount+songCount).map((m,i)=>sgItemHtml(m,artistCount+i,nq)).join("");
+  }
+  const more=[];
+  if(moreArtists)more.push(`+${moreArtists} more artist${moreArtists==1?"":"s"}`);
+  if(moreSongs)more.push(`+${moreSongs} more song${moreSongs==1?"":"s"}`);
+  if(more.length)html+=`<div class="sg-hint"><span>${more.join(" · ")} — keep typing</span></div>`;
+  html+=`<div class="sg-hint keys"><span>↑ ↓ to move</span><span>Enter to open</span></div>`;
+  artistSuggest.innerHTML=html;
   artistSearch.setAttribute("aria-activedescendant","sg-"+sgActive);
  }else{
-  artistSuggest.innerHTML=`<div class="sg-empty">No artists match “${esc(q)}”</div>`;
+  artistSuggest.innerHTML=`<div class="sg-empty">Nothing matches “${esc(q)}”</div>`;
  }
  artistSuggest.hidden=false;artistSearch.setAttribute("aria-expanded","true");sgPlace();
 }
@@ -931,9 +1053,20 @@ function sgSetActive(i,scroll){
  artistSearch.setAttribute("aria-activedescendant","sg-"+sgActive);
  const el=document.getElementById("sg-"+sgActive);if(scroll&&el)el.scrollIntoView({block:"nearest"});
 }
-function chooseArtist(name){
- if(!name||!artists.has(name))return;
- closeSuggest();showArtist(name);artistSearch.blur();
+function chooseItem(m){
+ if(!m)return;
+ closeSuggest();artistSearch.blur();
+ if(m.type==="artist"){
+  if(artists.has(m.name))showArtist(m.name);
+ }else{
+  const name=m.t.mainArtist;
+  if(!artists.has(name))return;
+  showArtist(name);
+  setSongsOpen(true);
+  songSearch.value=m.t.name||"";
+  songMin.value="0";
+  renderSongs();
+ }
 }
 
 homeBtn.addEventListener("click",()=>{currentArtist="";showHome()});
@@ -956,9 +1089,9 @@ dedupeToggle.addEventListener("change",()=>{
 });
 for(const el of [songSearch])el.addEventListener("input",renderSongs);
 for(const el of [songMin,songSort])el.addEventListener("change",renderSongs);
-topSearch.addEventListener("input",renderTop);topMin.addEventListener("change",renderTop);
+topSongSearch.addEventListener("input",renderTop);
 topList.addEventListener("click",e=>{const el=e.target.closest("[data-artist]");if(el)showArtist(el.dataset.artist)});
-artistSearch.addEventListener("input",()=>{sgActive=0;updateArtistControls();renderSuggest()});
+artistSearch.addEventListener("input",()=>{sgActive=0;updateArtistControls();renderSuggest();if(!topPage.classList.contains("hidden"))renderSleeveStack();});
 artistSearch.addEventListener("focus",()=>{if(artistSearch.value.trim())renderSuggest()});
 artistSearch.addEventListener("blur",()=>setTimeout(closeSuggest,120));
 artistSearch.addEventListener("keydown",e=>{
@@ -970,13 +1103,13 @@ artistSearch.addEventListener("keydown",e=>{
  }else if(e.key==="Enter"){
   e.preventDefault();
   if(!artistSearch.value.trim())return;
-  if(artistSuggest.hidden){sgItems=sgMatches(artistSearch.value.trim()).slice(0,8);sgActive=0}
-  if(sgItems[sgActive])chooseArtist(sgItems[sgActive].name);
+  if(artistSuggest.hidden){sgItems=sgMatches(artistSearch.value.trim()).combined;sgActive=0}
+  if(sgItems[sgActive])chooseItem(sgItems[sgActive]);
  }else if(e.key==="Escape")closeSuggest();
 });
 artistSuggest.addEventListener("mousedown",e=>e.preventDefault()); // keep focus in the input
-artistSuggest.addEventListener("click",e=>{const el=e.target.closest(".sg-item");if(el)chooseArtist(el.dataset.artist)});
-artistSuggest.addEventListener("mousemove",e=>{const el=e.target.closest(".sg-item");if(el){const i=+el.id.slice(3);if(i!==sgActive)sgSetActive(i,false)}});
+artistSuggest.addEventListener("click",e=>{const el=e.target.closest(".sg-item");if(el)chooseItem(sgItems[+el.dataset.i])});
+artistSuggest.addEventListener("mousemove",e=>{const el=e.target.closest(".sg-item");if(el){const i=+el.dataset.i;if(i!==sgActive)sgSetActive(i,false)}});
 document.addEventListener("click",e=>{if(!artistSuggest.contains(e.target)&&e.target!==artistSearch)closeSuggest()});
 topArtists.addEventListener("click",e=>{const el=e.target.closest("[data-artist]");if(el)showArtist(el.dataset.artist)});
 allArtists.addEventListener("click",e=>{const el=e.target.closest("[data-artist]");if(el)showArtist(el.dataset.artist)});
