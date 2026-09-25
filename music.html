@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta content="Salt's Music" property="og:title" />
-<meta content="Made by Salt & Vi ♥" property="og:description" />
+<meta content="Made by Salt &amp; Vi ♥" property="og:description" />
 <meta content="https://github.com/SaltAndViChips/SaltAndViChips.github.io/tree/main" property="og:url" />
 <meta content="https://saltandvichips.github.io/SaltAndViChips.github.io/profile.png" property="og:image" />
 <meta content="#00fa9a" data-react-helmet="true" name="theme-color" />
@@ -39,7 +39,7 @@ select,.file-label,.artist-search{background:#171021;border:1px solid var(--bord
 .home-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(320px,.7fr);gap:18px}
 .artist-table{display:flex;flex-direction:column;gap:7px}.artist-row{display:grid;grid-template-columns:32px 42px minmax(0,1fr) auto;align-items:center;gap:14px;padding:11px 14px;border-radius:13px;cursor:pointer}.artist-row:hover{background:#241534}
 .rank{font-weight:800;color:#8f7aa2;text-align:center}.artist-mini{width:42px;height:42px;border-radius:9px;object-fit:cover;background:#261635}.artist-row-main{min-width:0}.artist-row-name{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.artist-row-meta{font-size:12px;color:var(--muted)}.artist-row-score{display:flex;flex-direction:column;align-items:flex-end;gap:3px;font-size:20px;font-weight:800;color:#d9c7ff;min-width:44px}
-.all-artists{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:510px;overflow:auto;padding:4px}.artist-chip{display:flex;align-items:center;gap:10px;padding:9px;border:1px solid transparent;border-radius:11px;cursor:pointer}.artist-chip:hover{background:#241534;border-color:var(--border)}.artist-chip img{width:38px;height:38px;border-radius:8px;object-fit:cover;background:#261635}.artist-chip-name{min-width:0}.artist-chip-name strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.artist-chip-name span{color:var(--muted);font-size:11px}
+.all-artists{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;max-height:680px;overflow:auto;padding:4px}.artist-chip{display:flex;align-items:center;gap:10px;padding:9px;border:1px solid transparent;border-radius:11px;cursor:pointer}.artist-chip:hover{background:#241534;border-color:var(--border)}.artist-chip img{width:38px;height:38px;border-radius:8px;object-fit:cover;background:#261635}.artist-chip-name{min-width:0}.artist-chip-name strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.artist-chip-name span{color:var(--muted);font-size:11px}
 .song-list{max-height:520px;overflow:auto;padding-right:4px;display:flex;flex-direction:column;gap:2px}
 .song{display:grid;grid-template-columns:32px 40px minmax(0,1fr) auto;align-items:center;gap:14px;padding:8px 14px;border-radius:12px}.song:hover{background:#241534}
 .song-num{font-weight:800;color:#8f7aa2;text-align:center}.song-thumb{width:40px;height:40px;border-radius:8px;object-fit:cover;background:#261635}
@@ -157,6 +157,11 @@ main:not(.hidden)>*:nth-child(n+6){animation-delay:.2s}
 .sg-score{font-weight:800;color:#d9c7ff}
 .sg-empty{padding:14px;text-align:center;color:var(--muted);font-size:13px}
 .sg-hint{display:flex;justify-content:space-between;gap:10px;padding:8px 10px 4px;color:#7d7090;font-size:11px}
+.sg-group-label{padding:10px 10px 5px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#7d7090}
+.sg-badge{flex:none;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.02em;text-transform:uppercase}
+.sg-badge.artist{background:#2b1742;color:#c9a8ff}
+.sg-badge.song{background:#1d3b2c;color:#7de3a8}
+.sg-item .sg-score{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
 @media (hover:none){.sg-hint.keys{display:none}.artist-row:hover,.album:hover,.song:hover,.artist-chip:hover{background:none;border-color:transparent}.album.active{background:#241534}}
 
 /* ================= MOBILE VIEW ================= */
@@ -170,7 +175,6 @@ main:not(.hidden)>*:nth-child(n+6){animation-delay:.2s}
  #homeBtn,#topBtn,#requestBtn{display:none}
  .controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;width:100%}
  #artistSearch{grid-column:1/-1;width:100%}
- #artistSelect{width:100%;min-width:0}
  .file-label{white-space:nowrap;text-align:center}
  select,input:not([type=checkbox]),.file-label,.home-btn{min-height:44px;font-size:16px}
  .hero{padding:16px;gap:12px;border-radius:18px}
@@ -191,6 +195,7 @@ main:not(.hidden)>*:nth-child(n+6){animation-delay:.2s}
  .artist-row{grid-template-columns:24px 40px minmax(0,1fr) auto;gap:10px;padding:10px 6px}
  .artist-row-score{font-size:18px}
  .all-artists{grid-template-columns:1fr;max-height:56vh}
+ #allArtistsSort{min-width:0}
  .artist-chip{padding:10px 8px}
  .album-head{flex-direction:column;align-items:stretch}
  .album-head:has(#songsToggle){flex-direction:row;align-items:center}
@@ -293,6 +298,39 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 #reqSortToggle svg{transition:transform .2s var(--ease)}
 #reqSortToggle.desc svg{transform:rotate(180deg)}
 @media(max-width:600px){.req-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}}
+
+/* ================= TOP SONGS: RECORD SLEEVE STACK ================= */
+.top-stack-wrap{position:relative;height:184px;margin:6px auto 20px;display:flex;align-items:center;justify-content:center;touch-action:pan-y}
+.top-stack{position:relative;width:148px;height:148px}
+.sleeve{position:absolute;inset:0;border-radius:14px;overflow:hidden;background:#1a1226;border:1px solid var(--border);box-shadow:0 14px 30px #0008;cursor:pointer;transition:transform .24s cubic-bezier(.16,1,.3,1),opacity .2s linear,box-shadow .3s;will-change:transform,opacity}
+.sleeve img{width:100%;height:100%;object-fit:cover;display:block}
+.sleeve .sleeve-name{position:absolute;left:0;right:0;bottom:0;padding:9px 10px 7px;font-size:12.5px;font-weight:700;background:linear-gradient(0deg,#000c,transparent 90%);color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sleeve.infinity{display:flex;align-items:center;justify-content:center;font-size:56px;line-height:1;color:#d9c7ff;background:linear-gradient(135deg,#291a3d,#170f22)}
+.sleeve:hover{box-shadow:0 18px 38px #000a}
+.top-stack-nav{flex:none;width:36px;height:36px;border-radius:50%;background:#170f22;border:1px solid var(--border);color:var(--text);display:grid;place-items:center;cursor:pointer;z-index:60;font-size:18px;user-select:none;transition:border-color .2s,transform .15s var(--ease)}
+.top-stack-nav:hover{border-color:#6f42a8;transform:scale(1.06)}
+.top-stack-nav.prev{margin-right:10px}
+.top-stack-nav.next{margin-left:10px}
+
+/* ================= TOP SONGS: VINYL GRID, GROUPED BY ARTIST ================= */
+.song-shelf{display:flex;flex-direction:column;gap:14px}
+.vinyl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:14px}
+.song-vinyl{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;padding:14px 10px 12px;border-radius:16px;background:linear-gradient(160deg,#1d1329,#130c1c);border:1px solid var(--border);text-decoration:none;color:inherit;transition:transform .18s var(--ease),border-color .18s,box-shadow .18s}
+.song-vinyl:hover{transform:translateY(-4px) scale(1.02);border-color:#6f42a8;box-shadow:0 16px 34px #0007}
+.song-vinyl:hover .vinyl{animation:vinylSpin 2.8s linear infinite}
+.song-vinyl.tier-5{border-color:#5c4420;background:linear-gradient(160deg,#2a2013,#160f1e)}
+.song-vinyl.tier-5:hover{border-color:#e0b654;box-shadow:0 16px 34px #4a350012}
+.song-vinyl .vinyl{position:relative;width:76%;aspect-ratio:1;border-radius:50%;margin-bottom:10px;background:repeating-radial-gradient(circle at center,#100a18 0 2px,#1c1329 2px 4px);box-shadow:0 10px 22px #0009,inset 0 0 0 1px #2c1c3d;display:grid;place-items:center}
+.song-vinyl.tier-5 .vinyl{box-shadow:0 10px 22px #0009,inset 0 0 0 1px #7a5a22,0 0 22px -4px #e0b65466}
+.song-vinyl .vinyl::before{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 34% 28%,#ffffff17,transparent 55%);pointer-events:none}
+.song-vinyl .vinyl-label{position:relative;width:42%;aspect-ratio:1;border-radius:50%;overflow:hidden;background:#241633;box-shadow:0 0 0 3px #0b0712,0 0 0 4px #3a2452}
+.song-vinyl .vinyl-label img{width:100%;height:100%;object-fit:cover;display:block}
+.song-vinyl .vinyl-hole{position:absolute;top:50%;left:50%;width:6px;height:6px;border-radius:50%;background:#0b0712;transform:translate(-50%,-50%);box-shadow:0 0 0 2px #05030899;z-index:1}
+.song-vinyl .sv-stars{align-self:center;padding:2px 10px;border-radius:999px;background:#2a1a3d;color:#f5c451;font-size:11px;font-weight:800;margin-bottom:7px}
+.song-vinyl.tier-5 .sv-stars{background:#3a2b12;color:#f6d488}
+.song-vinyl .sv-title{font-weight:650;font-size:12.5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.28;width:100%}
+.song-vinyl .sv-album{font-size:11px;color:var(--muted);margin-top:3px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;width:100%}
+@media(max-width:600px){.vinyl-grid{grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}}
 </style>
 </head>
 <body data-state="loading">
@@ -303,8 +341,7 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 <button id="homeBtn" class="home-btn active">Home</button>
 <button id="topBtn" class="home-btn">Top Songs</button>
 <button id="requestBtn" class="home-btn">Request Song</button>
-<input id="artistSearch" class="artist-search" type="search" placeholder="Search artists…" aria-label="Search artists" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="artistSuggest" aria-autocomplete="list">
-<select id="artistSelect" aria-label="Select artist"></select>
+<input id="artistSearch" class="artist-search" type="search" placeholder="Search artists or songs…" aria-label="Search artists or songs" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="artistSuggest" aria-autocomplete="list">
 <label class="file-label icon-btn" title="Load ratings JSON" aria-label="Load ratings JSON"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h8V4"/><path d="M8 14h8v6H8z"/></svg><input id="fileInput" type="file" accept=".json,application/json"></label>
 <div id="artistSuggest" class="suggest" role="listbox" hidden></div>
 </div>
@@ -359,18 +396,14 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 <div id="featuredBody"></div>
 </section>
 <section class="card tools" style="margin-bottom:18px"><label>Rank artists by <select id="rankMode" title="Adjusted nudges artists with few songs toward your overall average"><option value="raw">Average rating</option><option value="adj">Adjusted</option></select></label><label>Min songs to rank <input id="minRank" type="number" min="1" value="6"></label><label>Min songs per album <input id="minAlbum" type="number" min="1" value="3"></label><label class="check" title="Same title, same artist, different albums — only the highest rating counts"><input id="dedupeToggle" type="checkbox" checked> Merge duplicate songs</label></section>
-<section class="home-grid">
-<div class="card" data-accent="purple">
+<section class="card" data-accent="purple" style="margin-bottom:18px">
 <h3>Highest artist averages</h3>
 <div class="hint" id="rankHint"></div>
 <div id="topArtists" class="artist-table"></div>
-
-</div>
-<div class="card" data-accent="blue">
-<h3>All artists</h3>
-
+</section>
+<section class="card" data-accent="blue">
+<div class="album-head"><div><h3>All artists</h3><div class="hint" id="allArtistsHint" style="margin-bottom:0">—</div></div><label style="display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px">Sort <select id="allArtistsSort"><option value="az">Name A–Z</option><option value="rating">Rating high–low</option><option value="songs">Most songs</option></select></label></div>
 <div id="allArtists" class="all-artists"></div>
-</div>
 </section>
 <section class="card" data-accent="teal" style="margin-top:18px"><h3>Average rating by decade</h3><div class="chart-wrap" style="height:270px"><canvas id="homeDecadeChart" style="width:100%;height:100%"></canvas></div></section>
 </main>
@@ -395,7 +428,14 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 <section class="card" data-accent="green" style="margin-top:18px"><div class="album-head"><div><h3>All rated songs</h3><div class="hint" id="songsHint" style="margin-bottom:0">—</div></div><button id="songsToggle" class="home-btn" type="button" aria-expanded="false" aria-controls="songList">Show songs</button></div><div id="songTools" class="tools hidden"><input id="songSearch" class="artist-search" type="search" placeholder="Search songs or albums…"><label>Min rating <select id="songMin"><option value="0">All</option><option value="3">3+</option><option value="3.5">3.5+</option><option value="4">4+</option><option value="4.5">4.5+</option><option value="5">5</option></select></label><label>Sort <select id="songSort"><option value="high">Highest rated</option><option value="low">Lowest rated</option><option value="az">Title A–Z</option><option value="album">Album</option></select></label></div><div id="songList" class="song-list hidden"></div></section>
 </main>
 <main id="topPage" class="hidden"><section class="hero"><div><h2 style="margin:0;font-size:28px">Top Rated Songs</h2></div><div class="score"><div class="num" id="topCount">—</div><small>matching songs</small></div></section>
-<section class="card" data-accent="gold"><div class="tools"><input id="topSearch" class="artist-search" type="search" placeholder="Search title, artist or album…"><label>Min rating <select id="topMin"><option value="5">5</option><option value="4.5" selected>4.5+</option><option value="4">4+</option><option value="3.5">3.5+</option><option value="0">All</option></select></label></div><div id="topList" class="song-list" style="max-height:720px"></div></section></main>
+<section class="card" data-accent="gold">
+<div class="top-stack-wrap" id="topStackWrap">
+ <div class="top-stack-nav prev" id="topStackPrev" aria-label="Previous artist">‹</div>
+ <div class="top-stack" id="topStack"></div>
+ <div class="top-stack-nav next" id="topStackNext" aria-label="Next artist">›</div>
+</div>
+<div class="tools" style="visibility: hidden"><input id="topSongSearch" class="artist-search" type="search" placeholder="Search songs…"></div>
+<div id="topList" class="song-shelf"></div></section></main>
 <main id="requestPage" class="hidden"><section class="hero"><div><h2 style="margin:0;font-size:28px">Request a Song</h2></div></section>
 <section class="card" data-accent="green">
 <form id="requestForm" class="tools" style="margin-bottom:4px">
@@ -525,13 +565,7 @@ function buildArtists(){
  renderHome();
  renderFeatured();
 }
-/* The dropdown always starts with a placeholder option. With a single search result the <select>
-   used to have that result pre-selected, so choosing it never fired "change". */
 function updateArtistControls(){
- const q=norm(artistSearch.value.trim());
- const names=[...artists.keys()].filter(n=>!q||norm(n).includes(q)).sort(byAlpha);
- artistSelect.innerHTML='<option value="">'+(names.length?"Select artist…":"No matches")+'</option>'+names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join("");
- artistSelect.value=names.includes(currentArtist)?currentArtist:"";
  updateAllArtistsFilter();
 }
 function setImage(el,url){
@@ -539,7 +573,10 @@ function setImage(el,url){
  else{el.removeAttribute("src");el.style.display="none"}
 }
 
-/* ---- Featured today: 3 artists + 5 songs, reshuffled once per calendar day ---- */
+/* ---- Featured today: artists with a high volume of recently-highly-rated tracks, plus a
+   4.0+ song spotlight guaranteeing a 5, a 4.5 and a 4 where available. The actual picks are
+   cached per calendar day (by artist name / track url) so importing more tracks later in the
+   same day can't reshuffle what's shown — only the next day's refresh can. ---- */
 function mulberry32(seed){
  return function(){
   seed|=0;seed=seed+0x6D2B79F5|0;
@@ -575,42 +612,80 @@ function weightedSample(pool,weights,n,rng){
  }
  return out;
 }
+const FEATURED_KEY="featuredDailyPick";
+function loadFeaturedCache(){try{return JSON.parse(localStorage.getItem(FEATURED_KEY)||"null")}catch{return null}}
+function saveFeaturedCache(c){try{localStorage.setItem(FEATURED_KEY,JSON.stringify(c))}catch{}}
+function recencySpan(list){
+ const times=list.map(ratedAtMs),hasTime=times.some(ms=>ms!=null);
+ let newest=null,oldest=null;
+ if(hasTime)for(const ms of times)if(ms!=null){if(newest==null||ms>newest)newest=ms;if(oldest==null||ms<oldest)oldest=ms}
+ return {times,hasTime,oldest,span:hasTime?Math.max(1,newest-oldest):1};
+}
+function computeFeatured(){
+ const {times,hasTime,oldest,span}=recencySpan(tracks);
+ const recencyOf=ms=>!hasTime||ms==null?1:1+2*((ms-oldest)/span); // 1x oldest → 3x newest
+ // Artists: ranked by volume of recently-highly-rated (4.0+) tracks, not just their average —
+ // a prolific artist with several recent 4+ ratings should outrank one great song from long ago.
+ const HIGH=4;
+ const artistScore=new Map();
+ tracks.forEach((t,i)=>{
+  if(t.rating<HIGH)return;
+  artistScore.set(t.mainArtist,(artistScore.get(t.mainArtist)||0)+recencyOf(times[i]));
+ });
+ const featArtists=[...artistScore.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,3).map(x=>x[0]);
+
+ // Songs: only 4.0+, weighted by rating²×recency, guaranteeing one 5, one 4.5 and one 4 (if any
+ // exist) before filling the rest of the spotlight, then sorted highest → lowest.
+ const pool=tracks.map((t,i)=>({t,w:Math.pow(t.rating,2)*recencyOf(times[i])})).filter(x=>x.t.rating>=HIGH);
+ const dayKey=new Date().toISOString().slice(0,10);
+ const rng=mulberry32(hashStr(dayKey));
+ const TARGET=5,picked=[],usedUrls=new Set();
+ for(const tier of [5,4.5,4]){
+  const tierPool=pool.filter(x=>x.t.rating===tier&&!usedUrls.has(trackUrl(x.t)||x.t.name));
+  if(!tierPool.length)continue;
+  const [pick]=weightedSample(tierPool.map(x=>x.t),tierPool.map(x=>x.w),1,rng);
+  picked.push(pick);usedUrls.add(trackUrl(pick)||pick.name);
+ }
+ const remaining=pool.filter(x=>!usedUrls.has(trackUrl(x.t)||x.t.name));
+ const extra=weightedSample(remaining.map(x=>x.t),remaining.map(x=>x.w),Math.max(0,TARGET-picked.length),rng);
+ const songs=[...picked,...extra].sort((a,b)=>b.rating-a.rating||(ratedAtMs(b)||0)-(ratedAtMs(a)||0));
+ return {artists:featArtists,songUrls:songs.map(t=>trackUrl(t)||t.name)};
+}
 function renderFeatured(){
  if(!tracks.length){featuredCard.classList.add("hidden");return}
  featuredCard.classList.remove("hidden");
- const today=new Date(),dayKey=today.toISOString().slice(0,10);
- const rng=mulberry32(hashStr(dayKey+"|"+tracks.length)); // stable all day, reshuffles daily and when the library size changes
- const times=tracks.map(ratedAtMs),hasTime=times.some(ms=>ms!=null);
- let newest=null,oldest=null;
- if(hasTime){for(const ms of times)if(ms!=null){if(newest==null||ms>newest)newest=ms;if(oldest==null||ms<oldest)oldest=ms}}
- const span=hasTime?Math.max(1,newest-oldest):1;
- // weight: rating^2 always counts; a recently-rated song gets up to 3x extra weight, decaying linearly with age
- const songWeight=(t,ms)=>{
-  const base=Math.pow(Math.max(t.rating,.1),2);
-  if(!hasTime||ms==null)return base;
-  const recency=1+2*((ms-oldest)/span);
-  return base*recency;
- };
- const songW=tracks.map((t,i)=>songWeight(t,times[i]));
- const songs=weightedSample(tracks,songW,5,rng);
-
- const artistNames=[...artists.keys()];
- const artistW=artistNames.map(name=>{
-  const ts=artists.get(name),ms=ts.map(ratedAtMs);
-  return ts.reduce((s,t,i)=>s+songWeight(t,ms[i]),0)/ts.length; // average weight, so prolific artists aren't auto-favored
- });
- const featArtists=weightedSample(artistNames,artistW,3,rng);
+ const dayKey=new Date().toISOString().slice(0,10);
+ let cache=loadFeaturedCache();
+ // Reuse today's picks as-is (even if the library changed) so results don't reshuffle until
+ // the next calendar day; only fall back to a fresh computation on a new day or first run.
+ if(!cache||cache.day!==dayKey){
+  cache={day:dayKey,...computeFeatured()};
+  saveFeaturedCache(cache);
+ }
+ let featArtistNames=cache.artists.filter(n=>artists.has(n));
+ const byUrl=new Map(tracks.map(t=>[trackUrl(t)||t.name,t]));
+ let songs=cache.songUrls.map(u=>byUrl.get(u)).filter(Boolean);
+ // If the cached picks no longer resolve (e.g. a brand-new library was imported), recompute
+ // once and cache that instead of showing an empty spotlight all day.
+ if(!featArtistNames.length||!songs.length){
+  cache={day:dayKey,...computeFeatured()};
+  saveFeaturedCache(cache);
+  featArtistNames=cache.artists.filter(n=>artists.has(n));
+  songs=cache.songUrls.map(u=>byUrl.get(u)).filter(Boolean);
+ }
+ songs.sort((a,b)=>b.rating-a.rating||(ratedAtMs(b)||0)-(ratedAtMs(a)||0));
 
  featuredHint.textContent="Refreshes Daily";
- 
+
  featuredBody.innerHTML=
-  `<div class="featured-artists">${featArtists.map(name=>{
+  (featArtistNames.length?`<div class="featured-artists">${featArtistNames.map(name=>{
     const ts=artists.get(name),u=img(ts[0]?.album?.images);
     return `<div class="feat-artist" data-artist="${esc(name)}">
      <img src="${esc(u)}" alt="" onerror="this.style.visibility='hidden'">
      <strong>${esc(name)}</strong><span>${fmt(avg(ts))} avg</span></div>`;
-  }).join("")}</div>`+
-  `<div class="featured-songs">${songs.map((t,i)=>songRow(t,i,true)).join("")}</div>`;
+  }).join("")}</div>`:"")+
+  (songs.length?`<div class="featured-songs">${songs.map((t,i)=>songRow(t,i,true)).join("")}</div>`
+   :'<div class="empty">No 4.0+ rated songs yet.</div>');
 }
 featuredBody.addEventListener("click",e=>{
  const a=e.target.closest("[data-artist]");
@@ -657,8 +732,10 @@ function renderHome(){
    <div class="artist-row-score"><span>${fmt(a.score)}</span>${stars(a.score,"sm")}</div>
   </div>`).join("")||`<div class="empty">No artists with ${minN}+ rated songs.</div>`;
 
- const alphabetical=[...stats].sort((a,b)=>byAlpha(a.name,b.name));
- allArtists.innerHTML=alphabetical.map(a=>`
+ const sorters={az:(a,b)=>byAlpha(a.name,b.name),rating:(a,b)=>b.average-a.average||byAlpha(a.name,b.name),songs:(a,b)=>b.tracks.length-a.tracks.length||byAlpha(a.name,b.name)};
+ const sortedStats=[...stats].sort(sorters[allArtistsSort.value]||sorters.az);
+ allArtistsHint.textContent=`${sortedStats.length.toLocaleString()} artist${sortedStats.length==1?"":"s"}`;
+ allArtists.innerHTML=sortedStats.map(a=>`
   <div class="artist-chip" data-artist="${esc(a.name)}" data-artist-name="${esc(a.name.toLowerCase())}">
    <img src="${esc(a.image)}" alt="" onerror="this.style.display='none'">
    <div class="artist-chip-name"><strong>${esc(a.name)}</strong><span>${a.tracks.length} songs · ${fmt(a.average)} avg</span></div>
@@ -733,15 +810,139 @@ function renderSongs(){
  songList.innerHTML=ts.map((t,i)=>songRow(t,i,false)).join("")||'<div class="empty">No songs match.</div>';
  songList.scrollTop=0;setSongsOpen(songsOpen);
 }
+let topArtistFilter="",sleeveItems=[],sleeveFront=0;
+function buildSleeveItems(){
+ const q=norm(artistSearch.value.trim());
+ const names=[...artists.keys()].filter(n=>(!q||norm(n).includes(q))&&artists.get(n).some(t=>t.rating>=4)).sort(byAlpha);
+ sleeveItems=[{key:"",label:"All Songs",infinity:true},...names.map(n=>({key:n,label:n,img:img(artists.get(n)[0]?.album?.images)}))];
+}
+// Fixed 5-slot carousel: center + 2 on either side. Only those ~5 elements are ever in the DOM
+// (unlike animating every artist, which is what made the old version laggy on large libraries) —
+// a step slides all of them one slot, drops whichever one exits, and slides a new one in from
+// the freed edge.
+let sleeveEls=new Map(); // item key -> mounted element
+const SLEEVE_VISIBLE=2;
+const SLEEVE_SLOTS={
+ 0:{tx:0,ty:0,scale:1,rot:0,opacity:1,z:50},
+ 1:{tx:92,ty:10,scale:.84,rot:3,opacity:.6,z:30},
+ 2:{tx:168,ty:20,scale:.68,rot:5.5,opacity:.28,z:15},
+ 3:{tx:222,ty:28,scale:.55,rot:7,opacity:0,z:5}
+};
+function slotStyle(offset){
+ const abs=Math.min(Math.abs(offset),3),s=SLEEVE_SLOTS[abs],sign=offset<0?-1:1;
+ return{tx:sign*s.tx,ty:s.ty,scale:s.scale,rot:sign*s.rot,opacity:s.opacity,z:s.z};
+}
+function applySleeveStyle(el,offset,withTransition){
+ el.style.transition=withTransition?"":"none";
+ const st=slotStyle(offset);
+ el.style.transform=`translate(${st.tx}px,${st.ty}px) scale(${st.scale}) rotate(${st.rot}deg)`;
+ el.style.opacity=st.opacity;el.style.zIndex=st.z;
+ el.style.pointerEvents=Math.abs(offset)<=SLEEVE_VISIBLE?"auto":"none";
+}
+function sleeveElFor(item){
+ const el=document.createElement("div");
+ el.className="sleeve"+(item.infinity?" infinity":"");
+ el.dataset.key=item.key;
+ el.innerHTML=item.infinity?"∞":`<img src="${esc(item.img)}" alt="" onerror="this.style.display='none'"><span class="sleeve-name">${esc(item.label)}</span>`;
+ return el;
+}
+// Places the 5-slot window fresh, with no slide — used on page open or when the artist filter changes.
+function layoutSleevesFresh(){
+ for(const el of sleeveEls.values())el.remove();
+ sleeveEls.clear();
+ const N=sleeveItems.length;if(!N)return;
+ for(let o=-SLEEVE_VISIBLE;o<=SLEEVE_VISIBLE;o++){
+  const idx=((sleeveFront+o)%N+N)%N,item=sleeveItems[idx];
+  const el=sleeveElFor(item);
+  topStack.appendChild(el);sleeveEls.set(item.key,el);
+  applySleeveStyle(el,o,false);
+ }
+}
+// Slides the whole window by one slot. dir=+1: content shifts left, the leftmost sleeve exits,
+// and a new one slides in from the right. dir=-1 is the mirror image.
+function stepSleeve(dir){
+ const N=sleeveItems.length;if(N<2)return;
+ sleeveFront=((sleeveFront+dir)%N+N)%N;
+ for(const [key,el] of [...sleeveEls]){
+  const idx=sleeveItems.findIndex(it=>it.key===key);
+  if(idx<0){el.remove();sleeveEls.delete(key);continue}
+  let off=idx-sleeveFront;
+  if(N>1){off=((off%N)+N)%N;if(off>N/2)off-=N}
+  applySleeveStyle(el,off,true);
+  if(Math.abs(off)>SLEEVE_VISIBLE)setTimeout(()=>{if(sleeveEls.get(key)===el){el.remove();sleeveEls.delete(key)}},260);
+ }
+ const enterOffset=dir>0?SLEEVE_VISIBLE:-SLEEVE_VISIBLE;
+ const enterIdx=((sleeveFront+enterOffset)%N+N)%N,enterItem=sleeveItems[enterIdx];
+ if(!sleeveEls.has(enterItem.key)){
+  const el=sleeveElFor(enterItem);
+  topStack.appendChild(el);sleeveEls.set(enterItem.key,el);
+  applySleeveStyle(el,enterOffset+dir,false); // start just past the edge it's entering from
+  el.getBoundingClientRect(); // force layout so the next style change animates
+  applySleeveStyle(el,enterOffset,true);
+ }
+ const key=sleeveItems[sleeveFront]?.key||"";
+ if(key!==topArtistFilter){topArtistFilter=key;renderTop()}
+}
+function renderSleeveStack(){
+ buildSleeveItems();
+ const idx=sleeveItems.findIndex(s=>s.key===topArtistFilter);
+ sleeveFront=idx>=0?idx:0;
+ topArtistFilter=sleeveItems[sleeveFront]?.key||"";
+ layoutSleevesFresh();
+}
+function advanceSleeve(delta){
+ const dir=delta<0?-1:1;
+ for(let i=0;i<Math.abs(delta);i++)stepSleeve(dir);
+}
+topStack.addEventListener("click",e=>{
+ const el=e.target.closest(".sleeve");if(!el)return;
+ const idx=sleeveItems.findIndex(it=>it.key===el.dataset.key);
+ if(idx<0)return;
+ const N=sleeveItems.length;let off=idx-sleeveFront;
+ if(N>1){off=((off%N)+N)%N;if(off>N/2)off-=N}
+ if(off)advanceSleeve(off);
+});
+topStackPrev.addEventListener("click",()=>advanceSleeve(-1));
+topStackNext.addEventListener("click",()=>advanceSleeve(1));
+// One wheel/trackpad "notch" of accumulated delta advances exactly one slot; a short lock just
+// keeps a single physical scroll gesture from firing many steps at once.
+let sleeveWheelLock=false,wheelAccum=0;
+const SLEEVE_WHEEL_THRESH=28,SLEEVE_WHEEL_LOCK=110;
+topStackWrap.addEventListener("wheel",e=>{
+ if(!sleeveItems.length)return;
+ e.preventDefault();
+ wheelAccum+=e.deltaY||e.deltaX;
+ if(sleeveWheelLock||Math.abs(wheelAccum)<SLEEVE_WHEEL_THRESH)return;
+ wheelAccum=0;sleeveWheelLock=true;
+ advanceSleeve((e.deltaY||e.deltaX)>0?1:-1);
+ setTimeout(()=>sleeveWheelLock=false,SLEEVE_WHEEL_LOCK);
+},{passive:false});
+let sleeveDragX=null;
+topStackWrap.addEventListener("pointerdown",e=>{sleeveDragX=e.clientX});
+topStackWrap.addEventListener("pointerup",e=>{
+ if(sleeveDragX==null)return;
+ const dx=e.clientX-sleeveDragX;sleeveDragX=null;
+ if(Math.abs(dx)>24)advanceSleeve(dx<0?1:-1);
+});
+function vinylCard(t){
+ const url=trackUrl(t),title=esc(t.name||"Untitled"),album=esc(t.album.name||"");
+ const inner=`<div class="sv-stars">${t.rating.toFixed(1).replace(/\.0$/,"")} ★</div>
+   <div class="vinyl"><div class="vinyl-hole"></div><div class="vinyl-label"><img src="${esc(img(t.album.images))}" alt="" onerror="this.style.display='none'"></div></div>
+   <div class="sv-title">${title}</div><div class="sv-album">${album}</div>`;
+ const cls="song-vinyl"+(t.rating>=5?" tier-5":"");
+ return url?`<a class="${cls}" href="${esc(url)}" target="_blank" rel="noopener">${inner}</a>`:`<div class="${cls}">${inner}</div>`;
+}
 function renderTop(){
- const q=topSearch.value.trim().toLowerCase(),min=Number(topMin.value),CAP=300;
- const all=tracks.filter(t=>t.rating>=min&&(!q||[t.name,t.mainArtist,t.album.name].some(x=>String(x||"").toLowerCase().includes(q)))).sort((a,b)=>b.rating-a.rating||a.mainArtist.localeCompare(b.mainArtist)||byName(a,b));
+ const q=topSongSearch.value.trim().toLowerCase(),CAP=500;
+ const all=tracks.filter(t=>(!topArtistFilter||t.mainArtist===topArtistFilter)&&(!q||[t.name,t.album.name].some(x=>String(x||"").toLowerCase().includes(q))))
+  .sort((a,b)=>b.rating-a.rating||byName(a,b));
  topCount.textContent=all.length.toLocaleString();
- topList.innerHTML=all.slice(0,CAP).map((t,i)=>songRow(t,i,true)).join("")+(all.length>CAP?`<div class="empty">Showing the first ${CAP} of ${all.length.toLocaleString()}.</div>`:"")||'<div class="empty">No songs match.</div>';
- topList.scrollTop=0;
+ if(!all.length){topList.innerHTML='<div class="empty">No songs match.</div>';return}
+ topList.innerHTML=`<div class="vinyl-grid">${all.slice(0,CAP).map(vinylCard).join("")}</div>`+
+  (all.length>CAP?`<div class="empty">Showing the top ${CAP} of ${all.length.toLocaleString()}.</div>`:"");
 }
 function showTop(){
- showPage("topPage","topBtn");renderTop();pageChanged("top");
+ showPage("topPage","topBtn");renderSleeveStack();renderTop();pageChanged("top");
 }
 function showRequest(){
  showPage("requestPage","requestBtn");pageChanged("request");
@@ -800,20 +1001,40 @@ function drawPie(canvas,rows,legendEl){
  legendEl.innerHTML=rows.filter(x=>x.count).map(x=>`<div class="legend-row"><i class="dot" style="background:${ratingColor(x.rating)}"></i>${stars(x.rating,"sm")}<span>${x.rating}/5 · ${x.count} (${(x.count/total*100).toFixed(1)}%)</span></div>`).join("");
 }
 
-/* ---- artist search dropdown: highlighted result, arrows + Enter ---- */
+/* ---- artist search dropdown: combined artist + song results, highlighted, arrows + Enter ---- */
 let sgItems=[],sgActive=0;
-function sgMatches(q){
+const SG_ARTIST_MAX=5,SG_SONG_MAX=5;
+function sgArtistMatches(q){
  const nq=norm(q),out=[];
  for(const [name,ts] of artists){
   const n=norm(name),i=n.indexOf(nq);
   if(i<0)continue;
-  out.push({name,ts,rank:i===0?0:/[\s\-&.,(]/.test(n[i-1])?1:2});
+  out.push({type:"artist",name,ts,rank:i===0?0:/[\s\-&.,(]/.test(n[i-1])?1:2});
  }
  // prefix matches first, then word-start, then anywhere; most-rated first within a group
  return out.sort((a,b)=>a.rank-b.rank||b.ts.length-a.ts.length||byAlpha(a.name,b.name));
 }
+function sgSongMatches(q){
+ const nq=norm(q),out=[];
+ for(const t of tracks){
+  const n=norm(t.name||"");
+  const i=n.indexOf(nq);
+  if(i<0)continue;
+  out.push({type:"song",t,rank:i===0?0:/[\s\-&.,(]/.test(n[i-1])?1:2});
+ }
+ return out.sort((a,b)=>a.rank-b.rank||b.t.rating-a.t.rating||byName(a.t,b.t));
+}
+function sgMatches(q){
+ const artistTotal=sgArtistMatches(q),songTotal=sgSongMatches(q);
+ return {
+  artists:artistTotal,songs:songTotal,
+  combined:[...artistTotal.slice(0,SG_ARTIST_MAX),...songTotal.slice(0,SG_SONG_MAX)],
+  moreArtists:Math.max(0,artistTotal.length-SG_ARTIST_MAX),
+  moreSongs:Math.max(0,songTotal.length-SG_SONG_MAX)
+ };
+}
 function sgPlace(){
- const c=artistSearch.parentElement,w=Math.max(artistSearch.offsetWidth,Math.min(340,c.offsetWidth));
+ const c=artistSearch.parentElement,w=Math.max(artistSearch.offsetWidth,Math.min(360,c.offsetWidth));
  artistSuggest.style.width=w+"px";
  artistSuggest.style.left=Math.max(0,Math.min(artistSearch.offsetLeft,c.offsetWidth-w))+"px";
  artistSuggest.style.top=(artistSearch.offsetTop+artistSearch.offsetHeight+8)+"px";
@@ -825,26 +1046,47 @@ function sgHighlight(name,nq){
  if(i<0)return esc(name);
  return esc(name.slice(0,i))+"<mark>"+esc(name.slice(i,i+nq.length))+"</mark>"+esc(name.slice(i+nq.length));
 }
+function sgItemHtml(m,i,nq){
+ if(m.type==="artist"){
+  const u=img(m.ts[0]?.album?.images);
+  return `<div class="sg-item${i===sgActive?" active":""}" role="option" id="sg-${i}" aria-selected="${i===sgActive}" data-i="${i}">
+   <img class="sg-img" alt="" ${u?`src="${esc(u)}"`:""} onerror="this.style.visibility='hidden'">
+   <div class="sg-main"><strong>${sgHighlight(m.name,nq)}</strong><span>${m.ts.length} song${m.ts.length==1?"":"s"}</span></div>
+   <div class="sg-score"><span class="sg-badge artist">Artist</span>${fmt(avg(m.ts))}</div></div>`;
+ }
+ const u=img(m.t.album.images);
+ return `<div class="sg-item${i===sgActive?" active":""}" role="option" id="sg-${i}" aria-selected="${i===sgActive}" data-i="${i}">
+  <img class="sg-img" alt="" ${u?`src="${esc(u)}"`:""} onerror="this.style.visibility='hidden'">
+  <div class="sg-main"><strong>${sgHighlight(m.t.name||"Untitled",nq)}</strong><span>${esc(m.t.mainArtist)}</span></div>
+  <div class="sg-score"><span class="sg-badge song">Song</span>${fmt(m.t.rating)}</div></div>`;
+}
 function closeSuggest(){artistSuggest.hidden=true;artistSearch.setAttribute("aria-expanded","false");artistSearch.removeAttribute("aria-activedescendant")}
 function renderSuggest(){
  const q=artistSearch.value.trim();
  if(!q){closeSuggest();return}
- const all=sgMatches(q),nq=norm(q);
- sgItems=all.slice(0,8);
+ const {combined,artists:artistTotal,songs:songTotal,moreArtists,moreSongs}=sgMatches(q),nq=norm(q);
+ sgItems=combined;
  sgActive=Math.min(sgActive,Math.max(sgItems.length-1,0));
  if(sgItems.length){
-  artistSuggest.innerHTML=sgItems.map((m,i)=>{
-   const u=img(m.ts[0]?.album?.images);
-   return `<div class="sg-item${i===sgActive?" active":""}" role="option" id="sg-${i}" aria-selected="${i===sgActive}" data-artist="${esc(m.name)}">
-    <img class="sg-img" alt="" ${u?`src="${esc(u)}"`:""} onerror="this.style.visibility='hidden'">
-    <div class="sg-main"><strong>${sgHighlight(m.name,nq)}</strong><span>${m.ts.length} song${m.ts.length==1?"":"s"}</span></div>
-    <div class="sg-score">${fmt(avg(m.ts))}</div></div>`;
-  }).join("")+
-  (all.length>sgItems.length?`<div class="sg-hint"><span>+${all.length-sgItems.length} more — keep typing</span></div>`:"")+
-  `<div class="sg-hint keys"><span>↑ ↓ to move</span><span>Enter to open</span></div>`;
+  const artistCount=Math.min(artistTotal.length,SG_ARTIST_MAX),songCount=Math.min(songTotal.length,SG_SONG_MAX);
+  let html="";
+  if(artistCount){
+   html+=`<div class="sg-group-label">Artists</div>`;
+   html+=sgItems.slice(0,artistCount).map((m,i)=>sgItemHtml(m,i,nq)).join("");
+  }
+  if(songCount){
+   html+=`<div class="sg-group-label">Songs</div>`;
+   html+=sgItems.slice(artistCount,artistCount+songCount).map((m,i)=>sgItemHtml(m,artistCount+i,nq)).join("");
+  }
+  const more=[];
+  if(moreArtists)more.push(`+${moreArtists} more artist${moreArtists==1?"":"s"}`);
+  if(moreSongs)more.push(`+${moreSongs} more song${moreSongs==1?"":"s"}`);
+  if(more.length)html+=`<div class="sg-hint"><span>${more.join(" · ")} — keep typing</span></div>`;
+  html+=`<div class="sg-hint keys"><span>↑ ↓ to move</span><span>Enter to open</span></div>`;
+  artistSuggest.innerHTML=html;
   artistSearch.setAttribute("aria-activedescendant","sg-"+sgActive);
  }else{
-  artistSuggest.innerHTML=`<div class="sg-empty">No artists match “${esc(q)}”</div>`;
+  artistSuggest.innerHTML=`<div class="sg-empty">Nothing matches “${esc(q)}”</div>`;
  }
  artistSuggest.hidden=false;artistSearch.setAttribute("aria-expanded","true");sgPlace();
 }
@@ -855,9 +1097,20 @@ function sgSetActive(i,scroll){
  artistSearch.setAttribute("aria-activedescendant","sg-"+sgActive);
  const el=document.getElementById("sg-"+sgActive);if(scroll&&el)el.scrollIntoView({block:"nearest"});
 }
-function chooseArtist(name){
- if(!name||!artists.has(name))return;
- closeSuggest();showArtist(name);artistSearch.blur();
+function chooseItem(m){
+ if(!m)return;
+ closeSuggest();artistSearch.blur();
+ if(m.type==="artist"){
+  if(artists.has(m.name))showArtist(m.name);
+ }else{
+  const name=m.t.mainArtist;
+  if(!artists.has(name))return;
+  showArtist(name);
+  setSongsOpen(true);
+  songSearch.value=m.t.name||"";
+  songMin.value="0";
+  renderSongs();
+ }
 }
 
 homeBtn.addEventListener("click",()=>{currentArtist="";showHome()});
@@ -871,6 +1124,7 @@ document.querySelector(".mnav").addEventListener("click",e=>{
  else{window.scrollTo(0,0);artistSearch.focus()}
 });
 rankMode.addEventListener("change",renderHome);
+allArtistsSort.addEventListener("change",renderHome);
 minRank.addEventListener("change",renderHome);
 minAlbum.addEventListener("change",()=>{MIN_ALBUM_SONGS=Math.max(1,parseInt(minAlbum.value)||1);minAlbum.value=MIN_ALBUM_SONGS;renderHome()});
 dedupeToggle.addEventListener("change",()=>{
@@ -879,9 +1133,9 @@ dedupeToggle.addEventListener("change",()=>{
 });
 for(const el of [songSearch])el.addEventListener("input",renderSongs);
 for(const el of [songMin,songSort])el.addEventListener("change",renderSongs);
-topSearch.addEventListener("input",renderTop);topMin.addEventListener("change",renderTop);
+topSongSearch.addEventListener("input",renderTop);
 topList.addEventListener("click",e=>{const el=e.target.closest("[data-artist]");if(el)showArtist(el.dataset.artist)});
-artistSearch.addEventListener("input",()=>{sgActive=0;updateArtistControls();renderSuggest()});
+artistSearch.addEventListener("input",()=>{sgActive=0;updateArtistControls();renderSuggest();if(!topPage.classList.contains("hidden"))renderSleeveStack();});
 artistSearch.addEventListener("focus",()=>{if(artistSearch.value.trim())renderSuggest()});
 artistSearch.addEventListener("blur",()=>setTimeout(closeSuggest,120));
 artistSearch.addEventListener("keydown",e=>{
@@ -893,15 +1147,14 @@ artistSearch.addEventListener("keydown",e=>{
  }else if(e.key==="Enter"){
   e.preventDefault();
   if(!artistSearch.value.trim())return;
-  if(artistSuggest.hidden){sgItems=sgMatches(artistSearch.value.trim()).slice(0,8);sgActive=0}
-  if(sgItems[sgActive])chooseArtist(sgItems[sgActive].name);
+  if(artistSuggest.hidden){sgItems=sgMatches(artistSearch.value.trim()).combined;sgActive=0}
+  if(sgItems[sgActive])chooseItem(sgItems[sgActive]);
  }else if(e.key==="Escape")closeSuggest();
 });
 artistSuggest.addEventListener("mousedown",e=>e.preventDefault()); // keep focus in the input
-artistSuggest.addEventListener("click",e=>{const el=e.target.closest(".sg-item");if(el)chooseArtist(el.dataset.artist)});
-artistSuggest.addEventListener("mousemove",e=>{const el=e.target.closest(".sg-item");if(el){const i=+el.id.slice(3);if(i!==sgActive)sgSetActive(i,false)}});
+artistSuggest.addEventListener("click",e=>{const el=e.target.closest(".sg-item");if(el)chooseItem(sgItems[+el.dataset.i])});
+artistSuggest.addEventListener("mousemove",e=>{const el=e.target.closest(".sg-item");if(el){const i=+el.dataset.i;if(i!==sgActive)sgSetActive(i,false)}});
 document.addEventListener("click",e=>{if(!artistSuggest.contains(e.target)&&e.target!==artistSearch)closeSuggest()});
-artistSelect.addEventListener("change",e=>{if(e.target.value)showArtist(e.target.value)});
 topArtists.addEventListener("click",e=>{const el=e.target.closest("[data-artist]");if(el)showArtist(el.dataset.artist)});
 allArtists.addEventListener("click",e=>{const el=e.target.closest("[data-artist]");if(el)showArtist(el.dataset.artist)});
 songsToggle.addEventListener("click",()=>setSongsOpen(!songsOpen));
@@ -1136,9 +1389,38 @@ function libraryRatedUrls(){
  for(const t of rawTracks){const u=trackUrl(t);if(u)s.add(u)}
  return s;
 }
+// Album-type requests don't carry a Spotify album id we can match against the ratings export
+// (it only records track-level data), so a single-track "album" is recognized instead by its
+// oEmbed title/artist matching a track we've already rated — which is what a single's album
+// title equalling its one song's title looks like. Confirmed matches are cached by URL so a
+// request only needs its metadata fetched (and checked) once per session.
+let metaRatedUrls=new Set();
+// Spotify formats the same release title differently depending on context — e.g. an album page
+// may read "Song Name - Remixer Remix" where the track itself is named "Song Name (Remixer
+// Remix)". Punctuation is stripped down to bare words before comparing so those differences
+// (dashes vs. parens, ampersands, extra spacing) don't block an otherwise-identical match.
+function squash(s){return norm(s).replace(/[^\p{L}\p{N}]+/gu," ").trim().replace(/\s+/g," ")}
+function isRatedSingleAlbum(title,author){
+ // Spotify's album title often also carries a release-type suffix ("Song Name - Single") that
+ // a plain track name won't have, so that's stripped first.
+ const stripped=String(title||"").replace(/\s*[-–]\s*(single|ep|album)\s*$/i,"").trim();
+ const nt=squash(stripped||title);
+ if(nt.length<3)return false;
+ const na=norm(author||"");
+ return rawTracks.some(t=>{
+  const ntName=squash(t.name||"");
+  if(!ntName||ntName.length<3)return false;
+  const titleMatches=ntName===nt||(nt.length>=6&&ntName.length>=6&&(nt.includes(ntName)||ntName.includes(nt)));
+  if(!titleMatches)return false;
+  if(!na)return true;
+  const names=[t.mainArtist,...(t.artists||[]).map(a=>a?.name)].filter(Boolean).map(norm);
+  return names.some(n=>n===na||n.includes(na)||na.includes(n));
+ });
+}
 function allRatedUrls(){
  const s=new Set(sheetRatedUrls);
  for(const u of libraryRatedUrls())s.add(u);
+ for(const u of metaRatedUrls)s.add(u);
  return s;
 }
 function applyRatedFilter(){
@@ -1164,6 +1446,16 @@ function renderReqGrid(){
  items.forEach((item,i)=>{
   fetchSpotifyMeta(item).then(meta=>{
    const el=document.getElementById("reqc-"+i);if(!el)return;
+   if(item.type==="album"&&isRatedSingleAlbum(meta.title,meta.author_name)){
+    // a single whose one song is already rated — drop it and remember it so it stays
+    // filtered out without needing to refetch its metadata again this session
+    metaRatedUrls.add(item.url);
+    el.remove();
+    const left=reqGrid.querySelectorAll(".req-card").length;
+    reqGridHint.textContent=left?`${left.toLocaleString()} song${left==1?"":"s"} requested`:"No requests yet.";
+    if(!left)reqGrid.innerHTML='<div class="empty">Nothing requested yet — be the first above.</div>';
+    return;
+   }
    el.classList.remove("req-loading");
    const [title,by]=[meta.title||item.url,meta.author_name||""];
    el.querySelector(".vinyl-label").innerHTML=meta.thumbnail_url?`<img src="${esc(meta.thumbnail_url)}" alt="" loading="lazy">`:"";
