@@ -302,7 +302,7 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 /* ================= TOP SONGS: RECORD SLEEVE STACK ================= */
 .top-stack-wrap{position:relative;height:184px;margin:6px auto 20px;display:flex;align-items:center;justify-content:center;touch-action:pan-y}
 .top-stack{position:relative;width:148px;height:148px}
-.sleeve{position:absolute;inset:0;border-radius:14px;overflow:hidden;background:#1a1226;border:1px solid var(--border);box-shadow:0 14px 30px #0008;cursor:pointer;transition:transform .14s cubic-bezier(.16,1,.3,1),opacity .1s linear,box-shadow .3s;will-change:transform,opacity}
+.sleeve{position:absolute;inset:0;border-radius:14px;overflow:hidden;background:#1a1226;border:1px solid var(--border);box-shadow:0 14px 30px #0008;cursor:pointer;transition:transform .24s cubic-bezier(.16,1,.3,1),opacity .2s linear,box-shadow .3s;will-change:transform,opacity}
 .sleeve img{width:100%;height:100%;object-fit:cover;display:block}
 .sleeve .sleeve-name{position:absolute;left:0;right:0;bottom:0;padding:9px 10px 7px;font-size:12.5px;font-weight:700;background:linear-gradient(0deg,#000c,transparent 90%);color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sleeve.infinity{display:flex;align-items:center;justify-content:center;font-size:56px;line-height:1;color:#d9c7ff;background:linear-gradient(135deg,#291a3d,#170f22)}
@@ -434,7 +434,7 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
  <div class="top-stack" id="topStack"></div>
  <div class="top-stack-nav next" id="topStackNext" aria-label="Next artist">›</div>
 </div>
-<div class="tools"><input id="topSongSearch" class="artist-search" type="search" placeholder="Search songs…"></div>
+<div class="tools" style="visibility: hidden"><input id="topSongSearch" class="artist-search" type="search" placeholder="Search songs…"></div>
 <div id="topList" class="song-shelf"></div></section></main>
 <main id="requestPage" class="hidden"><section class="hero"><div><h2 style="margin:0;font-size:28px">Request a Song</h2></div></section>
 <section class="card" data-accent="green">
@@ -816,62 +816,106 @@ function buildSleeveItems(){
  const names=[...artists.keys()].filter(n=>(!q||norm(n).includes(q))&&artists.get(n).some(t=>t.rating>=4)).sort(byAlpha);
  sleeveItems=[{key:"",label:"All Songs",infinity:true},...names.map(n=>({key:n,label:n,img:img(artists.get(n)[0]?.album?.images)}))];
 }
-// distance 0 = front (selected), 1..4 = the next few previewed behind it, N-1 = the sleeve
-// that just left the front (swings out to the left before rejoining the back of the deck),
-// everything else waits, hidden, at the back of the stack.
-function sleeveStyle(dist,N){
- if(dist===0)return{transform:"translate(0,0) scale(1) rotate(0deg)",opacity:1,z:50};
- if(dist===1)return{transform:"translate(20px,8px) scale(.94) rotate(2deg)",opacity:.85,z:44};
- if(dist===2)return{transform:"translate(36px,14px) scale(.88) rotate(3.6deg)",opacity:.62,z:38};
- if(dist===3)return{transform:"translate(50px,19px) scale(.82) rotate(5deg)",opacity:.4,z:32};
- if(dist===4)return{transform:"translate(62px,23px) scale(.77) rotate(6.2deg)",opacity:.2,z:26};
- if(dist===N-1)return{transform:"translate(-190px,-8px) scale(.9) rotate(-11deg)",opacity:0,z:10};
- return{transform:"translate(62px,23px) scale(.74) rotate(6.2deg)",opacity:0,z:5};
+// Fixed 5-slot carousel: center + 2 on either side. Only those ~5 elements are ever in the DOM
+// (unlike animating every artist, which is what made the old version laggy on large libraries) —
+// a step slides all of them one slot, drops whichever one exits, and slides a new one in from
+// the freed edge.
+let sleeveEls=new Map(); // item key -> mounted element
+const SLEEVE_VISIBLE=2;
+const SLEEVE_SLOTS={
+ 0:{tx:0,ty:0,scale:1,rot:0,opacity:1,z:50},
+ 1:{tx:92,ty:10,scale:.84,rot:3,opacity:.6,z:30},
+ 2:{tx:168,ty:20,scale:.68,rot:5.5,opacity:.28,z:15},
+ 3:{tx:222,ty:28,scale:.55,rot:7,opacity:0,z:5}
+};
+function slotStyle(offset){
+ const abs=Math.min(Math.abs(offset),3),s=SLEEVE_SLOTS[abs],sign=offset<0?-1:1;
+ return{tx:sign*s.tx,ty:s.ty,scale:s.scale,rot:sign*s.rot,opacity:s.opacity,z:s.z};
 }
-function positionSleeves(){
- const N=sleeveItems.length;
- [...topStack.children].forEach((el,i)=>{
-  const dist=(i-sleeveFront+N)%N,st=sleeveStyle(dist,N);
-  el.style.transform=st.transform;el.style.opacity=st.opacity;el.style.zIndex=st.z;
-  el.style.pointerEvents=st.opacity>.05?"auto":"none";
- });
+function applySleeveStyle(el,offset,withTransition){
+ el.style.transition=withTransition?"":"none";
+ const st=slotStyle(offset);
+ el.style.transform=`translate(${st.tx}px,${st.ty}px) scale(${st.scale}) rotate(${st.rot}deg)`;
+ el.style.opacity=st.opacity;el.style.zIndex=st.z;
+ el.style.pointerEvents=Math.abs(offset)<=SLEEVE_VISIBLE?"auto":"none";
+}
+function sleeveElFor(item){
+ const el=document.createElement("div");
+ el.className="sleeve"+(item.infinity?" infinity":"");
+ el.dataset.key=item.key;
+ el.innerHTML=item.infinity?"∞":`<img src="${esc(item.img)}" alt="" onerror="this.style.display='none'"><span class="sleeve-name">${esc(item.label)}</span>`;
+ return el;
+}
+// Places the 5-slot window fresh, with no slide — used on page open or when the artist filter changes.
+function layoutSleevesFresh(){
+ for(const el of sleeveEls.values())el.remove();
+ sleeveEls.clear();
+ const N=sleeveItems.length;if(!N)return;
+ for(let o=-SLEEVE_VISIBLE;o<=SLEEVE_VISIBLE;o++){
+  const idx=((sleeveFront+o)%N+N)%N,item=sleeveItems[idx];
+  const el=sleeveElFor(item);
+  topStack.appendChild(el);sleeveEls.set(item.key,el);
+  applySleeveStyle(el,o,false);
+ }
+}
+// Slides the whole window by one slot. dir=+1: content shifts left, the leftmost sleeve exits,
+// and a new one slides in from the right. dir=-1 is the mirror image.
+function stepSleeve(dir){
+ const N=sleeveItems.length;if(N<2)return;
+ sleeveFront=((sleeveFront+dir)%N+N)%N;
+ for(const [key,el] of [...sleeveEls]){
+  const idx=sleeveItems.findIndex(it=>it.key===key);
+  if(idx<0){el.remove();sleeveEls.delete(key);continue}
+  let off=idx-sleeveFront;
+  if(N>1){off=((off%N)+N)%N;if(off>N/2)off-=N}
+  applySleeveStyle(el,off,true);
+  if(Math.abs(off)>SLEEVE_VISIBLE)setTimeout(()=>{if(sleeveEls.get(key)===el){el.remove();sleeveEls.delete(key)}},260);
+ }
+ const enterOffset=dir>0?SLEEVE_VISIBLE:-SLEEVE_VISIBLE;
+ const enterIdx=((sleeveFront+enterOffset)%N+N)%N,enterItem=sleeveItems[enterIdx];
+ if(!sleeveEls.has(enterItem.key)){
+  const el=sleeveElFor(enterItem);
+  topStack.appendChild(el);sleeveEls.set(enterItem.key,el);
+  applySleeveStyle(el,enterOffset+dir,false); // start just past the edge it's entering from
+  el.getBoundingClientRect(); // force layout so the next style change animates
+  applySleeveStyle(el,enterOffset,true);
+ }
+ const key=sleeveItems[sleeveFront]?.key||"";
+ if(key!==topArtistFilter){topArtistFilter=key;renderTop()}
 }
 function renderSleeveStack(){
  buildSleeveItems();
  const idx=sleeveItems.findIndex(s=>s.key===topArtistFilter);
  sleeveFront=idx>=0?idx:0;
  topArtistFilter=sleeveItems[sleeveFront]?.key||"";
- topStack.innerHTML=sleeveItems.map((s,i)=>s.infinity
-  ?`<div class="sleeve infinity" data-i="${i}">∞</div>`
-  :`<div class="sleeve" data-i="${i}"><img src="${esc(s.img)}" alt="" onerror="this.style.display='none'"><span class="sleeve-name">${esc(s.label)}</span></div>`
- ).join("");
- positionSleeves();
+ layoutSleevesFresh();
 }
 function advanceSleeve(delta){
- const N=sleeveItems.length;if(!N)return;
- sleeveFront=(sleeveFront+delta+N)%N;
- topArtistFilter=sleeveItems[sleeveFront].key;
- positionSleeves();renderTop();
+ const dir=delta<0?-1:1;
+ for(let i=0;i<Math.abs(delta);i++)stepSleeve(dir);
 }
 topStack.addEventListener("click",e=>{
  const el=e.target.closest(".sleeve");if(!el)return;
- const i=Number(el.dataset.i),N=sleeveItems.length,dist=(i-sleeveFront+N)%N;
- if(dist)advanceSleeve(dist);
+ const idx=sleeveItems.findIndex(it=>it.key===el.dataset.key);
+ if(idx<0)return;
+ const N=sleeveItems.length;let off=idx-sleeveFront;
+ if(N>1){off=((off%N)+N)%N;if(off>N/2)off-=N}
+ if(off)advanceSleeve(off);
 });
 topStackPrev.addEventListener("click",()=>advanceSleeve(-1));
 topStackNext.addEventListener("click",()=>advanceSleeve(1));
-// Trackpads fire many tiny wheel events, which made stepping feel laggy; deltas are
-// accumulated and a step fires the instant the (low) threshold is crossed — just enough to
-// tell a deliberate flick from noise — with only a short lock matching the fast 140ms
-// transition, instead of waiting out a long cooldown.
+// One wheel/trackpad "notch" of accumulated delta advances exactly one slot; a short lock just
+// keeps a single physical scroll gesture from firing many steps at once.
 let sleeveWheelLock=false,wheelAccum=0;
+const SLEEVE_WHEEL_THRESH=28,SLEEVE_WHEEL_LOCK=110;
 topStackWrap.addEventListener("wheel",e=>{
+ if(!sleeveItems.length)return;
  e.preventDefault();
  wheelAccum+=e.deltaY||e.deltaX;
- if(sleeveWheelLock||Math.abs(wheelAccum)<18)return;
+ if(sleeveWheelLock||Math.abs(wheelAccum)<SLEEVE_WHEEL_THRESH)return;
  wheelAccum=0;sleeveWheelLock=true;
  advanceSleeve((e.deltaY||e.deltaX)>0?1:-1);
- setTimeout(()=>sleeveWheelLock=false,80);
+ setTimeout(()=>sleeveWheelLock=false,SLEEVE_WHEEL_LOCK);
 },{passive:false});
 let sleeveDragX=null;
 topStackWrap.addEventListener("pointerdown",e=>{sleeveDragX=e.clientX});
