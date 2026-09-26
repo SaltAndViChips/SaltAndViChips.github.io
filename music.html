@@ -302,7 +302,15 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 /* ================= TOP SONGS: RECORD SLEEVE STACK ================= */
 .top-stack-wrap{position:relative;height:184px;margin:6px auto 20px;display:flex;align-items:center;justify-content:center;touch-action:pan-y}
 .top-stack{position:relative;width:148px;height:148px}
-.sleeve{position:absolute;inset:0;border-radius:14px;overflow:hidden;background:#1a1226;border:1px solid var(--border);box-shadow:0 14px 30px #0008;cursor:pointer;transition:transform .24s cubic-bezier(.16,1,.3,1),opacity .2s linear,box-shadow .3s;will-change:transform,opacity}
+.sleeve{position:absolute;inset:0;border-radius:14px;overflow:hidden;background:#1a1226;border:1px solid var(--border);box-shadow:0 14px 30px #0008;cursor:pointer;transition:transform .36s cubic-bezier(.34,1.56,.64,1),opacity .22s ease,box-shadow .3s;will-change:transform,opacity}
+.sleeve-peek{position:absolute;left:50%;top:0;width:140px;display:flex;flex-direction:column;align-items:center;gap:6px;transform:translate(-50%,26px) rotate(-4deg);opacity:0;z-index:49;pointer-events:none;transition:transform .42s cubic-bezier(.34,1.56,.64,1) .1s,opacity .24s ease .1s}
+.sleeve-peek.show{transform:translate(-50%,-58px) rotate(-4deg);opacity:1}
+.sleeve-peek-text{font-size:10.5px;font-weight:700;color:#c9bedd;opacity:.75;letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:134px;text-shadow:0 2px 6px #000c}
+.sleeve-peek-disc{position:relative;width:112px;height:112px;border-radius:50%;background:repeating-radial-gradient(circle at center,#100a18 0 2px,#1c1329 2px 4px);box-shadow:0 10px 24px #0009,inset 0 0 0 1px #2c1c3d;display:grid;place-items:center}
+.sleeve-peek-disc::before{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 34% 28%,#ffffff17,transparent 55%);pointer-events:none}
+.sleeve-peek-label{position:relative;width:76%;aspect-ratio:1;border-radius:50%;overflow:hidden;background:#241633;box-shadow:0 0 0 3px #0b0712,0 0 0 4px #3a2452}
+.sleeve-peek-label img{width:100%;height:100%;object-fit:cover;display:block}
+.sleeve-peek-hole{position:absolute;top:50%;left:50%;width:6px;height:6px;border-radius:50%;background:#0b0712;transform:translate(-50%,-50%);box-shadow:0 0 0 2px #05030899;z-index:1}
 .sleeve img{width:100%;height:100%;object-fit:cover;display:block}
 .sleeve .sleeve-name{position:absolute;left:0;right:0;bottom:0;padding:9px 10px 7px;font-size:12.5px;font-weight:700;background:linear-gradient(0deg,#000c,transparent 90%);color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sleeve.infinity{display:flex;align-items:center;justify-content:center;font-size:56px;line-height:1;color:#d9c7ff;background:linear-gradient(135deg,#291a3d,#170f22)}
@@ -323,7 +331,7 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 .song-vinyl .vinyl{position:relative;width:76%;aspect-ratio:1;border-radius:50%;margin-bottom:10px;background:repeating-radial-gradient(circle at center,#100a18 0 2px,#1c1329 2px 4px);box-shadow:0 10px 22px #0009,inset 0 0 0 1px #2c1c3d;display:grid;place-items:center}
 .song-vinyl.tier-5 .vinyl{box-shadow:0 10px 22px #0009,inset 0 0 0 1px #7a5a22,0 0 22px -4px #e0b65466}
 .song-vinyl .vinyl::before{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 34% 28%,#ffffff17,transparent 55%);pointer-events:none}
-.song-vinyl .vinyl-label{position:relative;width:42%;aspect-ratio:1;border-radius:50%;overflow:hidden;background:#241633;box-shadow:0 0 0 3px #0b0712,0 0 0 4px #3a2452}
+.song-vinyl .vinyl-label{position:relative;width:76%;aspect-ratio:1;border-radius:50%;overflow:hidden;background:#241633;box-shadow:0 0 0 3px #0b0712,0 0 0 4px #3a2452}
 .song-vinyl .vinyl-label img{width:100%;height:100%;object-fit:cover;display:block}
 .song-vinyl .vinyl-hole{position:absolute;top:50%;left:50%;width:6px;height:6px;border-radius:50%;background:#0b0712;transform:translate(-50%,-50%);box-shadow:0 0 0 2px #05030899;z-index:1}
 .song-vinyl .sv-stars{align-self:center;padding:2px 10px;border-radius:999px;background:#2a1a3d;color:#f5c451;font-size:11px;font-weight:800;margin-bottom:7px}
@@ -427,14 +435,13 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 <section class="card" data-accent="teal" style="margin-top:18px"><h3>Average rating by decade</h3><div class="chart-wrap" style="height:270px"><canvas id="artistDecadeChart" style="width:100%;height:100%"></canvas></div></section>
 <section class="card" data-accent="green" style="margin-top:18px"><div class="album-head"><div><h3>All rated songs</h3><div class="hint" id="songsHint" style="margin-bottom:0">—</div></div><button id="songsToggle" class="home-btn" type="button" aria-expanded="false" aria-controls="songList">Show songs</button></div><div id="songTools" class="tools hidden"><input id="songSearch" class="artist-search" type="search" placeholder="Search songs or albums…"><label>Min rating <select id="songMin"><option value="0">All</option><option value="3">3+</option><option value="3.5">3.5+</option><option value="4">4+</option><option value="4.5">4.5+</option><option value="5">5</option></select></label><label>Sort <select id="songSort"><option value="high">Highest rated</option><option value="low">Lowest rated</option><option value="az">Title A–Z</option><option value="album">Album</option></select></label></div><div id="songList" class="song-list hidden"></div></section>
 </main>
-<main id="topPage" class="hidden"><section class="hero"><div><h2 style="margin:0;font-size:28px">Top Rated Songs</h2></div><div class="score"><div class="num" id="topCount">—</div><small>matching songs</small></div></section>
+<main id="topPage" class="hidden"><section class="hero" style="margin-bottom:34px"><div><h2 style="margin:0;font-size:28px">Top Rated Songs</h2></div><div class="score"><div class="num" id="topCount">—</div><small>matching songs</small></div></section>
 <section class="card" data-accent="gold">
 <div class="top-stack-wrap" id="topStackWrap">
  <div class="top-stack-nav prev" id="topStackPrev" aria-label="Previous artist">‹</div>
- <div class="top-stack" id="topStack"></div>
+ <div class="top-stack" id="topStack"><div class="sleeve-peek" id="sleevePeek"></div></div>
  <div class="top-stack-nav next" id="topStackNext" aria-label="Next artist">›</div>
 </div>
-<div class="tools" style="visibility: hidden"><input id="topSongSearch" class="artist-search" type="search" placeholder="Search songs…"></div>
 <div id="topList" class="song-shelf"></div></section></main>
 <main id="requestPage" class="hidden"><section class="hero"><div><h2 style="margin:0;font-size:28px">Request a Song</h2></div></section>
 <section class="card" data-accent="green">
@@ -816,12 +823,13 @@ function buildSleeveItems(){
  const names=[...artists.keys()].filter(n=>(!q||norm(n).includes(q))&&artists.get(n).some(t=>t.rating>=4)).sort(byAlpha);
  sleeveItems=[{key:"",label:"All Songs",infinity:true},...names.map(n=>({key:n,label:n,img:img(artists.get(n)[0]?.album?.images)}))];
 }
-// Fixed 5-slot carousel: center + 2 on either side. Only those ~5 elements are ever in the DOM
-// (unlike animating every artist, which is what made the old version laggy on large libraries) —
-// a step slides all of them one slot, drops whichever one exits, and slides a new one in from
-// the freed edge.
-let sleeveEls=new Map(); // item key -> mounted element
-const SLEEVE_VISIBLE=2;
+// Fixed, recycled carousel pool: 5 visible slots (center + 2 either side) plus one invisible
+// buffer slot on each edge for the enter animation — 7 elements total, created once and never
+// removed again. A step just relabels whichever pool element falls off one edge into the item
+// newly entering the opposite edge, instead of creating/destroying DOM nodes on a timer — that
+// timer-based create/remove was the source of the flicker and "ghost" covers.
+let sleevePool=[]; // {el,offset,idx}
+const SLEEVE_VISIBLE=2,SLEEVE_MIN=-(SLEEVE_VISIBLE+1),SLEEVE_MAX=SLEEVE_VISIBLE+1;
 const SLEEVE_SLOTS={
  0:{tx:0,ty:0,scale:1,rot:0,opacity:1,z:50},
  1:{tx:92,ty:10,scale:.84,rot:3,opacity:.6,z:30},
@@ -839,49 +847,66 @@ function applySleeveStyle(el,offset,withTransition){
  el.style.opacity=st.opacity;el.style.zIndex=st.z;
  el.style.pointerEvents=Math.abs(offset)<=SLEEVE_VISIBLE?"auto":"none";
 }
-function sleeveElFor(item){
- const el=document.createElement("div");
- el.className="sleeve"+(item.infinity?" infinity":"");
+function setSleeveContent(el,item){
  el.dataset.key=item.key;
+ el.className="sleeve"+(item.infinity?" infinity":"");
  el.innerHTML=item.infinity?"∞":`<img src="${esc(item.img)}" alt="" onerror="this.style.display='none'"><span class="sleeve-name">${esc(item.label)}</span>`;
- return el;
 }
-// Places the 5-slot window fresh, with no slide — used on page open or when the artist filter changes.
+function pickRandomSong(artistKey){
+ const ts=artists.get(artistKey);
+ return ts&&ts.length?ts[Math.floor(Math.random()*ts.length)]:null;
+}
+// A random track from whichever artist is centered peeks out above the sleeve as a little vinyl
+// record — grooves, a center label carrying the song's own art, and its title in small subtle
+// type above — re-rolled and re-animated every time a new artist lands in front.
+function updateSleevePeek(){
+ if(!sleevePeek)return;
+ const item=sleeveItems[sleeveFront];
+ const song=item&&!item.infinity?pickRandomSong(item.key):null;
+ if(!song){sleevePeek.classList.remove("show");return}
+ sleevePeek.innerHTML=`<div class="sleeve-peek-text">${esc(song.name||"Untitled")}</div>
+  <div class="sleeve-peek-disc"><div class="sleeve-peek-hole"></div>
+   <div class="sleeve-peek-label"><img src="${esc(img(song.album.images))}" alt="" onerror="this.style.display='none'"></div>
+  </div>`;
+ sleevePeek.classList.remove("show");
+ void sleevePeek.offsetWidth; // restart the slide-out even if it's already showing
+ sleevePeek.classList.add("show");
+}
+// Places the pool fresh, with no slide — used on page open or when the artist filter changes.
 function layoutSleevesFresh(){
- for(const el of sleeveEls.values())el.remove();
- sleeveEls.clear();
- const N=sleeveItems.length;if(!N)return;
- for(let o=-SLEEVE_VISIBLE;o<=SLEEVE_VISIBLE;o++){
+ for(const p of sleevePool)p.el.remove();
+ sleevePool=[];
+ const N=sleeveItems.length;if(!N){updateSleevePeek();return}
+ for(let o=SLEEVE_MIN;o<=SLEEVE_MAX;o++){
   const idx=((sleeveFront+o)%N+N)%N,item=sleeveItems[idx];
-  const el=sleeveElFor(item);
-  topStack.appendChild(el);sleeveEls.set(item.key,el);
+  const el=document.createElement("div");
+  setSleeveContent(el,item);
+  topStack.appendChild(el);
   applySleeveStyle(el,o,false);
+  sleevePool.push({el,offset:o,idx});
  }
+ updateSleevePeek();
 }
-// Slides the whole window by one slot. dir=+1: content shifts left, the leftmost sleeve exits,
-// and a new one slides in from the right. dir=-1 is the mirror image.
+// Slides the whole pool by one slot. dir=+1: content shifts left (the leftmost sleeve exits and
+// is recycled to relabel as the new sleeve entering from the right); dir=-1 is the mirror image.
 function stepSleeve(dir){
  const N=sleeveItems.length;if(N<2)return;
  sleeveFront=((sleeveFront+dir)%N+N)%N;
- for(const [key,el] of [...sleeveEls]){
-  const idx=sleeveItems.findIndex(it=>it.key===key);
-  if(idx<0){el.remove();sleeveEls.delete(key);continue}
-  let off=idx-sleeveFront;
-  if(N>1){off=((off%N)+N)%N;if(off>N/2)off-=N}
-  applySleeveStyle(el,off,true);
-  if(Math.abs(off)>SLEEVE_VISIBLE)setTimeout(()=>{if(sleeveEls.get(key)===el){el.remove();sleeveEls.delete(key)}},260);
- }
- const enterOffset=dir>0?SLEEVE_VISIBLE:-SLEEVE_VISIBLE;
- const enterIdx=((sleeveFront+enterOffset)%N+N)%N,enterItem=sleeveItems[enterIdx];
- if(!sleeveEls.has(enterItem.key)){
-  const el=sleeveElFor(enterItem);
-  topStack.appendChild(el);sleeveEls.set(enterItem.key,el);
-  applySleeveStyle(el,enterOffset+dir,false); // start just past the edge it's entering from
-  el.getBoundingClientRect(); // force layout so the next style change animates
-  applySleeveStyle(el,enterOffset,true);
+ for(const p of sleevePool){
+  p.offset-=dir;
+  if(p.offset<SLEEVE_MIN||p.offset>SLEEVE_MAX){
+   p.offset=dir>0?SLEEVE_MAX:SLEEVE_MIN;
+   p.idx=((sleeveFront+p.offset)%N+N)%N;
+   setSleeveContent(p.el,sleeveItems[p.idx]);
+   applySleeveStyle(p.el,p.offset,false); // relabeled while off-screen — no visible jump
+  }else{
+   p.idx=((sleeveFront+p.offset)%N+N)%N;
+   applySleeveStyle(p.el,p.offset,true);
+  }
  }
  const key=sleeveItems[sleeveFront]?.key||"";
  if(key!==topArtistFilter){topArtistFilter=key;renderTop()}
+ updateSleevePeek();
 }
 function renderSleeveStack(){
  buildSleeveItems();
@@ -896,11 +921,9 @@ function advanceSleeve(delta){
 }
 topStack.addEventListener("click",e=>{
  const el=e.target.closest(".sleeve");if(!el)return;
- const idx=sleeveItems.findIndex(it=>it.key===el.dataset.key);
- if(idx<0)return;
- const N=sleeveItems.length;let off=idx-sleeveFront;
- if(N>1){off=((off%N)+N)%N;if(off>N/2)off-=N}
- if(off)advanceSleeve(off);
+ const p=sleevePool.find(pp=>pp.el===el);
+ if(!p||!p.offset)return;
+ advanceSleeve(p.offset);
 });
 topStackPrev.addEventListener("click",()=>advanceSleeve(-1));
 topStackNext.addEventListener("click",()=>advanceSleeve(1));
@@ -933,8 +956,8 @@ function vinylCard(t){
  return url?`<a class="${cls}" href="${esc(url)}" target="_blank" rel="noopener">${inner}</a>`:`<div class="${cls}">${inner}</div>`;
 }
 function renderTop(){
- const q=topSongSearch.value.trim().toLowerCase(),CAP=500;
- const all=tracks.filter(t=>(!topArtistFilter||t.mainArtist===topArtistFilter)&&(!q||[t.name,t.album.name].some(x=>String(x||"").toLowerCase().includes(q))))
+ const CAP=500;
+ const all=tracks.filter(t=>!topArtistFilter||t.mainArtist===topArtistFilter)
   .sort((a,b)=>b.rating-a.rating||byName(a,b));
  topCount.textContent=all.length.toLocaleString();
  if(!all.length){topList.innerHTML='<div class="empty">No songs match.</div>';return}
@@ -1133,7 +1156,6 @@ dedupeToggle.addEventListener("change",()=>{
 });
 for(const el of [songSearch])el.addEventListener("input",renderSongs);
 for(const el of [songMin,songSort])el.addEventListener("change",renderSongs);
-topSongSearch.addEventListener("input",renderTop);
 topList.addEventListener("click",e=>{const el=e.target.closest("[data-artist]");if(el)showArtist(el.dataset.artist)});
 artistSearch.addEventListener("input",()=>{sgActive=0;updateArtistControls();renderSuggest();if(!topPage.classList.contains("hidden"))renderSleeveStack();});
 artistSearch.addEventListener("focus",()=>{if(artistSearch.value.trim())renderSuggest()});
