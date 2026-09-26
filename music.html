@@ -955,15 +955,33 @@ function vinylCard(t){
  const cls="song-vinyl"+(t.rating>=5?" tier-5":"");
  return url?`<a class="${cls}" href="${esc(url)}" target="_blank" rel="noopener">${inner}</a>`:`<div class="${cls}">${inner}</div>`;
 }
+const TOP_PAGE_SIZE=500;
+let topAll=[],topShown=0;
 function renderTop(){
- const CAP=500;
- const all=tracks.filter(t=>!topArtistFilter||t.mainArtist===topArtistFilter)
+ topAll=tracks.filter(t=>(!topArtistFilter||t.mainArtist===topArtistFilter)&&t.rating>=4)
   .sort((a,b)=>b.rating-a.rating||byName(a,b));
- topCount.textContent=all.length.toLocaleString();
- if(!all.length){topList.innerHTML='<div class="empty">No songs match.</div>';return}
- topList.innerHTML=`<div class="vinyl-grid">${all.slice(0,CAP).map(vinylCard).join("")}</div>`+
-  (all.length>CAP?`<div class="empty">Showing the top ${CAP} of ${all.length.toLocaleString()}.</div>`:"");
+ topShown=0;
+ topCount.textContent=topAll.length.toLocaleString();
+ if(!topAll.length){topList.innerHTML='<div class="empty">No songs match.</div>';return}
+ topList.innerHTML=`<div class="vinyl-grid"></div><div class="empty top-more hidden"></div>`;
+ growTop();
 }
+// Appends the next batch of songs into the existing grid (rather than re-rendering everything)
+// so scrolling to the bottom stays cheap even with thousands of matches.
+function growTop(){
+ const grid=topList.querySelector(".vinyl-grid"),more=topList.querySelector(".top-more");
+ if(!grid)return;
+ const next=topAll.slice(topShown,topShown+TOP_PAGE_SIZE);
+ if(next.length){grid.insertAdjacentHTML("beforeend",next.map(vinylCard).join(""));topShown+=next.length}
+ if(topShown<topAll.length){more.textContent=`Showing ${topShown.toLocaleString()} of ${topAll.length.toLocaleString()} — scroll for more`;more.classList.remove("hidden")}
+ else{more.classList.add("hidden")}
+}
+// Loads the next batch a bit before the user hits the very bottom of the page.
+window.addEventListener("scroll",()=>{
+ if(topPage.classList.contains("hidden"))return;
+ if(topShown>=topAll.length)return;
+ if(window.innerHeight+window.scrollY>=document.documentElement.scrollHeight-600)growTop();
+},{passive:true});
 function showTop(){
  showPage("topPage","topBtn");renderSleeveStack();renderTop();pageChanged("top");
 }
