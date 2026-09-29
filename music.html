@@ -1345,8 +1345,42 @@ function setSource(msg){dataSource.textContent=msg}
 function sourceNote(){
  return `Loaded ${tracks.length.toLocaleString()} songs from ${sourceName}`+(dupeCount?` · ${dupeCount.toLocaleString()} duplicate${dupeCount==1?"":"s"} merged`:"");
 }
-// Load ratings-export.json on every page load.
+// Ratings now live in a GitHub Gist so updates show up without a repo push/redeploy.
+// Have your sync script PATCH https://api.github.com/gists/<id> with the new content whenever
+// ratings-export.json changes.
+const RATINGS_GIST={id:"585ebcb7bf69836c17f0f11859b8ca27",file:"ratings_export.json"};
+
+// Load ratings on every page load: try the Gist first, fall back to a local ratings-export.json
+// (handy for local testing or as a backup), then to manual import.
 async function autoLoad(){
+ if(await loadFromGist())return;
+ await loadFromLocalFile();
+}
+async function loadFromGist(){
+ if(!RATINGS_GIST.id)return false;
+ try{
+  const res=await fetch(`https://api.github.com/gists/${RATINGS_GIST.id}`,{cache:"no-store"});
+  if(!res.ok)throw new Error("HTTP "+res.status);
+  const gist=await res.json();
+  const f=gist.files&&gist.files[RATINGS_GIST.file];
+  if(!f)throw new Error(`"${RATINGS_GIST.file}" not found in gist`);
+  let text=f.content;
+  if(f.truncated){
+   // Gist API inlines file content up to 1MB; larger files need a second fetch of raw_url.
+   const rawRes=await fetch(f.raw_url+(f.raw_url.includes("?")?"&":"?")+"_="+Date.now(),{cache:"no-store"});
+   if(!rawRes.ok)throw new Error("HTTP "+rawRes.status+" (raw)");
+   text=await rawRes.text();
+  }
+  rawTracks=parseRatings(JSON.parse(text));currentArtist="";currentAlbum=0;sourceName="Gist";
+  applyData();showHome();
+  setSource(sourceNote());
+  return true;
+ }catch(err){
+  console.info("Could not load ratings from Gist:",err);
+  return false;
+ }
+}
+async function loadFromLocalFile(){
  const FILE="ratings-export.json";
  try{
   // relative path + query string avoids stale cached copies
@@ -1362,8 +1396,10 @@ async function autoLoad(){
   applyData();showHome();
   setLandingMsg(location.protocol==="file:"
    ?`${FILE} can't be loaded automatically when the page is opened from your computer (file://). Import it below instead.`
-   :`Couldn't load ${FILE} (${why}). Import a file below, or check it's in the same folder as this page.`);
-  setSource(`Couldn't load ${FILE}: ${why}`);
+   :(RATINGS_GIST.id
+     ?`Couldn't load ratings from the Gist or ${FILE} (${why}). Import a file below instead.`
+     :`Couldn't load ${FILE} (${why}). Import a file below, or check it's in the same folder as this page.`));
+  setSource(`Couldn't load ratings: ${why}`);
  }
 }
 async function loadRatingsFile(file){
