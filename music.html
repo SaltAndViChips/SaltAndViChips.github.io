@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
 
-<title>Music Ratings</title>
+<title>Salt's Ratings</title>
 <style>
 :root{--bg:#0b0712;--panel:#130d1d;--panel2:#191025;--border:#2c1c3d;--purple:#9b5cff;--purple2:#7c3aed;--text:#f4effa;--muted:#a99eb6;--shadow:0 18px 60px #00000059}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% -10%,#9b5cff2e,transparent 34rem),radial-gradient(circle at 100% 0%,#7c3aed1f,transparent 30rem),var(--bg);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
@@ -174,7 +174,7 @@ main:not(.hidden)>*:nth-child(n+6){animation-delay:.2s}
  .header-inner{margin-bottom:0;gap:10px;padding:12px 12px}
  .site-header{margin-bottom:14px}
  h1{font-size:24px}
- #homeBtn,#topBtn,#requestBtn{display:none}
+ #homeBtn,#topBtn,#recentBtn,#requestBtn{display:none}
  .controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;width:100%}
  #artistSearch{grid-column:1/-1;width:100%}
  .file-label{white-space:nowrap;text-align:center}
@@ -379,6 +379,7 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 <div class="controls">
 <button id="homeBtn" class="home-btn active">Home</button>
 <button id="topBtn" class="home-btn">Top Songs</button>
+<button id="recentBtn" class="home-btn">Recently Rated</button>
 <button id="requestBtn" class="home-btn">Request Song</button>
 <input id="artistSearch" class="artist-search" type="search" placeholder="Search artists or songs…" aria-label="Search artists or songs" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="artistSuggest" aria-autocomplete="list">
 <label class="file-label icon-btn" title="Load ratings JSON" aria-label="Load ratings JSON"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h8V4"/><path d="M8 14h8v6H8z"/></svg><input id="fileInput" type="file" accept=".json,application/json"></label>
@@ -478,6 +479,8 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
  <div class="top-stack-nav next" id="topStackNext" aria-label="Next artist">›</div>
 </div>
 <div id="topList" class="song-shelf"></div></section></main>
+<main id="recentPage" class="hidden"><section class="hero" style="margin-bottom:34px"><div><h2 style="margin:0;font-size:28px">Recently Rated</h2><p id="recentHint" style="margin:6px 0 0;color:var(--muted)"></p></div><div class="score"><div class="num" id="recentCount">—</div><small>songs</small></div></section>
+<section class="card" data-accent="gold"><div id="recentList"></div><div class="top-more" style="text-align:center;margin-top:14px"><button id="recentMore" class="home-btn" type="button" hidden>Show more</button></div></section></main>
 <main id="requestPage" class="hidden"><section class="hero"><div><h2 style="margin:0;font-size:28px">Request a Song</h2></div></section>
 <section class="card">
 <form id="requestForm" class="tools" style="margin-bottom:4px">
@@ -497,6 +500,7 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 <nav class="mnav" aria-label="Main navigation">
 <button type="button" data-go="home" class="active"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Home</button>
 <button type="button" data-go="top"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>Top Songs</button>
+<button type="button" data-go="recent"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Recent</button>
 <button type="button" data-go="request"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l11-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/><path d="M20 3v5M22.5 5.5h-5" stroke-width="2"/></svg>Request</button>
 <button type="button" data-go="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>Search</button>
 </nav>
@@ -654,7 +658,7 @@ function weightedSample(pool,weights,n,rng){
  }
  return out;
 }
-const FEATURED_KEY="featuredDailyPick";
+const FEATURED_KEY="featuredDailyPick2";
 function loadFeaturedCache(){try{return JSON.parse(localStorage.getItem(FEATURED_KEY)||"null")}catch{return null}}
 function saveFeaturedCache(c){try{localStorage.setItem(FEATURED_KEY,JSON.stringify(c))}catch{}}
 function recencySpan(list){
@@ -663,6 +667,8 @@ function recencySpan(list){
  if(hasTime)for(const ms of times)if(ms!=null){if(newest==null||ms>newest)newest=ms;if(oldest==null||ms<oldest)oldest=ms}
  return {times,hasTime,oldest,span:hasTime?Math.max(1,newest-oldest):1};
 }
+// Local calendar day (not UTC) so the daily picks roll over at local midnight.
+function localDayKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function computeFeatured(){
  const {times,hasTime,oldest,span}=recencySpan(tracks);
  const recencyOf=ms=>!hasTime||ms==null?1:1+2*((ms-oldest)/span); // 1x oldest → 3x newest
@@ -674,12 +680,16 @@ function computeFeatured(){
   if(t.rating<HIGH)return;
   artistScore.set(t.mainArtist,(artistScore.get(t.mainArtist)||0)+recencyOf(times[i]));
  });
- const featArtists=[...artistScore.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,3).map(x=>x[0]);
+ // Daily shuffle: weighted random draw (own seeded rng so the song picks below are unaffected).
+ // Artists with more recent 4+ ratings are more likely, but not guaranteed, to show up.
+ const artistEntries=[...artistScore.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]));
+ const artistRng=mulberry32(hashStr(localDayKey()+"|artists"));
+ const featArtists=weightedSample(artistEntries.map(x=>x[0]),artistEntries.map(x=>x[1]),3,artistRng);
 
  // Songs: only 4.0+, weighted by rating²×recency, guaranteeing one 5, one 4.5 and one 4 (if any
  // exist) before filling the rest of the spotlight, then sorted highest → lowest.
  const pool=tracks.map((t,i)=>({t,w:Math.pow(t.rating,2)*recencyOf(times[i])})).filter(x=>x.t.rating>=HIGH);
- const dayKey=new Date().toISOString().slice(0,10);
+ const dayKey=localDayKey();
  const rng=mulberry32(hashStr(dayKey));
  const TARGET=5,picked=[],usedUrls=new Set();
  for(const tier of [5,4.5,4]){
@@ -696,7 +706,7 @@ function computeFeatured(){
 function renderFeatured(){
  if(!tracks.length){featuredCard.classList.add("hidden");return}
  featuredCard.classList.remove("hidden");
- const dayKey=new Date().toISOString().slice(0,10);
+ const dayKey=localDayKey();
  let cache=loadFeaturedCache();
  // Reuse today's picks as-is (even if the library changed) so results don't reshuffle until
  // the next calendar day; only fall back to a fresh computation on a new day or first run.
@@ -749,8 +759,8 @@ featuredBody.addEventListener("click",e=>{
  if(a)showArtist(a.dataset.artist);
 });
 
-const PAGES=["homePage","artistPage","topPage","requestPage"];
-const NAV_BTNS=["homeBtn","topBtn","requestBtn"];
+const PAGES=["homePage","artistPage","topPage","recentPage","requestPage"];
+const NAV_BTNS=["homeBtn","topBtn","recentBtn","requestBtn"];
 function pageChanged(page){
  document.querySelectorAll(".mnav [data-go]").forEach(b=>b.classList.toggle("active",b.dataset.go===page));
  window.scrollTo(0,0);
@@ -855,9 +865,9 @@ function setSongsOpen(open){
  const n=(artists.get(currentArtist)||[]).length;
  songsToggle.textContent=open?"Hide songs":`Show songs (${n})`;
 }
-function songRow(t,i,withArtist){
+function songRow(t,i,withArtist,extra){
  const url=trackUrl(t),title=esc(t.name||"Untitled"),r=t.rating,tier=r>=4.5?"top":r>=3.5?"good":r>=2.5?"mid":"low";
- const meta=(withArtist?`<span class="song-artist" data-artist="${esc(t.mainArtist)}">${esc(t.mainArtist)}</span> · `:"")+esc(t.album.name);
+ const meta=(withArtist?`<span class="song-artist" data-artist="${esc(t.mainArtist)}">${esc(t.mainArtist)}</span> · `:"")+esc(t.album.name)+(extra?` · ${esc(extra)}`:"");
  return `<div class="song" data-tier="${tier}">
    <div class="song-num">${i+1}</div>
    <img class="song-thumb" src="${esc(img(t.album.images))}" alt="" onerror="this.style.visibility='hidden'">
@@ -1040,6 +1050,56 @@ window.addEventListener("scroll",()=>{
 },{passive:true});
 function showTop(){
  showPage("topPage","topBtn");renderSleeveStack();renderTop();pageChanged("top");
+}
+/* ---- Recently rated: newest first, using the date each track was added to its rating playlist ---- */
+const RECENT_PAGE_SIZE=60;
+let recentAll=[],recentShown=0;
+function dayLabel(ms){
+ const d=new Date(ms),now=new Date(),start=x=>new Date(x.getFullYear(),x.getMonth(),x.getDate()).getTime();
+ const diff=Math.round((start(now)-start(d))/86400000);
+ if(diff<=0)return"Today";
+ if(diff===1)return"Yesterday";
+ if(diff<7)return d.toLocaleDateString(undefined,{weekday:"long"});
+ return d.toLocaleDateString(undefined,d.getFullYear()===now.getFullYear()?{month:"short",day:"numeric"}:{year:"numeric",month:"short",day:"numeric"});
+}
+const timeLabel=ms=>new Date(ms).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"});
+function renderRecent(){
+ recentAll=tracks.map(t=>({t,ms:ratedAtMs(t)})).filter(x=>x.ms!=null).sort((a,b)=>b.ms-a.ms);
+ recentShown=0;
+ recentCount.textContent=recentAll.length.toLocaleString();
+ recentHint.textContent=recentAll.length?"Newest ratings first":"";
+ if(!recentAll.length){
+  recentList.innerHTML='<div class="empty">No rating dates found in this export.</div>';
+  recentMore.hidden=true;return;
+ }
+ recentList.innerHTML="";
+ growRecent();
+}
+function growRecent(){
+ const next=recentAll.slice(recentShown,recentShown+RECENT_PAGE_SIZE);
+ let html="",lastGroup=recentList.dataset.lastGroup||"";
+ if(recentShown===0)lastGroup="";
+ let open=false;
+ for(const {t,ms} of next){
+  const g=dayLabel(ms);
+  if(g!==lastGroup){
+   if(open)html+="</div>";
+   html+=`<div class="feat-subhead" style="margin-top:${lastGroup||recentShown?"18px":"4px"}">${esc(g)}</div><div class="featured-songs">`;
+   open=true;lastGroup=g;
+  }
+  html+=songRow(t,recentShown,true,timeLabel(ms));
+  recentShown++;
+ }
+ if(open)html+="</div>";
+ recentList.dataset.lastGroup=lastGroup;
+ recentList.insertAdjacentHTML("beforeend",html);
+ const left=recentAll.length-recentShown;
+ recentMore.hidden=left<=0;
+ if(left>0)recentMore.textContent=`Show more (${left.toLocaleString()} left)`;
+}
+recentMore.addEventListener("click",growRecent);
+function showRecent(){
+ showPage("recentPage","recentBtn");renderRecent();pageChanged("recent");
 }
 function showRequest(){
  showPage("requestPage","requestBtn");pageChanged("request");
@@ -1294,11 +1354,13 @@ const siteHeader=document.querySelector(".site-header");
 window.addEventListener("scroll",()=>{siteHeader.classList.toggle("scrolled",window.scrollY>4)},{passive:true});
 homeBtn.addEventListener("click",()=>{currentArtist="";showHome()});
 topBtn.addEventListener("click",()=>{currentArtist="";showTop()});
+recentBtn.addEventListener("click",()=>{currentArtist="";showRecent()});
 requestBtn.addEventListener("click",()=>{currentArtist="";showRequest()});
 document.querySelector(".mnav").addEventListener("click",e=>{
  const b=e.target.closest("button");if(!b)return;
  if(b.dataset.go==="home")homeBtn.click();
  else if(b.dataset.go==="top")topBtn.click();
+ else if(b.dataset.go==="recent")recentBtn.click();
  else if(b.dataset.go==="request")requestBtn.click();
  else{window.scrollTo(0,0);artistSearch.focus()}
 });
@@ -1313,6 +1375,7 @@ dedupeToggle.addEventListener("change",()=>{
 for(const el of [songSearch])el.addEventListener("input",renderSongs);
 for(const el of [songMin,songSort])el.addEventListener("change",renderSongs);
 topList.addEventListener("click",e=>{const el=e.target.closest("[data-artist]");if(el)showArtist(el.dataset.artist)});
+recentList.addEventListener("click",e=>{const el=e.target.closest("[data-artist]");if(el)showArtist(el.dataset.artist)});
 artistSearch.addEventListener("input",()=>{sgActive=0;updateArtistControls();renderSuggest();if(!topPage.classList.contains("hidden"))renderSleeveStack();});
 artistSearch.addEventListener("focus",()=>{if(artistSearch.value.trim())renderSuggest()});
 artistSearch.addEventListener("blur",()=>setTimeout(closeSuggest,120));
@@ -1477,10 +1540,14 @@ refreshBtn.addEventListener("click",()=>{
  if(pendingGistText===null){refreshBtn.hidden=true;setRefreshTip(false);return}
  refreshBtn.classList.add("busy");
  const onArtistPage=!document.getElementById("artistPage").classList.contains("hidden");
+ const onTop=!document.getElementById("topPage").classList.contains("hidden");
+ const onRecent=!document.getElementById("recentPage").classList.contains("hidden");
  const prevArtist=currentArtist;
  try{
   applyGistText(pendingGistText);
   if(onArtistPage&&prevArtist&&artists.has(prevArtist))showArtist(prevArtist); // stay where you were
+  else if(onTop)showTop();
+  else if(onRecent)showRecent();
   refreshBtn.hidden=true;
   refreshTipPinned=false;clearTimeout(refreshTipTimer);setRefreshTip(false);
  }catch(err){
