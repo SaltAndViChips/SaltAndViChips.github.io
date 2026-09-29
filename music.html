@@ -354,6 +354,23 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 .song-vinyl .sv-title{font-weight:650;font-size:12.5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.28;width:100%}
 .song-vinyl .sv-album{font-size:11px;color:var(--muted);margin-top:3px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;width:100%}
 @media(max-width:600px){.vinyl-grid{grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}}
+
+/* refresh prompt (new ratings available in the Gist) */
+.header-inner{position:relative}
+.refresh-btn{position:absolute;top:2px;right:0;z-index:5;width:22px;height:22px;padding:0;display:grid;place-items:center;border-radius:50%;border:1px solid var(--purple);background:linear-gradient(180deg,#3a1f5c,#2b1742);color:#e7d9ff;cursor:pointer;box-shadow:0 0 0 3px #9b5cff1f,0 6px 20px #7c3aed33;animation:refreshPop .45s var(--ease) both,refreshPulse 2.2s ease-in-out .45s infinite}
+.refresh-btn[hidden]{display:none}
+.refresh-btn svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;animation:refreshSpin 3s linear infinite}
+.refresh-btn:hover{background:#3a1f5c;border-color:#b58bff}
+.refresh-btn:hover svg{animation-duration:.8s}
+.refresh-btn.busy svg{animation-duration:.6s}
+.refresh-btn.busy{pointer-events:none}
+.refresh-tip{position:absolute;top:calc(100% + 8px);right:0;background:#150d20f2;border:1px solid #3a2452;color:var(--text);font-size:12px;font-weight:600;padding:6px 11px;border-radius:10px;box-shadow:0 14px 34px #0009;white-space:nowrap;pointer-events:none;opacity:0;transform:translateY(-4px);transition:opacity .2s,transform .2s var(--ease);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.refresh-btn:hover .refresh-tip,.refresh-btn:focus-visible .refresh-tip,.refresh-btn.show-tip .refresh-tip{opacity:1;transform:none}
+@keyframes refreshSpin{to{transform:rotate(360deg)}}
+@keyframes refreshPop{from{opacity:0;transform:scale(.4) rotate(-90deg)}}
+@keyframes refreshPulse{0%,100%{box-shadow:0 0 0 3px #9b5cff1f,0 6px 20px #7c3aed33}50%{box-shadow:0 0 0 7px #9b5cff33,0 6px 24px #7c3aed66}}
+@media(max-width:900px){.refresh-btn{top:12px;right:22px;width:32px;height:32px}.refresh-btn svg{width:16px;height:16px}}
+@media(max-width:600px){.refresh-btn{right:12px}}
 </style>
 </head>
 <body data-state="loading">
@@ -368,6 +385,7 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 <label class="file-label icon-btn" title="Load ratings JSON" aria-label="Load ratings JSON"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h8V4"/><path d="M8 14h8v6H8z"/></svg><input id="fileInput" type="file" accept=".json,application/json"></label>
 <div id="artistSuggest" class="suggest" role="listbox" hidden></div>
 </div>
+<button id="refreshBtn" class="refresh-btn" type="button" hidden aria-label="New ratings available - click to refresh" title="New ratings available"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.9-3.5M4 4v4h4"/><path d="M4 13a8 8 0 0 0 14.9 3.5M20 20v-4h-4"/></svg><span class="refresh-tip">New ratings available &middot; click to refresh</span></button>
 </div>
 </header>
 <div class="wrap">
@@ -1345,41 +1363,113 @@ function setSource(msg){dataSource.textContent=msg}
 function sourceNote(){
  return `Loaded ${tracks.length.toLocaleString()} songs from ${sourceName}`+(dupeCount?` · ${dupeCount.toLocaleString()} duplicate${dupeCount==1?"":"s"} merged`:"");
 }
-// Ratings now live in a GitHub Gist so updates show up without a repo push/redeploy.
-// Have your sync script PATCH https://api.github.com/gists/<id> with the new content whenever
-// ratings-export.json changes.
+// Ratings live in a GitHub Gist so updates show up without a repo push/redeploy.
+// The sync script PATCHes https://api.github.com/gists/<id> whenever ratings-export.json changes.
+// Load order: Gist first, then the ratings-export.json hosted alongside this page on GitHub
+// (fallback), then manual import.
 const RATINGS_GIST={id:"585ebcb7bf69836c17f0f11859b8ca27",file:"ratings_export.json"};
+const GIST_POLL_MS=30000;
+let gistEtag=null,gistText=null,pendingGistText=null,gistPolling=false;
 
-// Load ratings on every page load: try the Gist first, fall back to a local ratings-export.json
-// (handy for local testing or as a backup), then to manual import.
 async function autoLoad(){
- if(await loadFromGist())return;
+ if(await loadFromGist()){startGistPolling();return}
  await loadFromLocalFile();
+ startGistPolling(); // keep checking: the Gist may come back and offer newer data
+}
+
+// Fetches the Gist file text. Sends If-None-Match when an ETag is known: GitHub answers 304
+// (which does not count against the unauthenticated API rate limit) if nothing changed.
+// Returns {changed:false} on 304, {changed:true,text} otherwise; throws on failure.
+async function fetchGistText(conditional){
+ const headers={Accept:"application/vnd.github+json"};
+ if(conditional&&gistEtag)headers["If-None-Match"]=gistEtag;
+ const res=await fetch(`https://api.github.com/gists/${RATINGS_GIST.id}`,{cache:"no-store",headers});
+ if(res.status===304)return{changed:false};
+ if(!res.ok)throw new Error("HTTP "+res.status);
+ const etag=res.headers.get("ETag");
+ const gist=await res.json();
+ const f=gist.files&&gist.files[RATINGS_GIST.file];
+ if(!f)throw new Error(`"${RATINGS_GIST.file}" not found in gist`);
+ let text=f.content;
+ if(f.truncated){
+  // Gist API inlines file content up to 1MB; larger files need a second fetch of raw_url.
+  const rawRes=await fetch(f.raw_url+(f.raw_url.includes("?")?"&":"?")+"_="+Date.now(),{cache:"no-store"});
+  if(!rawRes.ok)throw new Error("HTTP "+rawRes.status+" (raw)");
+  text=await rawRes.text();
+ }
+ if(etag)gistEtag=etag;
+ return{changed:true,text};
+}
+function applyGistText(text){
+ rawTracks=parseRatings(JSON.parse(text));currentArtist="";currentAlbum=0;sourceName="Gist";
+ gistText=text;pendingGistText=null;
+ applyData();showHome();
+ setSource(sourceNote());
 }
 async function loadFromGist(){
  if(!RATINGS_GIST.id)return false;
  try{
-  const res=await fetch(`https://api.github.com/gists/${RATINGS_GIST.id}`,{cache:"no-store"});
-  if(!res.ok)throw new Error("HTTP "+res.status);
-  const gist=await res.json();
-  const f=gist.files&&gist.files[RATINGS_GIST.file];
-  if(!f)throw new Error(`"${RATINGS_GIST.file}" not found in gist`);
-  let text=f.content;
-  if(f.truncated){
-   // Gist API inlines file content up to 1MB; larger files need a second fetch of raw_url.
-   const rawRes=await fetch(f.raw_url+(f.raw_url.includes("?")?"&":"?")+"_="+Date.now(),{cache:"no-store"});
-   if(!rawRes.ok)throw new Error("HTTP "+rawRes.status+" (raw)");
-   text=await rawRes.text();
-  }
-  rawTracks=parseRatings(JSON.parse(text));currentArtist="";currentAlbum=0;sourceName="Gist";
-  applyData();showHome();
-  setSource(sourceNote());
+  const r=await fetchGistText(false);
+  applyGistText(r.text);
   return true;
  }catch(err){
   console.info("Could not load ratings from Gist:",err);
   return false;
  }
 }
+
+// ---- Live update check (every 30s) + refresh prompt ----
+function startGistPolling(){
+ if(gistPolling||!RATINGS_GIST.id)return;
+ gistPolling=true;
+ setInterval(checkGistForUpdate,GIST_POLL_MS);
+ document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkGistForUpdate()});
+}
+async function checkGistForUpdate(){
+ if(document.hidden)return; // don't poll from background tabs
+ try{
+  const r=await fetchGistText(true);
+  if(!r.changed)return;
+  if(r.text===gistText)return;      // same content as what's on screen
+  if(r.text===pendingGistText)return; // already prompted for this version
+  JSON.parse(r.text);               // ignore half-written / invalid content
+  if(gistText===null&&(sourceName===""||sourceName==="ratings-export.json")){
+   // Page is showing the GitHub fallback (or nothing): the Gist is back, so switch to it.
+   // (A manually imported file is never replaced silently - that goes through the prompt.)
+   applyGistText(r.text);
+   return;
+  }
+  pendingGistText=r.text;
+  showRefreshPrompt();
+ }catch(err){
+  console.info("Gist update check failed:",err);
+ }
+}
+const refreshBtn=document.getElementById("refreshBtn");
+let refreshTipTimer=0;
+function showRefreshPrompt(){
+ refreshBtn.hidden=false;
+ refreshBtn.classList.remove("busy");
+ // Flash the tooltip for a few seconds so the prompt is noticed, then leave it to hover/focus
+ refreshBtn.classList.add("show-tip");
+ clearTimeout(refreshTipTimer);
+ refreshTipTimer=setTimeout(()=>refreshBtn.classList.remove("show-tip"),5000);
+}
+refreshBtn.addEventListener("click",()=>{
+ if(pendingGistText===null){refreshBtn.hidden=true;return}
+ refreshBtn.classList.add("busy");
+ const onArtistPage=!document.getElementById("artistPage").classList.contains("hidden");
+ const prevArtist=currentArtist;
+ try{
+  applyGistText(pendingGistText);
+  if(onArtistPage&&prevArtist&&artists.has(prevArtist))showArtist(prevArtist); // stay where you were
+  refreshBtn.hidden=true;
+  refreshBtn.classList.remove("show-tip");
+ }catch(err){
+  console.error("Refresh failed:",err);
+  refreshBtn.classList.remove("busy");
+ }
+});
 async function loadFromLocalFile(){
  const FILE="ratings-export.json";
  try{
