@@ -355,6 +355,26 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 .song-vinyl .sv-album{font-size:11px;color:var(--muted);margin-top:3px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;width:100%}
 @media(max-width:600px){.vinyl-grid{grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}}
 
+
+/* ---- Recently rated: side box with the newest song at each rating ---- */
+.recent-layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;align-items:start}
+.recent-side{position:sticky;top:14px;padding:14px 12px}
+.recent-side h3{padding:0 6px}.recent-side .hint{padding:0 6px}
+.rs-row{display:grid;grid-template-columns:40px 36px minmax(0,1fr);align-items:center;gap:10px;padding:7px 6px;border-radius:10px}
+.rs-row:hover{background:#241534}
+.rs-badge{text-align:center;padding:2px 0;border-radius:999px;background:#2a1a3d;color:#d9c7ff;font-size:13px;font-weight:800}
+.rs-row[data-tier=top] .rs-badge{background:linear-gradient(135deg,#f5c451,#e0a422);color:#2b1c00}
+.rs-row[data-tier=good] .rs-badge{background:#4c2a80;color:#efe4ff}
+.rs-row[data-tier=mid] .rs-badge{background:#2f2040;color:#c9b9df}
+.rs-row[data-tier=low] .rs-badge{background:#241a2f;color:#8f7f9f}
+.rs-thumb{width:36px;height:36px;border-radius:7px;object-fit:cover;background:#261635}
+.rs-ph{width:36px;height:36px;border-radius:7px;border:1px dashed var(--border)}
+.rs-main{min-width:0}
+.rs-name{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rs-name a{color:inherit;text-decoration:none}.rs-name a:hover{text-decoration:underline;color:#d9c7ff}
+.rs-meta{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rs-meta .song-artist{cursor:pointer}.rs-meta .song-artist:hover{color:#d9c7ff}
+.rs-row.rs-none{opacity:.55}
+@media(max-width:900px){.recent-layout{grid-template-columns:1fr}.recent-side{position:static;order:-1}}
 /* refresh prompt (new ratings available in the Gist) */
 .controls .icon-btn{align-self:stretch}
 .refresh-btn{color:#e7d9ff;border-color:var(--purple);background:linear-gradient(180deg,#3a1f5c,#2b1742);box-shadow:0 0 0 3px #9b5cff1f,0 6px 20px #7c3aed33;animation:refreshPop .45s var(--ease) both,refreshPulse 2.2s ease-in-out .45s infinite}
@@ -395,17 +415,17 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 <div class="landing-card">
  <div class="landing-loading">
   <div class="spinner" aria-hidden="true"></div>
-  <p>Loading your ratings…</p>
+  <p>Loading…</p>
  </div>
  <div class="landing-empty">
   <div class="landing-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l11-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></div>
   <h2>Import your ratings</h2>
-  <p>Pick a ratings file to see your artists, albums, and top songs. Nothing leaves your browser.</p>
+  <p>Nothing leaves your browser.</p>
   <button type="button" id="importBtn" class="btn-primary"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4"/><path d="M7 9l5-5 5 5"/><path d="M5 20h14"/></svg>Import ratings JSON</button>
-  <div class="landing-or">or drop a .json file anywhere on this page</div>
+  <div class="landing-or">or drop a .json file here</div>
   <p id="landingMsg" class="landing-msg" role="alert" hidden></p>
   <details class="landing-format">
-   <summary>What format does it expect?</summary>
+   <summary>Expected format</summary>
 <pre>[
   { "rating": 4.5,
     "tracks": [
@@ -418,7 +438,7 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
         "release": { "isoString": "2019-05-17" } }
     ] }
 ]</pre>
-   <p>One entry per rating, each with its tracks. A <code>{ "ratings": [...] }</code> or <code>{ "data": [...] }</code> wrapper works too. Or just drop <code>ratings-export.json</code> next to this page and it'll load on its own.</p>
+   <p>One entry per rating. A <code>{ "ratings": [...] }</code> or <code>{ "data": [...] }</code> wrapper also works.</p>
   </details>
  </div>
 </div>
@@ -427,21 +447,20 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 <main id="homePage">
 <section class="hero">
 <div><h2 style="margin:0;font-size:28px">All Artists</h2></div>
-<div class="score"><div class="num" id="totalSongCount">—</div><small>rated songs</small></div>
 </section>
 <section class="stats">
 <div class="card stat"><div class="label">Artists</div><div class="value" id="homeArtistCount">—</div></div>
 <div class="card stat"><div class="label">Rated songs</div><div class="value" id="homeSongs">—</div></div>
 <div class="card stat"><div class="label">Rated albums</div><div class="value" id="homeAlbums">—</div></div>
-<div class="card stat"><div class="label">Overall average</div><div class="value" id="homeAverage">—</div><div id="homeAverageStars" style="margin-top:6px"></div></div>
+<div class="card stat"><div class="label">Average</div><div class="value" id="homeAverage">—</div><div id="homeAverageStars" style="margin-top:6px"></div></div>
 </section>
 <section class="card" id="featuredCard" data-accent="gold" style="margin-bottom:14px">
 <div class="album-head"><div><h3>Featured today</h3><div class="hint" id="featuredHint" style="margin-bottom:0">—</div></div></div>
 <div id="featuredBody"></div>
 </section>
-<section class="card tools" style="margin-bottom:14px"><label>Rank artists by <select id="rankMode" title="Adjusted nudges artists with few songs toward your overall average"><option value="raw">Average rating</option><option value="adj">Adjusted</option></select></label><label>Min songs to rank <input id="minRank" type="number" min="1" value="6"></label><label>Min songs per album <input id="minAlbum" type="number" min="1" value="3"></label><label class="check" title="Same title, same artist, different albums — only the highest rating counts"><input id="dedupeToggle" type="checkbox" checked> Merge duplicate songs</label></section>
+<section class="card tools" style="margin-bottom:14px"><label>Rank by <select id="rankMode" title="Weighted pulls artists with few songs toward your overall average"><option value="adj">Weighted</option><option value="raw">Average</option></select></label><label>Min songs <input id="minRank" type="number" min="1" value="6"></label><label>Min album songs <input id="minAlbum" type="number" min="1" value="3"></label><label class="check" title="Same title and artist on different albums: keep the highest rating"><input id="dedupeToggle" type="checkbox" checked> Merge duplicates</label></section>
 <section class="card" data-accent="gold" style="margin-bottom:14px">
-<h3>Highest artist averages</h3>
+<h3>Top artists</h3>
 <div class="hint" id="rankHint"></div>
 <div id="topArtists" class="artist-table"></div>
 </section>
@@ -449,29 +468,29 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 <div class="album-head"><div><h3>All artists</h3><div class="hint" id="allArtistsHint" style="margin-bottom:0">—</div></div><label style="display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px">Sort <select id="allArtistsSort"><option value="az">Name A–Z</option><option value="rating">Rating high–low</option><option value="songs">Most songs</option></select></label></div>
 <div id="allArtists" class="all-artists"></div>
 </section>
-<section class="card" style="margin-top:14px"><h3>Average rating by decade</h3><div class="chart-wrap" style="height:230px"><canvas id="homeDecadeChart" style="width:100%;height:100%"></canvas></div></section>
+<section class="card" style="margin-top:14px"><h3>Average by decade</h3><div class="chart-wrap" style="height:230px"><canvas id="homeDecadeChart" style="width:100%;height:100%"></canvas></div></section>
 </main>
 
 <main id="artistPage" class="hidden">
 <section class="hero">
 <div class="artist"><img id="artistCover" class="cover" alt="Artist artwork"><div><h2 id="artistName">—</h2><p id="artistMeta">—</p></div></div>
-<div class="score"><div class="num" id="overallScore">—</div><div class="score-stars" id="overallStars"></div><small>overall average</small></div>
+<div class="score"><div class="num" id="overallScore">—</div><div class="score-stars" id="overallStars"></div><small>average</small></div>
 </section>
 <section class="stats">
 <div class="card stat"><div class="label">Rated songs</div><div class="value" id="songCount">—</div></div>
-<div class="card stat"><div class="label">Albums rated</div><div class="value" id="albumCount">—</div></div>
-<div class="card stat"><div class="label">Highest album average</div><div class="value" id="highAlbum">—</div></div>
-<div class="card stat"><div class="label">Lowest album average</div><div class="value" id="lowAlbum">—</div></div>
+<div class="card stat"><div class="label">Albums</div><div class="value" id="albumCount">—</div></div>
+<div class="card stat"><div class="label">Best album</div><div class="value" id="highAlbum">—</div></div>
+<div class="card stat"><div class="label">Lowest album</div><div class="value" id="lowAlbum">—</div></div>
 </section>
 <section class="grid">
-<div class="card"><h3>Overall song rating distribution</h3><div class="chart-wrap"><canvas id="overallChart" width="560" height="330"></canvas></div><div class="legend" id="overallLegend"></div></div>
-<div class="card"><div class="album-head"><div><h3>Album averages</h3><div class="hint">Albums with <span id="albumRule">3</span>+ rated songs</div></div><select id="albumSelect" aria-label="Select album"></select></div><div class="album-list" id="albumList"></div></div>
+<div class="card"><h3>Ratings</h3><div class="chart-wrap"><canvas id="overallChart" width="560" height="330"></canvas></div><div class="legend" id="overallLegend"></div></div>
+<div class="card"><div class="album-head"><div><h3>Albums</h3><div class="hint"><span id="albumRule">3</span>+ songs</div></div><select id="albumSelect" aria-label="Select album"></select></div><div class="album-list" id="albumList"></div></div>
 </section>
-<section class="card" style="margin-top:14px"><h3 id="albumChartTitle">Album song rating distribution</h3><div class="hint" id="albumChartHint"></div><div class="chart-wrap"><canvas id="albumChart" width="700" height="340"></canvas></div><div class="legend" id="albumLegend"></div></section>
-<section class="card" style="margin-top:14px"><h3>Average rating by decade</h3><div class="chart-wrap" style="height:230px"><canvas id="artistDecadeChart" style="width:100%;height:100%"></canvas></div></section>
-<section class="card" style="margin-top:14px"><div class="album-head"><div><h3>All rated songs</h3><div class="hint" id="songsHint" style="margin-bottom:0">—</div></div><button id="songsToggle" class="home-btn" type="button" aria-expanded="false" aria-controls="songList">Show songs</button></div><div id="songTools" class="tools hidden"><input id="songSearch" class="artist-search" type="search" placeholder="Search songs or albums…"><label>Min rating <select id="songMin"><option value="0">All</option><option value="3">3+</option><option value="3.5">3.5+</option><option value="4">4+</option><option value="4.5">4.5+</option><option value="5">5</option></select></label><label>Sort <select id="songSort"><option value="high">Highest rated</option><option value="low">Lowest rated</option><option value="az">Title A–Z</option><option value="album">Album</option></select></label></div><div id="songList" class="song-list hidden"></div></section>
+<section class="card" style="margin-top:14px"><h3 id="albumChartTitle">Album ratings</h3><div class="hint" id="albumChartHint"></div><div class="chart-wrap"><canvas id="albumChart" width="700" height="340"></canvas></div><div class="legend" id="albumLegend"></div></section>
+<section class="card" style="margin-top:14px"><h3>Average by decade</h3><div class="chart-wrap" style="height:230px"><canvas id="artistDecadeChart" style="width:100%;height:100%"></canvas></div></section>
+<section class="card" style="margin-top:14px"><div class="album-head"><div><h3>Songs</h3><div class="hint" id="songsHint" style="margin-bottom:0">—</div></div><button id="songsToggle" class="home-btn" type="button" aria-expanded="false" aria-controls="songList">Show songs</button></div><div id="songTools" class="tools hidden"><input id="songSearch" class="artist-search" type="search" placeholder="Search songs or albums…"><label>Min rating <select id="songMin"><option value="0">All</option><option value="3">3+</option><option value="3.5">3.5+</option><option value="4">4+</option><option value="4.5">4.5+</option><option value="5">5</option></select></label><label>Sort <select id="songSort"><option value="high">Highest rated</option><option value="low">Lowest rated</option><option value="az">Title A–Z</option><option value="album">Album</option></select></label></div><div id="songList" class="song-list hidden"></div></section>
 </main>
-<main id="topPage" class="hidden"><section class="hero" style="margin-bottom:34px"><div><h2 style="margin:0;font-size:28px">Top Rated Songs</h2></div><div class="score"><div class="num" id="topCount">—</div><small>matching songs</small></div></section>
+<main id="topPage" class="hidden"><section class="hero" style="margin-bottom:34px"><div><h2 style="margin:0;font-size:28px">Top Songs</h2></div><div class="score"><div class="num" id="topCount">—</div><small>songs</small></div></section>
 <section class="card" data-accent="gold">
 <div class="top-stack-wrap" id="topStackWrap">
  <div class="top-stack-nav prev" id="topStackPrev" aria-label="Previous artist">‹</div>
@@ -479,8 +498,8 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
  <div class="top-stack-nav next" id="topStackNext" aria-label="Next artist">›</div>
 </div>
 <div id="topList" class="song-shelf"></div></section></main>
-<main id="recentPage" class="hidden"><section class="hero" style="margin-bottom:34px"><div><h2 style="margin:0;font-size:28px">Recently Rated</h2><p id="recentHint" style="margin:6px 0 0;color:var(--muted)"></p></div><div class="score"><div class="num" id="recentCount">—</div><small>songs</small></div></section>
-<section class="card" data-accent="gold"><div id="recentList"></div><div id="recentMore" class="empty top-more hidden"></div></section></main>
+<main id="recentPage" class="hidden"><section class="hero" style="margin-bottom:34px"><div><h2 style="margin:0;font-size:28px">Recently Rated</h2><p id="recentHint" style="margin:0"></p></div><div class="score"><div class="num" id="recentCount">—</div><small>songs</small></div></section>
+<div class="recent-layout"><section class="card" data-accent="gold"><div id="recentList"></div><div id="recentMore" class="empty top-more hidden"></div></section><aside class="card recent-side" data-accent="gold" aria-label="Latest song at each rating"><h3>Latest at each rating</h3><div id="recentByStar"></div></aside></div></main>
 <main id="requestPage" class="hidden"><section class="hero"><div><h2 style="margin:0;font-size:28px">Request a Song</h2></div></section>
 <section class="card">
 <form id="requestForm" class="tools" style="margin-bottom:4px">
@@ -727,7 +746,7 @@ function renderFeatured(){
  }
  songs.sort((a,b)=>b.rating-a.rating||(ratedAtMs(b)||0)-(ratedAtMs(a)||0));
 
- featuredHint.textContent="Refreshes Daily";
+ featuredHint.textContent="Refreshes daily";
 
  const heroSong=songs[0],restSongs=songs.slice(1);
  const heroHtml=heroSong?(()=>{
@@ -752,7 +771,7 @@ function renderFeatured(){
      <strong>${esc(name)}</strong><span>${fmt(avg(ts))} avg</span></div>`;
   }).join("")}</div>`:"")+
   (restSongs.length?`<div class="feat-subhead">More top picks</div><div class="featured-songs">${restSongs.map((t,i)=>songRow(t,i+1,true)).join("")}</div>`
-   :(heroSong?"":'<div class="empty">No 4.0+ rated songs yet.</div>'));
+   :(heroSong?"":'<div class="empty">No 4.0+ songs yet.</div>'));
 }
 featuredBody.addEventListener("click",e=>{
  const a=e.target.closest("[data-artist]");
@@ -788,14 +807,11 @@ function renderHome(){
  const stats=artistStats(),allSongs=tracks.length,albumTotal=stats.reduce((n,a)=>n+a.albums.length,0);
  homeArtistCount.textContent=stats.length.toLocaleString();
  homeSongs.textContent=allSongs.toLocaleString();
- totalSongCount.textContent=allSongs.toLocaleString();
  homeAlbums.textContent=albumTotal.toLocaleString();
  homeAverage.textContent=allSongs?fmt(avg(tracks)):"—";homeAverageStars.innerHTML=allSongs?stars(avg(tracks)):"";
 
- const minN=Math.max(1,parseInt(minRank.value)||1),adj=rankMode.value==="adj",C=avg(tracks),PRIOR=5;
- rankHint.textContent=adj
-  ?`Weighted Average (accounts for artists with less songs).`
-  :"Average Artist Rating.";
+ const minN=Math.max(1,parseInt(minRank.value)||1),adj=rankMode.value==="adj",C=avg(tracks),PRIOR=15;
+ rankHint.textContent=adj?"Weighted by song count":"";
  const eligible=stats.filter(a=>a.tracks.length>=minN).map(a=>({...a,score:adj?(a.tracks.length*a.average+PRIOR*C)/(a.tracks.length+PRIOR):a.average})).sort((x,y)=>y.score-x.score||y.tracks.length-x.tracks.length||x.name.localeCompare(y.name));
  topArtists.innerHTML=eligible.map((a,i)=>`
   <div class="artist-row" data-artist="${esc(a.name)}">
@@ -803,7 +819,7 @@ function renderHome(){
    <img class="artist-mini" src="${esc(a.image)}" alt="" onerror="this.style.visibility='hidden'">
    <div class="artist-row-main"><div class="artist-row-name">${esc(a.name)}</div><div class="artist-row-meta">${a.tracks.length} songs · ${a.albums.length} albums${adj?` · avg ${fmt(a.average)}`:""}</div></div>
    <div class="artist-row-score"><span>${fmt(a.score)}</span>${stars(a.score,"sm")}</div>
-  </div>`).join("")||`<div class="empty">No artists with ${minN}+ rated songs.</div>`;
+  </div>`).join("")||`<div class="empty">No artists with ${minN}+ songs.</div>`;
 
  const sorters={az:(a,b)=>byAlpha(a.name,b.name),rating:(a,b)=>b.average-a.average||byAlpha(a.name,b.name),songs:(a,b)=>b.tracks.length-a.tracks.length||byAlpha(a.name,b.name)};
  const sortedStats=[...stats].sort(sorters[allArtistsSort.value]||sorters.az);
@@ -840,7 +856,7 @@ function updateAllArtistsFilter(){
 function renderArtist(){
  albumRule.textContent=MIN_ALBUM_SONGS;
  const ts=artists.get(currentArtist)||[],als=albumsFor(currentArtist);
- artistName.textContent=currentArtist||"No data";artistMeta.textContent=`${ts.length} rated songs · ${als.length} albums`;
+ artistName.textContent=currentArtist||"No data";artistMeta.textContent=`${ts.length} songs · ${als.length} albums`;
  overallScore.textContent=ts.length?fmt(avg(ts)):"—";overallStars.innerHTML=ts.length?stars(avg(ts),"lg"):"";songCount.textContent=ts.length.toLocaleString();albumCount.textContent=als.length.toLocaleString();
  setImage(artistCover,img(ts[0]?.album?.images));
  if(als.length){
@@ -853,7 +869,7 @@ function renderArtist(){
  albumList.innerHTML=als.map((a,i)=>`<div class="album ${i==currentAlbum?"active":""}" data-i="${i}">
  <img class="thumb" src="${esc(a.image)}" alt="" onerror="this.style.visibility='hidden'">
  <div><div class="album-name">${esc(a.name)}</div><div class="album-meta">${a.tracks.length} song${a.tracks.length==1?"":"s"}</div><div class="bar"><i style="width:${avg(a.tracks)/5*100}%"></i></div></div>
- <div class="album-score"><span>${fmt(avg(a.tracks))}</span>${stars(avg(a.tracks),"sm")}</div></div>`).join("")||`<div class="empty">No albums with ${MIN_ALBUM_SONGS}+ rated songs.</div>`;
+ <div class="album-score"><span>${fmt(avg(a.tracks))}</span>${stars(avg(a.tracks),"sm")}</div></div>`).join("")||`<div class="empty">No albums with ${MIN_ALBUM_SONGS}+ songs.</div>`;
  drawPie(overallChart,dist(ts),overallLegend);renderAlbum();drawDecades(artistDecadeChart,ts);
 }
 let songsOpen=false;
@@ -879,7 +895,7 @@ function renderSongs(){
  const all=artists.get(currentArtist)||[],q=songSearch.value.trim().toLowerCase(),min=Number(songMin.value);
  const sorters={high:(a,b)=>b.rating-a.rating||byName(a,b),low:(a,b)=>a.rating-b.rating||byName(a,b),az:byName,album:(a,b)=>String(a.album.name).localeCompare(String(b.album.name))||(a.trackNumber||0)-(b.trackNumber||0)};
  const ts=all.filter(t=>t.rating>=min&&(!q||String(t.name||"").toLowerCase().includes(q)||String(t.album.name).toLowerCase().includes(q))).sort(sorters[songSort.value]);
- songsHint.textContent=`${ts.length} of ${all.length} rated song${all.length==1?"":"s"}`;
+ songsHint.textContent=`${ts.length} of ${all.length}`;
  songList.innerHTML=ts.map((t,i)=>songRow(t,i,false)).join("")||'<div class="empty">No songs match.</div>';
  songList.scrollTop=0;setSongsOpen(songsOpen);
 }
@@ -1039,7 +1055,7 @@ function growTop(){
  if(!grid)return;
  const next=topAll.slice(topShown,topShown+TOP_PAGE_SIZE);
  if(next.length){grid.insertAdjacentHTML("beforeend",next.map(vinylCard).join(""));topShown+=next.length}
- if(topShown<topAll.length){more.textContent=`Showing ${topShown.toLocaleString()} of ${topAll.length.toLocaleString()} — scroll for more`;more.classList.remove("hidden")}
+ if(topShown<topAll.length){more.textContent=`${topShown.toLocaleString()} of ${topAll.length.toLocaleString()}`;more.classList.remove("hidden")}
  else{more.classList.add("hidden")}
 }
 // Loads the next batch a bit before the user hits the very bottom of the page.
@@ -1063,13 +1079,29 @@ function dayLabel(ms){
  return d.toLocaleDateString(undefined,d.getFullYear()===now.getFullYear()?{month:"short",day:"numeric"}:{year:"numeric",month:"short",day:"numeric"});
 }
 const timeLabel=ms=>new Date(ms).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"});
+function renderRecentByStar(){
+ const latest=new Map();
+ for(const x of recentAll){const k=Number(x.t.rating);if(!latest.has(k))latest.set(k,x)}
+ let html="";
+ for(let r=5;r>=0;r-=.5){
+  const tier=r>=4.5?"top":r>=3.5?"good":r>=2.5?"mid":"low",x=latest.get(r);
+  if(!x){html+=`<div class="rs-row rs-none" data-tier="${tier}"><div class="rs-badge">${r}</div><div class="rs-ph"></div><div class="rs-main"><div class="rs-meta">None</div></div></div>`;continue}
+  const t=x.t,url=trackUrl(t),title=esc(t.name||"Untitled");
+  html+=`<div class="rs-row" data-tier="${tier}"><div class="rs-badge">${r}</div>
+   <img class="rs-thumb" src="${esc(img(t.album.images))}" alt="" onerror="this.style.visibility='hidden'">
+   <div class="rs-main"><div class="rs-name">${url?`<a href="${esc(url)}" target="_blank" rel="noopener">${title}</a>`:title}</div>
+   <div class="rs-meta"><span class="song-artist" data-artist="${esc(t.mainArtist)}">${esc(t.mainArtist)}</span> · ${esc(dayLabel(x.ms))}</div></div></div>`;
+ }
+ recentByStar.innerHTML=html;
+}
 function renderRecent(){
  recentAll=tracks.map(t=>({t,ms:ratedAtMs(t)})).filter(x=>x.ms!=null).sort((a,b)=>b.ms-a.ms);
+ renderRecentByStar();
  recentShown=0;
  recentCount.textContent=recentAll.length.toLocaleString();
- recentHint.textContent=recentAll.length?"Newest ratings first":"";
+ recentHint.textContent="";
  if(!recentAll.length){
-  recentList.innerHTML='<div class="empty">No rating dates found in this export.</div>';
+  recentList.innerHTML='<div class="empty">No rating dates in this export.</div>';
   recentMore.classList.add("hidden");return;
  }
  recentList.innerHTML="";
@@ -1094,7 +1126,7 @@ function growRecent(){
  recentList.dataset.lastGroup=lastGroup;
  recentList.insertAdjacentHTML("beforeend",html);
  const left=recentAll.length-recentShown;
- if(left>0){recentMore.textContent=`Showing ${recentShown.toLocaleString()} of ${recentAll.length.toLocaleString()} — scroll for more`;recentMore.classList.remove("hidden")}
+ if(left>0){recentMore.textContent=`${recentShown.toLocaleString()} of ${recentAll.length.toLocaleString()}`;recentMore.classList.remove("hidden")}
  else recentMore.classList.add("hidden");
 }
 // Loads the next batch a bit before the user reaches the bottom of the page.
@@ -1112,8 +1144,8 @@ function showRequest(){
 }
 function renderAlbum(){
  const als=albumsFor(currentArtist),a=als[Number(currentAlbum)||0];
- if(!a){albumChartTitle.textContent="Album song rating distribution";albumChartHint.textContent="";drawPie(albumChart,[],albumLegend);return}
- albumChartTitle.textContent=a.name;albumChartHint.innerHTML=`${a.tracks.length} rated song${a.tracks.length==1?"":"s"} · average ${fmt(avg(a.tracks))} ${stars(avg(a.tracks),"sm")}`;
+ if(!a){albumChartTitle.textContent="Album ratings";albumChartHint.textContent="";drawPie(albumChart,[],albumLegend);return}
+ albumChartTitle.textContent=a.name;albumChartHint.innerHTML=`${a.tracks.length} song${a.tracks.length==1?"":"s"} · avg ${fmt(avg(a.tracks))} ${stars(avg(a.tracks),"sm")}`;
  drawPie(albumChart,dist(a.tracks),albumLegend);
  [...albumList.children].forEach((el,i)=>el.classList.toggle("active",i==currentAlbum));
 }
@@ -1323,7 +1355,7 @@ function renderSuggest(){
   const more=[];
   if(moreArtists)more.push(`+${moreArtists} more artist${moreArtists==1?"":"s"}`);
   if(moreSongs)more.push(`+${moreSongs} more song${moreSongs==1?"":"s"}`);
-  if(more.length)html+=`<div class="sg-hint"><span>${more.join(" · ")} — keep typing</span></div>`;
+  if(more.length)html+=`<div class="sg-hint"><span>${more.join(" · ")}</span></div>`;
   html+=`<div class="sg-hint keys"><span>↑ ↓ to move</span><span>Enter to open</span></div>`;
   artistSuggest.innerHTML=html;
   artistSearch.setAttribute("aria-activedescendant","sg-"+sgActive);
@@ -1381,6 +1413,7 @@ for(const el of [songSearch])el.addEventListener("input",renderSongs);
 for(const el of [songMin,songSort])el.addEventListener("change",renderSongs);
 topList.addEventListener("click",e=>{const el=e.target.closest("[data-artist]");if(el)showArtist(el.dataset.artist)});
 recentList.addEventListener("click",e=>{const el=e.target.closest("[data-artist]");if(el)showArtist(el.dataset.artist)});
+recentByStar.addEventListener("click",e=>{const el=e.target.closest("[data-artist]");if(el)showArtist(el.dataset.artist)});
 artistSearch.addEventListener("input",()=>{sgActive=0;updateArtistControls();renderSuggest();if(!topPage.classList.contains("hidden"))renderSleeveStack();});
 artistSearch.addEventListener("focus",()=>{if(artistSearch.value.trim())renderSuggest()});
 artistSearch.addEventListener("blur",()=>setTimeout(closeSuggest,120));
@@ -1429,7 +1462,7 @@ function parseRatings(parsed){
 }
 function setSource(msg){dataSource.textContent=msg}
 function sourceNote(){
- return `Loaded ${tracks.length.toLocaleString()} songs from ${sourceName}`+(dupeCount?` · ${dupeCount.toLocaleString()} duplicate${dupeCount==1?"":"s"} merged`:"");
+ return `${tracks.length.toLocaleString()} songs · ${sourceName}`+(dupeCount?` · ${dupeCount.toLocaleString()} merged`:"");
 }
 // Ratings live in a GitHub Gist so updates show up without a repo push/redeploy.
 // The sync script PATCHes https://api.github.com/gists/<id> whenever ratings-export.json changes.
@@ -1575,10 +1608,10 @@ async function loadFromLocalFile(){
   rawTracks=[];tracks=[];sourceName="";currentArtist="";currentAlbum=0;
   applyData();showHome();
   setLandingMsg(location.protocol==="file:"
-   ?`${FILE} can't be loaded automatically when the page is opened from your computer (file://). Import it below instead.`
+   ?`Can't auto-load ${FILE} from file://. Import it below.`
    :(RATINGS_GIST.id
-     ?`Couldn't load ratings from the Gist or ${FILE} (${why}). Import a file below instead.`
-     :`Couldn't load ${FILE} (${why}). Import a file below, or check it's in the same folder as this page.`));
+     ?`Couldn't load ratings (${why}). Import a file below.`
+     :`Couldn't load ${FILE} (${why}). Import a file below.`));
   setSource(`Couldn't load ratings: ${why}`);
  }
 }
@@ -1598,7 +1631,7 @@ async function loadRatingsFile(file){
   setSource(sourceNote());
  }catch(err){
   console.error("Ratings JSON load failed:",err);
-  const msg="Couldn't read that file. Expected a ratings export JSON.";
+  const msg="Couldn't read that file.";
   if(document.body.dataset.state==="ready")alert(msg);else setLandingMsg(msg);
  }
 }
@@ -1684,7 +1717,7 @@ requestForm.addEventListener("submit",async e=>{
   loadCommunityRequests();
  }else{
   window.open(googleFormLink(url),"_blank","noopener");
-  setRequestMsg("Opened the form in a new tab — hit Submit there.",true);
+  setRequestMsg("Form opened in a new tab. Submit it there.",true);
  }
 });
 
@@ -1816,8 +1849,8 @@ function sortedCommunityItems(){
 }
 function renderReqGrid(){
  const items=sortedCommunityItems();
- if(!items.length){reqGridHint.textContent="No requests yet.";reqGrid.innerHTML='<div class="empty">Nothing requested yet — be the first above.</div>';return}
- reqGridHint.textContent=`${items.length.toLocaleString()} song${items.length==1?"":"s"} requested`;
+ if(!items.length){reqGridHint.textContent="";reqGrid.innerHTML='<div class="empty">No requests yet.</div>';return}
+ reqGridHint.textContent=`${items.length.toLocaleString()} requested`;
  reqGrid.innerHTML=items.map((item,i)=>reqCardShell(item,i)).join("");
  items.forEach((item,i)=>{
   fetchSpotifyMeta(item).then(meta=>{
@@ -1828,8 +1861,8 @@ function renderReqGrid(){
     metaRatedUrls.add(item.url);
     el.remove();
     const left=reqGrid.querySelectorAll(".req-card").length;
-    reqGridHint.textContent=left?`${left.toLocaleString()} song${left==1?"":"s"} requested`:"No requests yet.";
-    if(!left)reqGrid.innerHTML='<div class="empty">Nothing requested yet — be the first above.</div>';
+    reqGridHint.textContent=left?`${left.toLocaleString()} requested`:"";
+    if(!left)reqGrid.innerHTML='<div class="empty">No requests yet.</div>';
     return;
    }
    el.classList.remove("req-loading");
@@ -1856,8 +1889,8 @@ function ensureCommunityLoaded(){
 }
 async function loadCommunityRequests(){
  if(!GOOGLE_SHEET.id){
-  reqGridHint.textContent="Not connected to a Sheet yet.";
-  reqGrid.innerHTML=`<div class="empty">Link a Sheet to show what people have requested — set <code>GOOGLE_SHEET</code> near the top of the script.</div>`;
+  reqGridHint.textContent="";
+  reqGrid.innerHTML=`<div class="empty">Requests aren't set up yet.</div>`;
   return;
  }
  reqGridHint.textContent="Loading…";reqGrid.innerHTML="";
@@ -1865,8 +1898,8 @@ async function loadCommunityRequests(){
  try{raw=await fetchSheetRequests()}
  catch(err){
   console.error("Sheet read failed:",err);
-  reqGridHint.textContent="Couldn't load requests.";
-  reqGrid.innerHTML=`<div class="empty">Couldn't read the sheet (${esc(err.message)}). Make sure it's shared as "Anyone with the link can view".</div>`;
+  reqGridHint.textContent="";
+  reqGrid.innerHTML=`<div class="empty">Couldn't load requests (${esc(err.message)}).</div>`;
   return;
  }
  const deduped=dedupeRequests(raw||[]);
