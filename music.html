@@ -401,6 +401,7 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 .pl-sub{font-size:11px;color:var(--muted);margin-top:3px}
 .pl-rate{display:flex;align-items:center;gap:8px;font-weight:700;margin-top:auto}
 @media(max-width:600px){.pl-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}}
+.pl-title{color:inherit;text-decoration:none}.pl-title:hover{text-decoration:underline;color:#d9c7ff}
 </style>
 </head>
 <body data-state="loading">
@@ -520,7 +521,7 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 <main id="playlistPage" class="hidden">
 <div style="margin-bottom:10px"><button id="plBack" class="home-btn" type="button">← All playlists</button></div>
 <section class="hero">
-<div class="artist"><img id="plCover" class="cover" alt="Playlist artwork"><div><h2 id="plName">—</h2><p id="plMeta">—</p><p style="margin:6px 0 0"><a id="plOpen" href="#" target="_blank" rel="noopener" style="color:#d9c7ff">Open in Spotify ↗</a></p></div></div>
+<div class="artist"><img id="plCover" class="cover" alt="Playlist artwork"><div><h2><a id="plName" class="pl-title" href="#" target="_blank" rel="noopener">—</a></h2><p id="plMeta">—</p></div></div>
 <div class="score"><div class="num" id="plAvg">—</div><div class="score-stars" id="plAvgStars"></div><small>song average</small></div>
 </section>
 <section class="stats">
@@ -1751,7 +1752,7 @@ function renderPlaylist(){
  plName.textContent=p.name;
  plMeta.textContent=[p.owner&&`by ${p.owner}`,`${p.total.toLocaleString()} song${p.total==1?"":"s"}`].filter(Boolean).join(" · ");
  setImage(plCover,p.cover);
- plOpen.href=p.url;
+ plName.href=p.url;
  plAvg.textContent=n?fmt(p.average):"—";plAvgStars.innerHTML=n?stars(p.average,"lg"):"";
  plRating.textContent=p.rating;plRatingStars.innerHTML=stars(p.rating);
  plSongs.textContent=p.total.toLocaleString();
@@ -2040,6 +2041,32 @@ reqSortToggle.addEventListener("click",()=>{
 });
 
 autoLoad();
+
+/* ---- Open Spotify links in the app ----
+   Desktop: try the spotify: URI (opens the app); if nothing took focus, fall back to the web link in a new tab.
+   Phones/tablets: leave the normal https link alone, the OS already hands open.spotify.com links to the app. */
+const IS_TOUCH_DEVICE=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+const SPOTIFY_WEB_RE=/^https:\/\/open\.spotify\.com\/(?:intl-[a-z]{2}\/)?(track|album|playlist|artist)\/([A-Za-z0-9]{22})/i;
+function openInSpotifyApp(type,id,webUrl){
+ let left=false;
+ const mark=()=>{left=true};
+ window.addEventListener("blur",mark,{once:true});
+ document.addEventListener("visibilitychange",()=>{if(document.hidden)left=true},{once:true});
+ window.location.href=`spotify:${type}:${id}`;
+ setTimeout(()=>{
+  window.removeEventListener("blur",mark);
+  if(!left&&!document.hidden&&document.hasFocus())window.open(webUrl,"_blank","noopener");
+ },1500);
+}
+document.addEventListener("click",e=>{
+ if(IS_TOUCH_DEVICE||e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;
+ const a=e.target.closest&&e.target.closest("a[href]");
+ if(!a)return;
+ const m=a.href.match(SPOTIFY_WEB_RE);
+ if(!m)return;
+ e.preventDefault();
+ openInSpotifyApp(m[1].toLowerCase(),m[2],a.href);
+});
 </script>
 </body>
 </html>
