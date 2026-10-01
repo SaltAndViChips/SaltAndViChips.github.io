@@ -174,7 +174,7 @@ main:not(.hidden)>*:nth-child(n+6){animation-delay:.2s}
  .header-inner{margin-bottom:0;gap:10px;padding:12px 12px}
  .site-header{margin-bottom:14px}
  h1{font-size:24px}
- #homeBtn,#topBtn,#recentBtn,#requestBtn{display:none}
+ #homeBtn,#topBtn,#recentBtn,#playlistsBtn,#requestBtn{display:none}
  .controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;width:100%}
  #artistSearch{grid-column:1/-1;width:100%}
  .file-label{white-space:nowrap;text-align:center}
@@ -390,6 +390,17 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 @keyframes refreshPop{from{opacity:0;transform:scale(.4) rotate(-90deg)}}
 @keyframes refreshPulse{0%,100%{box-shadow:0 0 0 3px #9b5cff1f,0 6px 20px #7c3aed33}50%{box-shadow:0 0 0 7px #9b5cff33,0 6px 24px #7c3aed66}}
 @media(max-width:600px){.refresh-btn{justify-self:end}}
+
+/* ================= PLAYLISTS ================= */
+.pl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px}
+.pl-card{display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:16px;background:linear-gradient(180deg,#1a1226,#140d1e);border:1px solid var(--border);cursor:pointer;transition:transform .2s var(--ease),border-color .2s,box-shadow .2s}
+.pl-card:hover,.pl-card:focus-visible{transform:translateY(-3px);border-color:#6f42a8;box-shadow:0 14px 30px #0006;outline:0}
+.pl-art{aspect-ratio:1;border-radius:12px;overflow:hidden;background:#241633;box-shadow:0 10px 24px #0008}
+.pl-art img{width:100%;height:100%;object-fit:cover;display:block}
+.pl-title{font-weight:650;font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;line-height:1.3}
+.pl-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.pl-rate{display:flex;align-items:center;gap:8px;font-weight:700;margin-top:auto}
+@media(max-width:600px){.pl-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}}
 </style>
 </head>
 <body data-state="loading">
@@ -400,7 +411,8 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 <button id="homeBtn" class="home-btn active">Home</button>
 <button id="topBtn" class="home-btn">Top Songs</button>
 <button id="recentBtn" class="home-btn">Recently Rated</button>
-<button id="requestBtn" class="home-btn">Request Song</button>
+<button id="playlistsBtn" class="home-btn">Playlists</button>
+<button id="requestBtn" class="home-btn">Request</button>
 <input id="artistSearch" class="artist-search" type="search" placeholder="Search artists or songs…" aria-label="Search artists or songs" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="artistSuggest" aria-autocomplete="list">
 <label class="file-label icon-btn" title="Load ratings JSON" aria-label="Load ratings JSON"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h8V4"/><path d="M8 14h8v6H8z"/></svg><input id="fileInput" type="file" accept=".json,application/json"></label>
 <button id="refreshBtn" class="home-btn icon-btn refresh-btn" type="button" hidden aria-label="New ratings available. Refresh"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.9-3.5M4 4v4h4"/><path d="M4 13a8 8 0 0 0 14.9 3.5M20 20v-4h-4"/></svg></button>
@@ -438,7 +450,7 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
         "release": { "isoString": "2019-05-17" } }
     ] }
 ]</pre>
-   <p>One entry per rating. A <code>{ "ratings": [...] }</code> or <code>{ "data": [...] }</code> wrapper also works.</p>
+   <p>One entry per rating. A <code>{ "ratings": [...] }</code> or <code>{ "data": [...] }</code> wrapper also works. Playlists you rated as a whole come in a top-level <code>playlists</code> array (use the <code>{ "ratings": [...], "playlists": [...] }</code> wrapper).</p>
   </details>
  </div>
 </div>
@@ -499,17 +511,37 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 </div>
 <div id="topList" class="song-shelf"></div></section></main>
 <main id="recentPage" class="hidden"><section class="hero" style="margin-bottom:34px"><div><h2 style="margin:0;font-size:28px">Recently Rated</h2><p id="recentHint" style="margin:0"></p></div><div class="score"><div class="num" id="recentCount">—</div><small>songs</small></div></section>
-<div class="recent-layout"><section class="card" data-accent="gold"><div id="recentList"></div><div id="recentMore" class="empty top-more hidden"></div></section><aside class="card recent-side" data-accent="gold" aria-label="Latest"><h3>Latest at each rating</h3><div id="recentByStar"></div></aside></div></main>
-<main id="requestPage" class="hidden"><section class="hero"><div><h2 style="margin:0;font-size:28px">Request a Song</h2></div></section>
+<div class="recent-layout"><section class="card" data-accent="gold"><div id="recentList"></div><div id="recentMore" class="empty top-more hidden"></div></section><aside class="card recent-side" data-accent="gold" aria-label="Latest song at each rating"><h3>Latest</h3><div id="recentByStar"></div></aside></div></main>
+<main id="playlistsPage" class="hidden"><section class="hero"><div><h2 style="margin:0;font-size:28px">Playlists</h2><p style="margin:4px 0 0">Playlists rated as a whole</p></div><div class="score"><div class="num" id="plCount">—</div><small>playlists</small></div></section>
+<section class="card">
+<div class="album-head"><div><h3>Rated playlists</h3></div><label style="display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px">Sort <select id="plSort"><option value="rating">Rating high–low</option><option value="avg">Song average</option><option value="recent">Recently rated</option><option value="name">Name A–Z</option></select></label></div>
+<div id="plGrid" class="pl-grid"></div>
+</section></main>
+<main id="playlistPage" class="hidden">
+<div style="margin-bottom:10px"><button id="plBack" class="home-btn" type="button">← All playlists</button></div>
+<section class="hero">
+<div class="artist"><img id="plCover" class="cover" alt="Playlist artwork"><div><h2 id="plName">—</h2><p id="plMeta">—</p><p style="margin:6px 0 0"><a id="plOpen" href="#" target="_blank" rel="noopener" style="color:#d9c7ff">Open in Spotify ↗</a></p></div></div>
+<div class="score"><div class="num" id="plAvg">—</div><div class="score-stars" id="plAvgStars"></div><small>song average</small></div>
+</section>
+<section class="stats">
+<div class="card stat"><div class="label">Playlist rating</div><div class="value" id="plRating">—</div><div id="plRatingStars" style="margin-top:6px"></div></div>
+<div class="card stat"><div class="label">Songs</div><div class="value" id="plSongs">—</div></div>
+<div class="card stat"><div class="label">Rated songs</div><div class="value" id="plRated">—</div></div>
+<div class="card stat"><div class="label">Coverage</div><div class="value" id="plCoverage">—</div></div>
+</section>
+<section class="card"><h3>Song ratings</h3><div class="chart-wrap"><canvas id="plChart" width="560" height="330"></canvas></div><div class="legend" id="plLegend"></div></section>
+<section class="card" style="margin-top:14px"><div class="album-head"><div><h3>Rated songs</h3><div class="hint" id="plSongsHint" style="margin-bottom:0">—</div></div></div><div id="plSongList" class="song-list"></div></section>
+</main>
+<main id="requestPage" class="hidden"><section class="hero"><div><h2 style="margin:0;font-size:28px">Request a Song or Playlist</h2></div></section>
 <section class="card">
 <form id="requestForm" class="tools" style="margin-bottom:4px">
- <input id="requestInput" class="artist-search" style="flex:1;min-width:220px" type="url" inputmode="url" placeholder="https://open.spotify.com/track/…" aria-label="Spotify track or album link">
+ <input id="requestInput" class="artist-search" style="flex:1;min-width:220px" type="url" inputmode="url" placeholder="Spotify song, album or playlist link…" aria-label="Spotify track, album or playlist link">
  <button type="submit" class="home-btn">Add request</button>
 </form>
 <p id="requestMsg" class="landing-msg" role="alert" hidden></p>
 </section>
 <section class="card" style="margin-top:14px">
-<div class="album-head"><div><h3>Requested songs</h3><div class="hint" id="reqGridHint" style="margin-bottom:0">—</div></div><div style="display:flex;gap:8px"><button id="reqSortToggle" class="home-btn icon-btn" type="button" title="Reverse order" aria-label="Reverse order"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button><button id="reqRefresh" class="home-btn" type="button">Refresh</button></div></div>
+<div class="album-head"><div><h3>Requests</h3><div class="hint" id="reqGridHint" style="margin-bottom:0">—</div></div><div style="display:flex;gap:8px"><button id="reqSortToggle" class="home-btn icon-btn" type="button" title="Reverse order" aria-label="Reverse order"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button><button id="reqRefresh" class="home-btn" type="button">Refresh</button></div></div>
 <div id="reqGrid" class="req-grid"></div>
 </section>
 </main>
@@ -518,14 +550,15 @@ body.dragging::after{content:"Drop your ratings JSON to import";position:fixed;i
 
 <nav class="mnav" aria-label="Main navigation">
 <button type="button" data-go="home" class="active"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Home</button>
-<button type="button" data-go="top"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>Top Songs</button>
+<button type="button" data-go="top"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>Top</button>
 <button type="button" data-go="recent"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Recent</button>
+<button type="button" data-go="playlists"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h11M4 11h11M4 16h6"/><circle cx="17.5" cy="17" r="2.5"/><path d="M20 17V8l-3 1"/></svg>Playlists</button>
 <button type="button" data-go="request"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l11-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/><path d="M20 3v5M22.5 5.5h-5" stroke-width="2"/></svg>Request</button>
 <button type="button" data-go="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>Search</button>
 </nav>
 
 <script>
-let rawTracks=[],tracks=[],artists=new Map(),currentArtist="",currentAlbum=0,dedupeOn=true,dupeCount=0,sourceName="";
+let rawPlaylists=[],playlists=[],currentPlaylist="",rawTracks=[],tracks=[],artists=new Map(),currentArtist="",currentAlbum=0,dedupeOn=true,dupeCount=0,sourceName="";
 const RATINGS=[0,.5,1,1.5,2,2.5,3,3.5,4,4.5,5];
 let MIN_ALBUM_SONGS=3; // releases below this are not treated as albums
 // one fixed color per rating value, so slices and legend always match
@@ -620,6 +653,7 @@ function applyData(){
  document.body.dataset.state=tracks.length?"ready":"empty";
  if(tracks.length)setLandingMsg("");
  buildArtists();
+ buildPlaylists();
  refreshRequestedAgainstLibrary();
 }
 function setLandingMsg(text){landingMsg.textContent=text;landingMsg.hidden=!text}
@@ -778,8 +812,8 @@ featuredBody.addEventListener("click",e=>{
  if(a)showArtist(a.dataset.artist);
 });
 
-const PAGES=["homePage","artistPage","topPage","recentPage","requestPage"];
-const NAV_BTNS=["homeBtn","topBtn","recentBtn","requestBtn"];
+const PAGES=["homePage","artistPage","topPage","recentPage","playlistsPage","playlistPage","requestPage"];
+const NAV_BTNS=["homeBtn","topBtn","recentBtn","playlistsBtn","requestBtn"];
 function pageChanged(page){
  document.querySelectorAll(".mnav [data-go]").forEach(b=>b.classList.toggle("active",b.dataset.go===page));
  window.scrollTo(0,0);
@@ -1398,6 +1432,7 @@ document.querySelector(".mnav").addEventListener("click",e=>{
  if(b.dataset.go==="home")homeBtn.click();
  else if(b.dataset.go==="top")topBtn.click();
  else if(b.dataset.go==="recent")recentBtn.click();
+ else if(b.dataset.go==="playlists")playlistsBtn.click();
  else if(b.dataset.go==="request")requestBtn.click();
  else{window.scrollTo(0,0);artistSearch.focus()}
 });
@@ -1458,6 +1493,7 @@ function parseRatings(parsed){
  if(!data)throw new Error("JSON is valid, but it is not a ratings export.");
  const next=flatten(data);
  if(!next.length)throw new Error("JSON contained no rated tracks.");
+ rawPlaylists=parsePlaylists(parsed);
  return next;
 }
 function setSource(msg){dataSource.textContent=msg}
@@ -1643,7 +1679,7 @@ fileInput.addEventListener("change",e=>{
 });
 window.addEventListener("resize",()=>{
  if(!artistSuggest.hidden)sgPlace();
- if(!artistPage.classList.contains("hidden"))renderArtist();else if(!homePage.classList.contains("hidden"))drawDecades(homeDecadeChart,tracks);
+ if(!artistPage.classList.contains("hidden"))renderArtist();else if(!playlistPage.classList.contains("hidden"))renderPlaylist();else if(!homePage.classList.contains("hidden"))drawDecades(homeDecadeChart,tracks);
 });
 importBtn.addEventListener("click",()=>fileInput.click());
 // drop a .json file anywhere on the page to import it
@@ -1655,8 +1691,95 @@ window.addEventListener("drop",e=>{
  e.preventDefault();document.body.classList.remove("dragging");
  loadRatingsFile(e.dataTransfer.files?.[0]);
 });
-/* ---- Request form: only accepts real Spotify track/album links ---- */
-const SPOTIFY_LINK_RE=/^https:\/\/open\.spotify\.com\/(?:intl-[a-z]{2}\/)?(track|album)\/([A-Za-z0-9]{22})(?:[/?].*)?$/i;
+/* ---- Playlists: rated as a whole in the plugin; the export carries each one's track list, and
+   the song average is worked out here by matching those tracks against the song ratings ---- */
+function parsePlaylists(parsed){
+ const arr=Array.isArray(parsed?.playlists)?parsed.playlists:[],out=[];
+ for(const p of arr){
+  const m=String(p?.uri||"").match(/^spotify:playlist:([A-Za-z0-9]+)$/),rating=Number(p?.rating);
+  if(!m||p.rating==null||!Number.isFinite(rating))continue;
+  out.push({id:m[1],uri:"spotify:playlist:"+m[1],url:"https://open.spotify.com/playlist/"+m[1],
+   name:String(p.name||"").trim()||"Untitled playlist",owner:String(p.owner||"").trim(),
+   image:img(p.images)||spotifyImageUrl(p.image),rating,ratedAt:p.ratedAt??null,
+   tracks:(Array.isArray(p.tracks)?p.tracks:[]).filter(t=>t&&typeof t.uri==="string")});
+ }
+ return out;
+}
+function buildPlaylists(){
+ // exact Spotify URI first; otherwise the same title + first artist (covers other releases of the song)
+ const byUri=new Map(),byKey=new Map();
+ const better=(m,k,t)=>{const c=m.get(k);if(!c||t.rating>c.rating)m.set(k,t)};
+ for(const t of rawTracks){
+  if(t.uri)better(byUri,t.uri,t);
+  const k=songKey(t);if(k)better(byKey,k,t);
+ }
+ playlists=rawPlaylists.map(p=>{
+  const seen=new Set(),hits=[];
+  for(const pt of p.tracks){
+   let hit=byUri.get(pt.uri);
+   if(!hit){const k=songKey({name:pt.name,artists:pt.artists,mainArtist:pt.artists?.[0]?.name});if(k)hit=byKey.get(k)}
+   if(hit&&!seen.has(hit)){seen.add(hit);hits.push(hit)}
+  }
+  const cover=p.image||img(hits.find(h=>img(h.album?.images))?.album?.images);
+  return {...p,hits,total:p.tracks.length,average:avg(hits),cover};
+ });
+ renderPlaylists();
+ if(!playlistPage.classList.contains("hidden"))renderPlaylist();
+}
+const plSorters={
+ rating:(a,b)=>b.rating-a.rating||byAlpha(a.name,b.name),
+ avg:(a,b)=>b.average-a.average||byAlpha(a.name,b.name),
+ recent:(a,b)=>(Number(b.ratedAt)||0)-(Number(a.ratedAt)||0)||byAlpha(a.name,b.name),
+ name:(a,b)=>byAlpha(a.name,b.name)
+};
+function playlistCard(p){
+ const sub=p.hits.length?`${p.hits.length} of ${p.total} rated · avg ${fmt(p.average)}`:`${p.total} song${p.total==1?"":"s"}`;
+ return `<div class="pl-card" data-pl="${esc(p.uri)}" role="button" tabindex="0">
+  <div class="pl-art">${p.cover?`<img src="${esc(p.cover)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`:""}</div>
+  <div><div class="pl-title" title="${esc(p.name)}">${esc(p.name)}</div><div class="pl-sub">${esc(sub)}</div></div>
+  <div class="pl-rate"><span>${p.rating}</span>${stars(p.rating,"sm")}</div></div>`;
+}
+function renderPlaylists(){
+ plCount.textContent=playlists.length.toLocaleString();
+ const list=[...playlists].sort(plSorters[plSort.value]||plSorters.rating);
+ plGrid.innerHTML=list.map(playlistCard).join("")||'<div class="empty">No rated playlists yet.</div>';
+}
+function renderPlaylist(){
+ const p=playlists.find(x=>x.uri===currentPlaylist);
+ if(!p){showPlaylists();return}
+ const n=p.hits.length;
+ plName.textContent=p.name;
+ plMeta.textContent=[p.owner&&`by ${p.owner}`,`${p.total.toLocaleString()} song${p.total==1?"":"s"}`].filter(Boolean).join(" · ");
+ setImage(plCover,p.cover);
+ plOpen.href=p.url;
+ plAvg.textContent=n?fmt(p.average):"—";plAvgStars.innerHTML=n?stars(p.average,"lg"):"";
+ plRating.textContent=p.rating;plRatingStars.innerHTML=stars(p.rating);
+ plSongs.textContent=p.total.toLocaleString();
+ plRated.textContent=n.toLocaleString();
+ plCoverage.textContent=p.total?Math.round(n/p.total*100)+"%":"—";
+ drawPie(plChart,dist(p.hits),plLegend);
+ plSongsHint.textContent=n?`${n} rated${p.total>n?` · ${p.total-n} not rated yet`:""}`:"None of this playlist's songs are rated yet.";
+ plSongList.innerHTML=[...p.hits].sort((a,b)=>b.rating-a.rating||byName(a,b)).map((t,i)=>songRow(t,i,true)).join("")||'<div class="empty">No rated songs.</div>';
+}
+function showPlaylists(){
+ showPage("playlistsPage","playlistsBtn");renderPlaylists();pageChanged("playlists");
+}
+function showPlaylist(uri){
+ if(!playlists.some(p=>p.uri===uri))return;
+ currentPlaylist=uri;showPage("playlistPage","playlistsBtn");renderPlaylist();pageChanged("playlists");
+}
+playlistsBtn.addEventListener("click",()=>{currentArtist="";showPlaylists()});
+plBack.addEventListener("click",showPlaylists);
+plSort.addEventListener("change",renderPlaylists);
+plGrid.addEventListener("click",e=>{const c=e.target.closest("[data-pl]");if(c)showPlaylist(c.dataset.pl)});
+plGrid.addEventListener("keydown",e=>{
+ if(e.key!=="Enter"&&e.key!==" ")return;
+ const c=e.target.closest("[data-pl]");if(c){e.preventDefault();showPlaylist(c.dataset.pl)}
+});
+plSongList.addEventListener("click",e=>{const a=e.target.closest("[data-artist]");if(a)showArtist(a.dataset.artist)});
+
+/* ---- Request form: only accepts real Spotify track, album or playlist links ---- */
+const SPOTIFY_LINK_RE=/^https:\/\/open\.spotify\.com\/(?:intl-[a-z]{2}\/)?(track|album|playlist)\/([A-Za-z0-9]{22})(?:[/?].*)?$/i;
 // form.url  = the form's viewform link
 // form.entry = the entry.NNNNNNNNN id for its link/URL question
 const GOOGLE_FORM={url:"https://docs.google.com/forms/d/e/1FAIpQLSenrjCDWNTsr0im9weMvAPJm-_n07NiTmIM2uI_8ffW7kWH9w/viewform",entry:"entry.1809868485"};
@@ -1694,9 +1817,9 @@ requestForm.addEventListener("submit",async e=>{
  e.preventDefault();
  const raw=requestInput.value.trim(),m=raw.match(SPOTIFY_LINK_RE);
  if(!raw){setRequestMsg("Paste a Spotify link first.");return}
- if(!m){setRequestMsg("That's not a Spotify track or album link.");return}
+ if(!m){setRequestMsg("That's not a Spotify song, album or playlist link.");return}
  const type=m[1].toLowerCase(),id=m[2],url=`https://open.spotify.com/${type}/${id}`;
- if(submittedUrls.has(url)){setRequestMsg("You've already requested this song.");return}
+ if(submittedUrls.has(url)){setRequestMsg("You've already requested this.");return}
  if(!GOOGLE_FORM.url||!GOOGLE_FORM.entry){setRequestMsg("Request form isn't set up yet.");return}
  // Wait for the "already rated" list to actually be loaded (not just kicked off) before
  // letting the submit through, so a request fired the instant the page opens can't slip
@@ -1705,7 +1828,7 @@ requestForm.addEventListener("submit",async e=>{
  await ensureCommunityLoaded();
  if(allRatedUrls().has(url)){
   requestSubmitBtn.disabled=false;requestSubmitBtn.textContent="Add request";
-  setRequestMsg("Song already rated");return;
+  setRequestMsg(type==="playlist"?"Playlist already rated":"Song already rated");return;
  }
  requestSubmitBtn.textContent="Sending…";
  const ok=await submitToGoogleForm(url);
@@ -1783,7 +1906,7 @@ async function fetchSpotifyMeta(item){
  return data;
 }
 function reqCardShell(item,i){
- const kind=item.type==="album"?"Album":"Song";
+ const kind=item.type==="album"?"Album":item.type==="playlist"?"Playlist":"Song";
  return `<a class="req-card req-loading" id="reqc-${i}" href="${esc(item.url)}" target="_blank" rel="noopener">
   <span class="req-kind">${kind}</span>${item.count>1?`<span class="req-count">×${item.count}</span>`:""}
   <div class="vinyl"><div class="vinyl-hole"></div><div class="vinyl-label skel"></div></div>
@@ -1796,6 +1919,7 @@ let lastCommunityItems=[],allDedupedItems=[],sheetRatedUrls=new Set(),reqSortDir
 function libraryRatedUrls(){
  const s=new Set();
  for(const t of rawTracks){const u=trackUrl(t);if(u)s.add(u)}
+ for(const p of rawPlaylists)s.add(p.url); // playlists rated as a whole drop out too
  return s;
 }
 // Album-type requests don't carry a Spotify album id we can match against the ratings export
